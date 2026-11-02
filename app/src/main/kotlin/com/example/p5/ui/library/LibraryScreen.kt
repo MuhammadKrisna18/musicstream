@@ -26,6 +26,7 @@ import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.DownloadDone
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -57,7 +58,9 @@ fun LibraryScreen(
     libraryViewModel: LibraryViewModel,
     playerState: PlayerState,
     onSongClick: (Song) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    currentVersion: String = "1.0",
+    onCheckForUpdate: () -> Unit = {}
 ) {
     val uiState by libraryViewModel.uiState.collectAsStateWithLifecycle()
     val downloadedSongs = uiState.downloadedSongs
@@ -72,7 +75,8 @@ fun LibraryScreen(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
                 Text(
@@ -85,6 +89,20 @@ fun LibraryScreen(
                     text = "${downloadedSongs.size} tracks available offline",
                     color = TextSecondary,
                     fontSize = 13.sp
+                )
+            }
+
+            IconButton(
+                onClick = onCheckForUpdate,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(DarkSurfaceVariant)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.SystemUpdate,
+                    contentDescription = "Cek Pembaruan",
+                    tint = OrangePrimary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

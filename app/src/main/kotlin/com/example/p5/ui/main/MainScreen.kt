@@ -40,11 +40,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.p5.ui.common.AppViewModelProvider
 import com.example.p5.ui.components.FullPlayerSheet
 import com.example.p5.ui.components.MiniPlayer
+import com.example.p5.ui.components.UpdateDialog
 import com.example.p5.ui.library.LibraryScreen
 import com.example.p5.ui.library.LibraryViewModel
 import com.example.p5.ui.player.PlayerViewModel
 import com.example.p5.ui.search.SearchScreen
 import com.example.p5.ui.search.SearchViewModel
+import com.example.p5.ui.update.UpdateViewModel
 import com.example.p5.ui.theme.BlackBackground
 import com.example.p5.ui.theme.DarkSurface
 import com.example.p5.ui.theme.OrangePrimary
@@ -56,10 +58,12 @@ fun MainScreen(
     searchViewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
     playerViewModel: PlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     libraryViewModel: LibraryViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    updateViewModel: UpdateViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
 ) {
     val playerState by playerViewModel.playerState.collectAsStateWithLifecycle()
     val libraryUiState by libraryViewModel.uiState.collectAsStateWithLifecycle()
+    val updateUiState by updateViewModel.uiState.collectAsStateWithLifecycle()
 
     var selectedTab by remember { mutableIntStateOf(0) }
     var isFullPlayerVisible by remember { mutableStateOf(false) }
@@ -79,6 +83,13 @@ fun MainScreen(
         libraryUiState.message?.let { message ->
             snackbarHostState.showSnackbar(message)
             libraryViewModel.clearMessage()
+        }
+    }
+
+    LaunchedEffect(updateUiState.userMessage) {
+        updateUiState.userMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            updateViewModel.clearUserMessage()
         }
     }
 
@@ -182,6 +193,8 @@ fun MainScreen(
                         libraryViewModel = libraryViewModel,
                         playerState = playerState,
                         onSongClick = { song -> playerViewModel.playSong(song) },
+                        currentVersion = updateViewModel.currentVersionName,
+                        onCheckForUpdate = { updateViewModel.checkForUpdates(isManualCheck = true) },
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -193,6 +206,18 @@ fun MainScreen(
                     onTogglePlayPause = playerViewModel::togglePlayPause,
                     onSeekTo = playerViewModel::seekTo,
                     onDismiss = { isFullPlayerVisible = false }
+                )
+            }
+
+            if (updateUiState.showDialog && updateUiState.updateInfo != null) {
+                UpdateDialog(
+                    updateInfo = updateUiState.updateInfo!!,
+                    isDownloading = updateUiState.isDownloading,
+                    downloadProgress = updateUiState.downloadProgress,
+                    downloadedFile = updateUiState.downloadedApkFile,
+                    onDismiss = updateViewModel::dismissDialog,
+                    onStartDownload = updateViewModel::startDownload,
+                    onInstall = updateViewModel::installDownloadedApk
                 )
             }
         }

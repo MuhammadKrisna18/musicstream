@@ -6,6 +6,8 @@ import com.example.p5.data.local.MusicDatabaseHelper
 import com.example.p5.data.remote.YouTubeNativeDataSource
 import com.example.p5.data.repository.DownloadRepositoryImpl
 import com.example.p5.data.repository.MusicRepositoryImpl
+import com.example.p5.data.repository.UpdateRepositoryImpl
+import com.example.p5.domain.repository.UpdateRepository
 import com.example.p5.domain.downloader.MusicDownloader
 import com.example.p5.domain.player.AudioPlayer
 import com.example.p5.domain.repository.DownloadRepository
@@ -39,6 +41,7 @@ interface AppContainer {
 
     val audioPlayer: AudioPlayer
     val musicPlayerManager: MusicPlayerManager
+    val updateRepository: UpdateRepository
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -110,5 +113,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val musicPlayerManager: MusicPlayerManager by lazy {
         MusicPlayerManager(audioPlayer, getStreamAudioUseCase, downloadRepository)
+    }
+
+    override val updateRepository: UpdateRepository by lazy {
+        UpdateRepositoryImpl(context, okHttpClient)
     }
 }

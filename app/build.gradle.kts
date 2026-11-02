@@ -12,13 +12,26 @@ android {
     minSdk = 24
     targetSdk = 36
     versionCode = 1
-    versionName = "1.0"
+    versionName = "1.0.0"
+  }
+
+  signingConfigs {
+    create("release") {
+      storeFile = file("keystore/release.jks")
+      storePassword = "musicstream123"
+      keyAlias = "musicstream"
+      keyPassword = "musicstream123"
+    }
   }
 
   buildTypes {
     release {
       isMinifyEnabled = false
+      signingConfig = signingConfigs.getByName("release")
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+    }
+    debug {
+      signingConfig = signingConfigs.getByName("release")
     }
   }
   compileOptions {
@@ -28,7 +41,7 @@ android {
   buildFeatures {
     compose = true
     aidl = false
-    buildConfig = false
+    buildConfig = true
     shaders = false
   }
 

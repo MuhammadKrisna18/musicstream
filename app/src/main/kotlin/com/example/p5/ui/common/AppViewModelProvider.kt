@@ -8,6 +8,7 @@ import com.example.p5.MusicApplication
 import com.example.p5.ui.library.LibraryViewModel
 import com.example.p5.ui.player.PlayerViewModel
 import com.example.p5.ui.search.SearchViewModel
+import com.example.p5.ui.update.UpdateViewModel
 
 object AppViewModelProvider {
     val Factory: ViewModelProvider.Factory = viewModelFactory {
@@ -29,6 +30,11 @@ object AppViewModelProvider {
                 musicApplication().container.getDownloadedSongsUseCase,
                 musicApplication().container.downloadSongUseCase,
                 musicApplication().container.deleteDownloadedSongUseCase
+            )
+        }
+        initializer {
+            UpdateViewModel(
+                musicApplication().container.updateRepository
             )
         }
     }
