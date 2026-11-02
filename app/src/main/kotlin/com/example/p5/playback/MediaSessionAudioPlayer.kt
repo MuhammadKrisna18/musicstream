@@ -9,7 +9,9 @@ import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.example.p5.domain.model.AudioStream
+import com.example.p5.domain.model.LyricsData
 import com.example.p5.domain.model.PlayerState
+import com.example.p5.domain.model.RepeatMode
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.player.AudioPlayer
 import com.google.common.util.concurrent.ListenableFuture
@@ -34,6 +36,7 @@ class MediaSessionAudioPlayer(
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private var mediaController: MediaController? = null
     private var pendingPlay: Pair<Song, AudioStream>? = null
+    private var onPlaybackEndedListener: (() -> Unit)? = null
 
     private val _playerState = MutableStateFlow(PlayerState())
     override val playerState: StateFlow<PlayerState> = _playerState.asStateFlow()
@@ -91,11 +94,56 @@ class MediaSessionAudioPlayer(
                     Player.STATE_ENDED -> {
                         _playerState.update { it.copy(isPlaying = false, currentPositionMs = 0L) }
                         stopProgressTracker()
+                        onPlaybackEndedListener?.invoke()
                     }
                     Player.STATE_IDLE -> _playerState.update { it.copy(isBuffering = false) }
                 }
             }
         })
+    }
+
+    override fun setOnPlaybackEndedListener(listener: () -> Unit) {
+        this.onPlaybackEndedListener = listener
+    }
+
+    override fun updateQueueState(
+        queue: List<Song>,
+        currentIndex: Int,
+        isShuffleEnabled: Boolean,
+        repeatMode: RepeatMode
+    ) {
+        _playerState.update {
+            it.copy(
+                queue = queue,
+                currentQueueIndex = currentIndex,
+                isShuffleEnabled = isShuffleEnabled,
+                repeatMode = repeatMode
+            )
+        }
+    }
+
+    override fun updateSleepTimerState(secondsRemaining: Long?, isEndOfTrack: Boolean) {
+        _playerState.update {
+            it.copy(
+                sleepTimerSecondsRemaining = secondsRemaining,
+                isSleepTimerEndOfTrack = isEndOfTrack
+            )
+        }
+    }
+
+    override fun updateLyricsState(lyrics: LyricsData?, isLoading: Boolean) {
+        _playerState.update {
+            it.copy(
+                currentLyrics = lyrics,
+                isLyricsLoading = isLoading
+            )
+        }
+    }
+
+    override fun updateFavoriteState(isFavorite: Boolean) {
+        _playerState.update {
+            it.copy(isCurrentSongFavorite = isFavorite)
+        }
     }
 
     override fun prepareSong(song: Song) {

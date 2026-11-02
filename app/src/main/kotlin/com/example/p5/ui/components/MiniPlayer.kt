@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +48,7 @@ import com.example.p5.ui.theme.DarkSurface
 import com.example.p5.ui.theme.DarkSurfaceVariant
 import com.example.p5.ui.theme.OrangeDark
 import com.example.p5.ui.theme.OrangePrimary
+import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
 
@@ -55,7 +57,8 @@ fun MiniPlayer(
     playerState: PlayerState,
     onTogglePlayPause: () -> Unit,
     onOpenFullPlayer: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSkipNext: () -> Unit = {}
 ) {
     val currentSong = playerState.currentSong
 
@@ -166,6 +169,19 @@ fun MiniPlayer(
                                 modifier = Modifier.size(22.dp)
                             )
                         }
+                    }
+
+                    IconButton(
+                        onClick = onSkipNext,
+                        enabled = playerState.hasNext,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.SkipNext,
+                            contentDescription = "Berikutnya",
+                            tint = if (playerState.hasNext) TextPrimary else TextMuted,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 }
             }

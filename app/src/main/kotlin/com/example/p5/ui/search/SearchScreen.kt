@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -100,7 +101,8 @@ fun SearchScreen(
     downloadedIds: Set<String>,
     onSongClick: (Song) -> Unit,
     onDownloadClick: (Song) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) }
 ) {
     val query by searchViewModel.query.collectAsStateWithLifecycle()
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -338,17 +340,17 @@ fun SearchScreen(
                                             LazyRow(
                                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
                                             ) {
-                                                items(
+                                                itemsIndexed(
                                                     items = section.tracks,
-                                                    key = { it.id }
-                                                ) { song ->
+                                                    key = { _, item -> item.id }
+                                                ) { index, song ->
                                                     TrendingTrackCard(
                                                         song = song,
                                                         isPlaying = playerState.isPlaying,
                                                         isSelected = playerState.currentSong?.id == song.id,
                                                         isDownloaded = downloadedIds.contains(song.id),
                                                         isDownloading = downloadingIds.contains(song.id),
-                                                        onSongClick = onSongClick,
+                                                        onSongClick = { onPlayQueue(section.tracks, index) },
                                                         onDownloadClick = onDownloadClick
                                                     )
                                                 }
@@ -415,10 +417,10 @@ fun SearchScreen(
                         contentPadding = PaddingValues(bottom = 100.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        items(
+                        itemsIndexed(
                             items = state.songs,
-                            key = { it.id }
-                        ) { song ->
+                            key = { _, item -> item.id }
+                        ) { index, song ->
                             val isSelected = playerState.currentSong?.id == song.id
                             val isDownloaded = downloadedIds.contains(song.id)
                             val isDownloading = downloadingIds.contains(song.id)
@@ -429,7 +431,7 @@ fun SearchScreen(
                                 isSelected = isSelected,
                                 isDownloaded = isDownloaded,
                                 isDownloading = isDownloading,
-                                onClick = { onSongClick(song) },
+                                onClick = { onPlayQueue(state.songs, index) },
                                 onDownloadClick = { onDownloadClick(song) }
                             )
                         }

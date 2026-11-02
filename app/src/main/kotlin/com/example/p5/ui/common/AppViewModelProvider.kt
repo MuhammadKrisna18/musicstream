@@ -29,7 +29,8 @@ object AppViewModelProvider {
             LibraryViewModel(
                 musicApplication().container.getDownloadedSongsUseCase,
                 musicApplication().container.downloadSongUseCase,
-                musicApplication().container.deleteDownloadedSongUseCase
+                musicApplication().container.deleteDownloadedSongUseCase,
+                musicApplication().container.favoriteRepository
             )
         }
         initializer {

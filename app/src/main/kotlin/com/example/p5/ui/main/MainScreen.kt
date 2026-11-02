@@ -105,7 +105,8 @@ fun MainScreen(
                 MiniPlayer(
                     playerState = playerState,
                     onTogglePlayPause = playerViewModel::togglePlayPause,
-                    onOpenFullPlayer = { isFullPlayerVisible = true }
+                    onOpenFullPlayer = { isFullPlayerVisible = true },
+                    onSkipNext = playerViewModel::playNext
                 )
 
                 NavigationBar(
@@ -184,6 +185,7 @@ fun MainScreen(
                         downloadingIds = libraryUiState.downloadingIds,
                         downloadedIds = downloadedIds,
                         onSongClick = { song -> playerViewModel.playSong(song) },
+                        onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
                         onDownloadClick = { song -> libraryViewModel.downloadSong(song) },
                         modifier = Modifier.fillMaxSize()
                     )
@@ -193,6 +195,7 @@ fun MainScreen(
                         libraryViewModel = libraryViewModel,
                         playerState = playerState,
                         onSongClick = { song -> playerViewModel.playSong(song) },
+                        onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
                         currentVersion = updateViewModel.currentVersionName,
                         onCheckForUpdate = { updateViewModel.checkForUpdates(isManualCheck = true) },
                         modifier = Modifier.fillMaxSize()
@@ -205,6 +208,16 @@ fun MainScreen(
                     playerState = playerState,
                     onTogglePlayPause = playerViewModel::togglePlayPause,
                     onSeekTo = playerViewModel::seekTo,
+                    onSkipNext = playerViewModel::playNext,
+                    onSkipPrevious = playerViewModel::playPrevious,
+                    onToggleShuffle = playerViewModel::toggleShuffle,
+                    onToggleRepeatMode = playerViewModel::toggleRepeatMode,
+                    onPlayQueueIndex = playerViewModel::playQueueIndex,
+                    onSetSleepTimerMinutes = playerViewModel::setSleepTimerMinutes,
+                    onSetSleepTimerEndOfTrack = playerViewModel::setSleepTimerEndOfTrack,
+                    onCancelSleepTimer = playerViewModel::cancelSleepTimer,
+                    onRetryFetchLyrics = playerViewModel::retryFetchLyrics,
+                    onToggleFavorite = playerViewModel::toggleFavoriteCurrentSong,
                     onDismiss = { isFullPlayerVisible = false }
                 )
             }

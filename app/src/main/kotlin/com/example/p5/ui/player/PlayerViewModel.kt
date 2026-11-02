@@ -12,8 +12,32 @@ class PlayerViewModel(
 
     val playerState: StateFlow<PlayerState> = musicPlayerManager.playerState
 
+    fun playQueue(songs: List<Song>, startIndex: Int = 0) {
+        musicPlayerManager.playQueue(songs, startIndex)
+    }
+
     fun playSong(song: Song) {
         musicPlayerManager.playSong(song)
+    }
+
+    fun playNext() {
+        musicPlayerManager.playNext()
+    }
+
+    fun playPrevious() {
+        musicPlayerManager.playPrevious()
+    }
+
+    fun toggleShuffle() {
+        musicPlayerManager.toggleShuffle()
+    }
+
+    fun toggleRepeatMode() {
+        musicPlayerManager.toggleRepeatMode()
+    }
+
+    fun playQueueIndex(index: Int) {
+        musicPlayerManager.playQueueIndex(index)
     }
 
     fun togglePlayPause() {
@@ -22,6 +46,26 @@ class PlayerViewModel(
 
     fun seekTo(positionMs: Long) {
         musicPlayerManager.seekTo(positionMs)
+    }
+
+    fun setSleepTimerMinutes(minutes: Int) {
+        musicPlayerManager.setSleepTimerMinutes(minutes)
+    }
+
+    fun setSleepTimerEndOfTrack() {
+        musicPlayerManager.setSleepTimerEndOfTrack()
+    }
+
+    fun cancelSleepTimer() {
+        musicPlayerManager.cancelSleepTimer()
+    }
+
+    fun retryFetchLyrics() {
+        musicPlayerManager.retryFetchLyrics()
+    }
+
+    fun toggleFavoriteCurrentSong() {
+        musicPlayerManager.toggleFavoriteCurrentSong()
     }
 
     fun stop() {

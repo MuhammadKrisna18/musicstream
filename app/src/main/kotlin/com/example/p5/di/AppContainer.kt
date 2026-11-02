@@ -5,8 +5,12 @@ import com.example.p5.data.downloader.MusicDownloaderImpl
 import com.example.p5.data.local.MusicDatabaseHelper
 import com.example.p5.data.remote.YouTubeNativeDataSource
 import com.example.p5.data.repository.DownloadRepositoryImpl
+import com.example.p5.data.repository.FavoriteRepositoryImpl
+import com.example.p5.data.repository.LyricsRepositoryImpl
 import com.example.p5.data.repository.MusicRepositoryImpl
 import com.example.p5.data.repository.UpdateRepositoryImpl
+import com.example.p5.domain.repository.FavoriteRepository
+import com.example.p5.domain.repository.LyricsRepository
 import com.example.p5.domain.repository.UpdateRepository
 import com.example.p5.domain.downloader.MusicDownloader
 import com.example.p5.domain.player.AudioPlayer
@@ -42,6 +46,8 @@ interface AppContainer {
     val audioPlayer: AudioPlayer
     val musicPlayerManager: MusicPlayerManager
     val updateRepository: UpdateRepository
+    val lyricsRepository: LyricsRepository
+    val favoriteRepository: FavoriteRepository
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -111,8 +117,16 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         MediaSessionAudioPlayer(context)
     }
 
+    override val lyricsRepository: LyricsRepository by lazy {
+        LyricsRepositoryImpl(okHttpClient)
+    }
+
+    override val favoriteRepository: FavoriteRepository by lazy {
+        FavoriteRepositoryImpl(dbHelper)
+    }
+
     override val musicPlayerManager: MusicPlayerManager by lazy {
-        MusicPlayerManager(audioPlayer, getStreamAudioUseCase, downloadRepository)
+        MusicPlayerManager(audioPlayer, getStreamAudioUseCase, downloadRepository, lyricsRepository, favoriteRepository)
     }
 
     override val updateRepository: UpdateRepository by lazy {
