@@ -44,58 +44,25 @@ class YouTubeNativeDataSource(
     @Volatile
     private var cachedHomeFeed: HomeFeed? = null
 
-    private val sectionVariations = mapOf(
-        "trending" to listOf(
-            SectionQuery("Trending Now", "Lagu paling populer dan viral saat ini", "trending music hits 2026"),
-            SectionQuery("Global Viral Hits", "Hits yang sedang meledak di seluruh dunia", "viral songs billboard global hits 2026"),
-            SectionQuery("Top Streaming Hits", "Lagu paling banyak didengarkan minggu ini", "top music official video trending 2026"),
-            SectionQuery("TikTok Viral Sounds", "Sound dan lagu terpopuler di media sosial", "trending tiktok songs viral music 2026")
-        ),
-        "indonesia_top" to listOf(
-            SectionQuery("Top Hits Indonesia", "Musik terfavorit dan viral di Indonesia", "top hits indonesia lagu viral 2026"),
-            SectionQuery("Populer Tanah Air", "Koleksi hits pop terbaik musisi Indonesia", "lagu pop indonesia terbaru hits viral"),
-            SectionQuery("Indie Senja Indonesia", "Lagu indie lokal yang syahdu dan bermakna", "indie pop indonesia hits playlist"),
-            SectionQuery("Akustik Hits Indonesia", "Cover akustik lagu Indonesia terfavorit", "akustik lagu indonesia hits santai")
-        ),
-        "new_releases" to listOf(
-            SectionQuery("Rilisan Terbaru", "Karya musik terbaru dari para musisi", "official music video 2026 new release"),
-            SectionQuery("Fresh Friday Music", "Lagu-lagu yang baru saja diluncurkan", "latest official music video singles 2026"),
-            SectionQuery("Lagu Baru Indonesia", "Single musik terbaru karya anak bangsa", "lagu baru indonesia official music video 2026"),
-            SectionQuery("International New Beats", "Rilisan terbaru musisi mancanegara", "new international official music video 2026")
-        ),
-        "chill_acoustic" to listOf(
-            SectionQuery("Chill & Akustik", "Teman santai dan rileks hari ini", "acoustic chill pop acoustic cover"),
-            SectionQuery("Coffee & Lofi", "Irama santai untuk menemani harimu", "lofi chill beats relaxing music study"),
-            SectionQuery("Late Night Vibes", "Lagu lembut pengantar istirahat malam", "late night acoustic chill songs peaceful"),
-            SectionQuery("Senja & Santai", "Musik syahdu pengiring waktu luang", "lagu santai sore cafe acoustic vibe")
-        ),
-        "workout_party" to listOf(
-            SectionQuery("Energy & Workout", "Semangat dengan beat cepat dan bertenaga", "edm workout motivation party hits"),
-            SectionQuery("EDM Party Hits", "Dentuman bas menghentak untuk pesta", "edm dance festival party hits 2026"),
-            SectionQuery("Gym Pump & Focus", "Bakar semangat latihanmu sekarang", "gym workout motivation music pump 2026"),
-            SectionQuery("Upbeat Dance Pop", "Lagu pop energik yang bikin semangat", "high energy upbeat pop dance music hits")
-        )
-    )
-
     private val staticMoodTags = listOf(
-        MoodTag("top_hits", "🔥 Top Hits", "Trending Music 2026"),
-        MoodTag("chill_lofi", "☕ Chill Lofi", "Lofi Chill Beats"),
-        MoodTag("workout", "⚡ Workout", "Workout Motivation Music"),
-        MoodTag("rock", "🎸 Rock Hits", "Rock Classics Hits"),
-        MoodTag("acoustic", "🌙 Acoustic", "Acoustic Pop Songs"),
-        MoodTag("jazz", "🎷 Smooth Jazz", "Smooth Jazz Instrumental"),
-        MoodTag("edm", "🎧 EDM Beats", "EDM Dance Hits")
+        MoodTag("top_hits", "🔥 Top Hits", "Lagu Trending"),
+        MoodTag("santai", "☕ Santai", "Lagu Santai"),
+        MoodTag("olah_raga", "⚡ Olah Raga", "Lagu Workout"),
+        MoodTag("rock", "🎸 Rock", "Lagu Rock"),
+        MoodTag("akustik", "🌙 Akustik", "Lagu Akustik"),
+        MoodTag("pesta", "🎉 Pesta", "Lagu Pesta"),
+        MoodTag("fokus", "🎧 Fokus", "Lagu Fokus")
     )
 
     private val staticCategories = listOf(
-        Category("top_hits", "Top Hits", "Top Hits 2026", "fire", "#FF6D00", "#D84315"),
-        Category("rock_metal", "Rock & Metal", "Rock Classics Hits", "electric_bolt", "#E65100", "#263238"),
-        Category("lofi_chill", "Lofi & Chill", "Lofi Chill Beats", "nightlife", "#FF8F00", "#3E2723"),
-        Category("pop_vibes", "Pop Vibes", "Pop Music Hits", "music_note", "#FFA000", "#E65100"),
-        Category("indie_wave", "Indie Wave", "Indie Pop Hits", "headphones", "#BF360C", "#1A237E"),
-        Category("workout_edm", "Workout & EDM", "EDM Workout Music", "bolt", "#FF5722", "#4A148C"),
-        Category("acoustic_cafe", "Acoustic Cafe", "Acoustic Pop Songs", "library_music", "#D84315", "#3E2723"),
-        Category("jazz_blues", "Jazz & Blues", "Smooth Jazz Instrumental", "graphic_eq", "#FF6D00", "#0D47A1")
+        Category("top_hits", "Top Hits", "Lagu Trending", "whatshot", "#FF6D00", "#D84315"),
+        Category("santai", "Santai & Rileks", "Lagu Santai", "nightlife", "#FF8F00", "#3E2723"),
+        Category("olah_raga", "Olah Raga & Energi", "Lagu Workout", "bolt", "#FF5722", "#4A148C"),
+        Category("pop_vibes", "Populer Indonesia", "Lagu Pop Indonesia", "music_note", "#FFA000", "#E65100"),
+        Category("indie_wave", "Indie & Senja", "Lagu Indie Indonesia", "headphones", "#BF360C", "#1A237E"),
+        Category("rock_metal", "Rock & Metal", "Lagu Rock", "electric_bolt", "#E65100", "#263238"),
+        Category("fokus_kerja", "Fokus & Belajar", "Lagu Fokus Lofi", "headphones", "#455A64", "#263238"),
+        Category("romantis", "Romantis & Cinta", "Lagu Romantis", "favorite", "#D81B60", "#4A148C")
     )
 
     suspend fun search(query: String, limit: Int = 20): List<Song> = withContext(ioDispatcher) {
@@ -181,44 +148,437 @@ class YouTubeNativeDataSource(
             return@withContext cachedHomeFeed!!
         }
 
-        val sections = coroutineScope {
-            sectionVariations.map { (key, variations) ->
-                async {
-                    val selected = variations.random()
-                    val songs = try {
-                        search(selected.query, limit = 8)
-                    } catch (e: Exception) {
-                        emptyList()
-                    }
-                    HomeSection(
-                        id = key,
-                        title = selected.title,
-                        subtitle = selected.subtitle,
-                        query = selected.query,
-                        tracks = songs
-                    )
-                }
-            }.map { it.await() }.filter { it.tracks.isNotEmpty() }
+        try {
+            val nativeFeed = fetchNativeMusicFeed()
+            if (nativeFeed.sections.isNotEmpty()) {
+                cachedHomeFeed = nativeFeed
+                return@withContext nativeFeed
+            }
+        } catch (_: Exception) {
         }
 
-        val feed = HomeFeed(
+        val fallbackFeed = loadFallbackFeed()
+        cachedHomeFeed = fallbackFeed
+        fallbackFeed
+    }
+
+    private suspend fun fetchNativeMusicFeed(): HomeFeed = coroutineScope {
+        val homeDeferred = async { runCatching { fetchBrowse("FEmusic_home") }.getOrNull() }
+        val exploreDeferred = async { runCatching { fetchBrowse("FEmusic_explore") }.getOrNull() }
+        val chartDeferred = async { runCatching { fetchBrowse("VLPL4fGSI1pDJn4lW6MJA2q37CfnraqAizqE") }.getOrNull() }
+
+        val homeJson = homeDeferred.await()
+        val exploreJson = exploreDeferred.await()
+        val chartJson = chartDeferred.await()
+
+        val sections = mutableListOf<HomeSection>()
+        var dynamicMoodTags: List<MoodTag> = emptyList()
+        var dynamicCategories: List<Category> = emptyList()
+
+        if (!homeJson.isNullOrEmpty()) {
+            val parsedHome = parseBrowseResponse(homeJson, prefixId = "home")
+            sections.addAll(parsedHome.sections)
+        }
+
+        if (!chartJson.isNullOrEmpty()) {
+            val parsedChart = parseBrowseResponse(chartJson, prefixId = "chart")
+            sections.addAll(parsedChart.sections)
+        }
+
+        if (!exploreJson.isNullOrEmpty()) {
+            val parsedExplore = parseBrowseResponse(exploreJson, prefixId = "explore")
+            sections.addAll(parsedExplore.sections)
+            if (parsedExplore.moodTags.isNotEmpty()) {
+                dynamicMoodTags = parsedExplore.moodTags
+            }
+            if (parsedExplore.categories.isNotEmpty()) {
+                dynamicCategories = parsedExplore.categories
+            }
+        }
+
+        HomeFeed(
+            sections = sections.filter { it.tracks.isNotEmpty() },
+            moodTags = if (dynamicMoodTags.isNotEmpty()) dynamicMoodTags else staticMoodTags,
+            categories = if (dynamicCategories.isNotEmpty()) dynamicCategories else staticCategories
+        )
+    }
+
+    private fun fetchBrowse(browseId: String): String {
+        val payload = JSONObject().apply {
+            put("context", JSONObject().apply {
+                put("client", JSONObject().apply {
+                    put("clientName", "WEB_REMIX")
+                    put("clientVersion", "1.20240801.01.00")
+                    put("hl", "id")
+                    put("gl", "ID")
+                })
+            })
+            put("browseId", browseId)
+        }
+
+        val request = Request.Builder()
+            .url("https://music.youtube.com/youtubei/v1/browse")
+            .addHeader("Content-Type", "application/json")
+            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
+            .addHeader("Referer", "https://music.youtube.com/")
+            .addHeader("Origin", "https://music.youtube.com")
+            .post(payload.toString().toRequestBody(jsonMediaType))
+            .build()
+
+        val response = okHttpClient.newCall(request).execute()
+        if (!response.isSuccessful) {
+            throw IOException("Browse API error: ${response.code}")
+        }
+        return response.body?.string() ?: throw IOException("Empty browse response")
+    }
+
+    private data class ParsedBrowse(
+        val sections: List<HomeSection>,
+        val moodTags: List<MoodTag>,
+        val categories: List<Category>
+    )
+
+    private fun parseBrowseResponse(jsonString: String, prefixId: String): ParsedBrowse {
+        val root = JSONObject(jsonString)
+        val sections = mutableListOf<HomeSection>()
+        val parsedMoodTags = mutableListOf<MoodTag>()
+        val parsedCategories = mutableListOf<Category>()
+
+        val contentsRoot = root.optJSONObject("contents")
+
+        // Handle playlist/chart responses (twoColumnBrowseResultsRenderer)
+        val twoCol = contentsRoot?.optJSONObject("twoColumnBrowseResultsRenderer")
+        if (twoCol != null) {
+            val secContents = twoCol.optJSONObject("secondaryContents")
+                ?.optJSONObject("sectionListRenderer")
+                ?.optJSONArray("contents") ?: JSONArray()
+
+            for (i in 0 until secContents.length()) {
+                val playlistShelf = secContents.optJSONObject(i)?.optJSONObject("musicPlaylistShelfRenderer") ?: continue
+                val items = playlistShelf.optJSONArray("contents") ?: continue
+                val tracks = mutableListOf<Song>()
+
+                for (j in 0 until items.length()) {
+                    val item = items.optJSONObject(j)?.optJSONObject("musicResponsiveListItemRenderer") ?: continue
+                    parseSongFromResponsive(item)?.let { tracks.add(it) }
+                }
+
+                if (tracks.isNotEmpty()) {
+                    sections.add(
+                        HomeSection(
+                            id = "${prefixId}_$i",
+                            title = "Top Charts Indonesia",
+                            subtitle = "Tangga lagu resmi paling populer di Indonesia",
+                            query = "Top Hits Indonesia",
+                            tracks = tracks.take(20)
+                        )
+                    )
+                }
+            }
+            return ParsedBrowse(sections, parsedMoodTags, parsedCategories)
+        }
+
+        // Handle standard browse pages (singleColumnBrowseResultsRenderer)
+        val tabs = contentsRoot
+            ?.optJSONObject("singleColumnBrowseResultsRenderer")
+            ?.optJSONArray("tabs") ?: JSONArray()
+
+        val contents = if (tabs.length() > 0) {
+            tabs.optJSONObject(0)
+                ?.optJSONObject("tabRenderer")
+                ?.optJSONObject("content")
+                ?.optJSONObject("sectionListRenderer")
+                ?.optJSONArray("contents") ?: JSONArray()
+        } else {
+            JSONArray()
+        }
+
+        for (i in 0 until contents.length()) {
+            val sectionObj = contents.optJSONObject(i) ?: continue
+            val carousel = sectionObj.optJSONObject("musicCarouselShelfRenderer") ?: continue
+            val header = carousel.optJSONObject("header")?.optJSONObject("musicCarouselShelfBasicHeaderRenderer")
+
+            val title = header?.optJSONObject("title")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+            var subtitle = header?.optJSONObject("strapline")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+
+            if (subtitle.isBlank()) {
+                subtitle = getDefaultSubtitle(title)
+            }
+
+            val items = carousel.optJSONArray("contents") ?: continue
+            val tracks = mutableListOf<Song>()
+
+            for (j in 0 until items.length()) {
+                val item = items.optJSONObject(j) ?: continue
+
+                // 1. Mood & Genre Navigation Button
+                val navButton = item.optJSONObject("musicNavigationButtonRenderer")
+                if (navButton != null) {
+                    val btnText = navButton.optJSONObject("buttonText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+                    val stripeColor = navButton.optJSONObject("solid")?.optLong("leftStripeColor", 0L) ?: 0L
+                    val colorHex = if (stripeColor != 0L) {
+                        String.format(Locale.ROOT, "#%06X", 0xFFFFFF and stripeColor.toInt())
+                    } else {
+                        "#FF6D00"
+                    }
+
+                    if (btnText.isNotBlank()) {
+                        val moodId = "mood_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
+                        if (parsedMoodTags.size < 12) {
+                            parsedMoodTags.add(MoodTag(id = moodId, label = btnText, query = "Lagu $btnText"))
+                        }
+                        if (parsedCategories.size < 12) {
+                            val icon = mapMoodToIcon(btnText)
+                            parsedCategories.add(
+                                Category(
+                                    id = moodId,
+                                    title = btnText,
+                                    query = "Lagu $btnText",
+                                    icon = icon,
+                                    startColor = colorHex,
+                                    endColor = "#1A1A1E"
+                                )
+                            )
+                        }
+                    }
+                    continue
+                }
+
+                // 2. Responsive list item (Standard YouTube Music Single Song)
+                val responsive = item.optJSONObject("musicResponsiveListItemRenderer")
+                if (responsive != null) {
+                    parseSongFromResponsive(responsive)?.let { tracks.add(it) }
+                    continue
+                }
+
+                // 3. Two-row item (Music video / single track card)
+                val twoRow = item.optJSONObject("musicTwoRowItemRenderer")
+                if (twoRow != null) {
+                    parseSongFromTwoRow(twoRow)?.let { tracks.add(it) }
+                    continue
+                }
+            }
+
+            if (tracks.isNotEmpty() && title.isNotBlank()) {
+                sections.add(
+                    HomeSection(
+                        id = "${prefixId}_$i",
+                        title = title,
+                        subtitle = subtitle,
+                        query = title,
+                        tracks = tracks
+                    )
+                )
+            }
+        }
+
+        return ParsedBrowse(sections, parsedMoodTags, parsedCategories)
+    }
+
+    private fun parseSongFromResponsive(responsive: JSONObject): Song? {
+        val flexColumns = responsive.optJSONArray("flexColumns") ?: return null
+        if (flexColumns.length() == 0) return null
+
+        val col0 = flexColumns.optJSONObject(0)?.optJSONObject("musicResponsiveListItemFlexColumnRenderer")
+        val title = col0?.optJSONObject("text")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+        if (title.isBlank()) return null
+
+        var artist = "YouTube Music"
+        var durationFormatted = "3:30"
+
+        if (flexColumns.length() > 1) {
+            val col1 = flexColumns.optJSONObject(1)?.optJSONObject("musicResponsiveListItemFlexColumnRenderer")
+            val runs = col1?.optJSONObject("text")?.optJSONArray("runs")
+            if (runs != null) {
+                val texts = mutableListOf<String>()
+                for (k in 0 until runs.length()) {
+                    val t = runs.optJSONObject(k)?.optString("text", "") ?: ""
+                    if (t.isNotBlank() && t != " • ") {
+                        texts.add(t)
+                    }
+                }
+                if (texts.isNotEmpty()) {
+                    artist = texts[0]
+                }
+                for (t in texts) {
+                    if (t.matches(Regex("^\\d{1,2}:\\d{2}$"))) {
+                        durationFormatted = t
+                    }
+                }
+            }
+        }
+
+        var videoId = responsive.optJSONObject("playlistItemData")?.optString("videoId") ?: ""
+        if (videoId.isBlank()) {
+            videoId = responsive.optJSONObject("overlay")
+                ?.optJSONObject("musicItemThumbnailOverlayRenderer")
+                ?.optJSONObject("content")
+                ?.optJSONObject("musicPlayButtonRenderer")
+                ?.optJSONObject("playNavigationEndpoint")
+                ?.optJSONObject("watchEndpoint")
+                ?.optString("videoId") ?: ""
+        }
+        if (videoId.isBlank()) return null
+
+        val thumbs = responsive.optJSONObject("thumbnail")
+            ?.optJSONObject("musicThumbnailRenderer")
+            ?.optJSONObject("thumbnail")
+            ?.optJSONArray("thumbnails")
+
+        val thumbnailUrl = if (thumbs != null && thumbs.length() > 0) {
+            thumbs.optJSONObject(thumbs.length() - 1)?.optString("url")
+                ?: "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+        } else {
+            "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+        }
+
+        val durationSec = parseDurationToSeconds(durationFormatted)
+
+        return Song(
+            id = videoId,
+            title = title,
+            artist = artist,
+            durationSeconds = durationSec,
+            durationFormatted = durationFormatted,
+            thumbnailUrl = thumbnailUrl,
+            webUrl = "https://www.youtube.com/watch?v=$videoId"
+        )
+    }
+
+    private fun parseSongFromTwoRow(twoRow: JSONObject): Song? {
+        val title = twoRow.optJSONObject("title")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+        if (title.isBlank()) return null
+
+        val subRuns = twoRow.optJSONObject("subtitle")?.optJSONArray("runs")
+        val artist = subRuns?.optJSONObject(0)?.optString("text") ?: "YouTube Music"
+
+        var videoId = twoRow.optJSONObject("navigationEndpoint")
+            ?.optJSONObject("watchEndpoint")
+            ?.optString("videoId") ?: ""
+
+        if (videoId.isBlank()) {
+            videoId = twoRow.optJSONObject("thumbnailOverlay")
+                ?.optJSONObject("musicItemThumbnailOverlayRenderer")
+                ?.optJSONObject("content")
+                ?.optJSONObject("musicPlayButtonRenderer")
+                ?.optJSONObject("playNavigationEndpoint")
+                ?.optJSONObject("watchEndpoint")
+                ?.optString("videoId") ?: ""
+        }
+
+        if (videoId.isBlank()) return null
+
+        val thumbs = twoRow.optJSONObject("thumbnailRenderer")
+            ?.optJSONObject("musicThumbnailRenderer")
+            ?.optJSONObject("thumbnail")
+            ?.optJSONArray("thumbnails")
+
+        val thumbnailUrl = if (thumbs != null && thumbs.length() > 0) {
+            thumbs.optJSONObject(thumbs.length() - 1)?.optString("url")
+                ?: "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+        } else {
+            "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+        }
+
+        return Song(
+            id = videoId,
+            title = title,
+            artist = artist,
+            durationSeconds = 210,
+            durationFormatted = "3:30",
+            thumbnailUrl = thumbnailUrl,
+            webUrl = "https://www.youtube.com/watch?v=$videoId"
+        )
+    }
+
+    private fun getDefaultSubtitle(title: String): String {
+        val lower = title.lowercase(Locale.ROOT)
+        return when {
+            lower.contains("pilihan") || lower.contains("quick") -> "Lagu rekomendasi terbaik hari ini"
+            lower.contains("trending") -> "Lagu paling populer dan viral saat ini"
+            lower.contains("video") -> "Video musik yang baru saja diluncurkan"
+            lower.contains("album") || lower.contains("single") -> "Rilisan musik terbaru musisi favorit"
+            else -> "Koleksi hits musik pilihan"
+        }
+    }
+
+    private fun mapMoodToIcon(title: String): String {
+        val lower = title.lowercase(Locale.ROOT)
+        return when {
+            lower.contains("olah raga") || lower.contains("workout") -> "bolt"
+            lower.contains("santai") || lower.contains("chill") || lower.contains("lofi") -> "nightlife"
+            lower.contains("pesta") || lower.contains("party") || lower.contains("dance") -> "nightlife"
+            lower.contains("fokus") || lower.contains("belajar") -> "headphones"
+            lower.contains("romantis") || lower.contains("cinta") -> "music_note"
+            lower.contains("rock") || lower.contains("metal") -> "electric_bolt"
+            lower.contains("jazz") || lower.contains("blues") -> "graphic_eq"
+            lower.contains("senang") || lower.contains("happy") -> "whatshot"
+            else -> "music_note"
+        }
+    }
+
+    private suspend fun loadFallbackFeed(): HomeFeed = coroutineScope {
+        val queries = listOf(
+            Triple("Trending Now", "Lagu paling populer dan viral saat ini", "top hits indonesia official video singles"),
+            Triple("Rilisan Terbaru", "Karya musik terbaru dari para musisi", "latest official music video singles"),
+            Triple("Chill & Akustik", "Teman santai dan rileks hari ini", "acoustic chill pop singles")
+        )
+
+        val sections = queries.map { (title, subtitle, q) ->
+            async {
+                val songs = try {
+                    search(q, limit = 8)
+                } catch (_: Exception) {
+                    emptyList()
+                }
+                HomeSection(
+                    id = title.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_"),
+                    title = title,
+                    subtitle = subtitle,
+                    query = q,
+                    tracks = songs
+                )
+            }
+        }.map { it.await() }.filter { it.tracks.isNotEmpty() }
+
+        HomeFeed(
             sections = sections,
             moodTags = staticMoodTags,
             categories = staticCategories
         )
-        cachedHomeFeed = feed
-        feed
     }
 
     fun getCategories(): HomeCategories {
-        return HomeCategories(
-            moodTags = staticMoodTags,
-            categories = staticCategories
-        )
+        val feed = cachedHomeFeed
+        return if (feed != null && feed.categories.isNotEmpty()) {
+            HomeCategories(
+                moodTags = feed.moodTags,
+                categories = feed.categories
+            )
+        } else {
+            HomeCategories(
+                moodTags = staticMoodTags,
+                categories = staticCategories
+            )
+        }
     }
 
     suspend fun getTrending(limit: Int = 15): List<Song> {
-        return search("top hits indonesia trending 2026", limit)
+        val feed = cachedHomeFeed ?: try {
+            getHomeFeed(refresh = false)
+        } catch (_: Exception) {
+            null
+        }
+
+        val trendingSection = feed?.sections?.firstOrNull {
+            it.title.contains("trending", ignoreCase = true) || it.title.contains("pilihan", ignoreCase = true)
+        } ?: feed?.sections?.firstOrNull()
+
+        if (trendingSection != null && trendingSection.tracks.isNotEmpty()) {
+            return trendingSection.tracks.take(limit)
+        }
+
+        return search("top hits indonesia official video singles", limit)
     }
 
     private fun parseSearchResults(jsonString: String, limit: Int): List<Song> {
@@ -257,6 +617,18 @@ class YouTubeNativeDataSource(
                     ?: ""
                 val durationFormatted = if (durationSimple.isNotEmpty()) durationSimple.replace('.', ':') else "3:30"
                 val durationSec = parseDurationToSeconds(durationFormatted)
+
+                // Filter out compilation/playlist videos (> 10 minutes or > 6 minutes with compilation keywords)
+                val isLikelyCompilation = durationSec > 600 || (durationSec > 360 && (
+                    title.contains("playlist", ignoreCase = true) ||
+                    title.contains("full album", ignoreCase = true) ||
+                    title.contains("kompilasi", ignoreCase = true) ||
+                    title.contains("kumpulan lagu", ignoreCase = true) ||
+                    title.contains("top hits spotify", ignoreCase = true) ||
+                    title.contains("nonstop", ignoreCase = true)
+                ))
+
+                if (isLikelyCompilation) continue
 
                 val thumbnails = vr.optJSONObject("thumbnail")?.optJSONArray("thumbnails")
                 val thumbnailUrl = if (thumbnails != null && thumbnails.length() > 0) {
@@ -393,10 +765,4 @@ class YouTubeNativeDataSource(
         val seconds = totalSec % 60
         return String.format(Locale.US, "%d:%02d", minutes, seconds)
     }
-
-    private data class SectionQuery(
-        val title: String,
-        val subtitle: String,
-        val query: String
-    )
 }
