@@ -5,11 +5,11 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 
 private val DarkColorScheme = darkColorScheme(
-    primary = OrangePrimary,
+    primary = ToscaPrimary,
     onPrimary = BlackBackground,
-    primaryContainer = OrangeContainer,
-    onPrimaryContainer = OrangeLight,
-    secondary = OrangeLight,
+    primaryContainer = ToscaContainer,
+    onPrimaryContainer = ToscaLight,
+    secondary = ToscaLight,
     onSecondary = BlackBackground,
     background = BlackBackground,
     onBackground = TextPrimary,

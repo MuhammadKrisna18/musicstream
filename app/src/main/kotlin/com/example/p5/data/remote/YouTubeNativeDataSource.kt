@@ -55,14 +55,14 @@ class YouTubeNativeDataSource(
     )
 
     private val staticCategories = listOf(
-        Category("top_hits", "Top Hits", "Lagu Trending", "whatshot", "#FF6D00", "#D84315"),
-        Category("santai", "Santai & Rileks", "Lagu Santai", "nightlife", "#FF8F00", "#3E2723"),
-        Category("olah_raga", "Olah Raga & Energi", "Lagu Workout", "bolt", "#FF5722", "#4A148C"),
-        Category("pop_vibes", "Populer Indonesia", "Lagu Pop Indonesia", "music_note", "#FFA000", "#E65100"),
-        Category("indie_wave", "Indie & Senja", "Lagu Indie Indonesia", "headphones", "#BF360C", "#1A237E"),
-        Category("rock_metal", "Rock & Metal", "Lagu Rock", "electric_bolt", "#E65100", "#263238"),
-        Category("fokus_kerja", "Fokus & Belajar", "Lagu Fokus Lofi", "headphones", "#455A64", "#263238"),
-        Category("romantis", "Romantis & Cinta", "Lagu Romantis", "favorite", "#D81B60", "#4A148C")
+        Category("top_hits", "Top Hits", "Lagu Trending", "whatshot", "#00E5BF", "#004D40"),
+        Category("santai", "Santai & Rileks", "Lagu Santai", "nightlife", "#00BFA5", "#121519"),
+        Category("olah_raga", "Olah Raga & Energi", "Lagu Workout", "bolt", "#1DE9B6", "#004D40"),
+        Category("pop_vibes", "Populer Indonesia", "Lagu Pop Indonesia", "music_note", "#00B0FF", "#0D47A1"),
+        Category("indie_wave", "Indie & Senja", "Lagu Indie Indonesia", "headphones", "#7C4DFF", "#1A237E"),
+        Category("rock_metal", "Rock & Metal", "Lagu Rock", "electric_bolt", "#00E5BF", "#263238"),
+        Category("fokus_kerja", "Fokus & Belajar", "Lagu Fokus Lofi", "headphones", "#64FFDA", "#263238"),
+        Category("romantis", "Romantis & Cinta", "Lagu Romantis", "favorite", "#26A69A", "#004D40")
     )
 
     suspend fun search(query: String, limit: Int = 20): List<Song> = withContext(ioDispatcher) {
@@ -319,7 +319,7 @@ class YouTubeNativeDataSource(
                     val colorHex = if (stripeColor != 0L) {
                         String.format(Locale.ROOT, "#%06X", 0xFFFFFF and stripeColor.toInt())
                     } else {
-                        "#FF6D00"
+                        "#00E5BF"
                     }
 
                     if (btnText.isNotBlank()) {

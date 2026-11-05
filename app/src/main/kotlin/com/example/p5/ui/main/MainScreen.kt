@@ -1,17 +1,20 @@
 package com.example.p5.ui.main
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DownloadDone
-import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.LibraryMusic
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -29,7 +32,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -49,9 +51,11 @@ import com.example.p5.ui.search.SearchViewModel
 import com.example.p5.ui.update.UpdateViewModel
 import com.example.p5.ui.theme.BlackBackground
 import com.example.p5.ui.theme.DarkSurface
-import com.example.p5.ui.theme.OrangePrimary
+import com.example.p5.ui.theme.DividerColor
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
+import com.example.p5.ui.theme.TextSecondary
+import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun MainScreen(
@@ -109,6 +113,14 @@ fun MainScreen(
                     onSkipNext = playerViewModel::playNext
                 )
 
+                // Elegant subtle border separator
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(DividerColor.copy(alpha = 0.5f))
+                )
+
                 NavigationBar(
                     containerColor = DarkSurface,
                     contentColor = TextPrimary,
@@ -116,21 +128,33 @@ fun MainScreen(
                 ) {
                     NavigationBarItem(
                         selected = selectedTab == 0,
-                        onClick = { selectedTab = 0 },
+                        onClick = {
+                            if (selectedTab == 0) {
+                                searchViewModel.onQueryChanged("")
+                            } else {
+                                selectedTab = 0
+                            }
+                        },
                         icon = {
                             Icon(
-                                imageVector = Icons.Rounded.Search,
-                                contentDescription = null,
+                                imageVector = Icons.Rounded.Home,
+                                contentDescription = "Home",
                                 modifier = Modifier.size(24.dp)
                             )
                         },
-                        label = { Text("Search", fontSize = 11.sp, fontWeight = FontWeight.Medium) },
+                        label = {
+                            Text(
+                                "Home",
+                                fontSize = 11.sp,
+                                fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium
+                            )
+                        },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = OrangePrimary,
-                            selectedTextColor = OrangePrimary,
-                            unselectedIconColor = TextMuted,
-                            unselectedTextColor = TextMuted,
-                            indicatorColor = Color.Transparent
+                            selectedIconColor = ToscaPrimary,
+                            selectedTextColor = ToscaPrimary,
+                            unselectedIconColor = TextSecondary,
+                            unselectedTextColor = TextSecondary,
+                            indicatorColor = ToscaPrimary.copy(alpha = 0.16f)
                         )
                     )
 
@@ -141,26 +165,39 @@ fun MainScreen(
                             BadgedBox(
                                 badge = {
                                     if (libraryUiState.downloadedSongs.isNotEmpty()) {
-                                        Badge(containerColor = OrangePrimary, contentColor = BlackBackground) {
-                                            Text("${libraryUiState.downloadedSongs.size}")
+                                        Badge(
+                                            containerColor = ToscaPrimary,
+                                            contentColor = Color.Black
+                                        ) {
+                                            Text(
+                                                "${libraryUiState.downloadedSongs.size}",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 10.sp
+                                            )
                                         }
                                     }
                                 }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Rounded.DownloadDone,
-                                    contentDescription = null,
+                                    imageVector = Icons.Rounded.LibraryMusic,
+                                    contentDescription = "Library",
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
                         },
-                        label = { Text("Library", fontSize = 11.sp, fontWeight = FontWeight.Medium) },
+                        label = {
+                            Text(
+                                "Library",
+                                fontSize = 11.sp,
+                                fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium
+                            )
+                        },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = OrangePrimary,
-                            selectedTextColor = OrangePrimary,
-                            unselectedIconColor = TextMuted,
-                            unselectedTextColor = TextMuted,
-                            indicatorColor = Color.Transparent
+                            selectedIconColor = ToscaPrimary,
+                            selectedTextColor = ToscaPrimary,
+                            unselectedIconColor = TextSecondary,
+                            unselectedTextColor = TextSecondary,
+                            indicatorColor = ToscaPrimary.copy(alpha = 0.16f)
                         )
                     )
                 }
@@ -177,29 +214,35 @@ fun MainScreen(
                 .padding(innerPadding)
                 .background(BlackBackground)
         ) {
-            when (selectedTab) {
-                0 -> {
-                    SearchScreen(
-                        searchViewModel = searchViewModel,
-                        playerState = playerState,
-                        downloadingIds = libraryUiState.downloadingIds,
-                        downloadedIds = downloadedIds,
-                        onSongClick = { song -> playerViewModel.playSong(song) },
-                        onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
-                        onDownloadClick = { song -> libraryViewModel.downloadSong(song) },
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-                1 -> {
-                    LibraryScreen(
-                        libraryViewModel = libraryViewModel,
-                        playerState = playerState,
-                        onSongClick = { song -> playerViewModel.playSong(song) },
-                        onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
-                        currentVersion = updateViewModel.currentVersionName,
-                        onCheckForUpdate = { updateViewModel.checkForUpdates(isManualCheck = true) },
-                        modifier = Modifier.fillMaxSize()
-                    )
+            Crossfade(
+                targetState = selectedTab,
+                animationSpec = tween(durationMillis = 200),
+                label = "tab_crossfade"
+            ) { tab ->
+                when (tab) {
+                    0 -> {
+                        SearchScreen(
+                            searchViewModel = searchViewModel,
+                            playerState = playerState,
+                            downloadingIds = libraryUiState.downloadingIds,
+                            downloadedIds = downloadedIds,
+                            onSongClick = { song -> playerViewModel.playSong(song) },
+                            onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
+                            onDownloadClick = { song -> libraryViewModel.downloadSong(song) },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    1 -> {
+                        LibraryScreen(
+                            libraryViewModel = libraryViewModel,
+                            playerState = playerState,
+                            onSongClick = { song -> playerViewModel.playSong(song) },
+                            onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
+                            currentVersion = updateViewModel.currentVersionName,
+                            onCheckForUpdate = { updateViewModel.checkForUpdates(isManualCheck = true) },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
 

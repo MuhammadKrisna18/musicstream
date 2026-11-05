@@ -3,15 +3,21 @@ package com.example.p5.ui.search
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -62,12 +69,16 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
@@ -86,11 +97,13 @@ import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.theme.BlackBackground
 import com.example.p5.ui.theme.DarkSurface
 import com.example.p5.ui.theme.DarkSurfaceVariant
-import com.example.p5.ui.theme.OrangeDark
-import com.example.p5.ui.theme.OrangePrimary
+import com.example.p5.ui.theme.DividerColor
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
+import com.example.p5.ui.theme.ToscaDark
+import com.example.p5.ui.theme.ToscaLight
+import com.example.p5.ui.theme.ToscaPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -112,6 +125,7 @@ fun SearchScreen(
     val isHomeLoading by searchViewModel.isHomeLoading.collectAsStateWithLifecycle()
     val isRefreshing by searchViewModel.isRefreshing.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
+    val shimmerBrush = rememberShimmerBrush()
 
     val refreshTransition = rememberInfiniteTransition(label = "refreshAnim")
     val refreshAngle by refreshTransition.animateFloat(
@@ -164,7 +178,7 @@ fun SearchScreen(
                     Icon(
                         imageVector = Icons.Rounded.Refresh,
                         contentDescription = "Refresh Feed",
-                        tint = if (isRefreshing) OrangePrimary else TextSecondary,
+                        tint = if (isRefreshing) ToscaPrimary else TextSecondary,
                         modifier = Modifier
                             .size(24.dp)
                             .rotate(if (isRefreshing) refreshAngle else 0f)
@@ -188,7 +202,7 @@ fun SearchScreen(
                     Icon(
                         imageVector = Icons.Rounded.Search,
                         contentDescription = null,
-                        tint = OrangePrimary
+                        tint = ToscaPrimary
                     )
                 },
                 trailingIcon = {
@@ -208,11 +222,11 @@ fun SearchScreen(
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = DarkSurface,
                     unfocusedContainerColor = DarkSurface,
-                    focusedBorderColor = OrangePrimary,
+                    focusedBorderColor = ToscaPrimary,
                     unfocusedBorderColor = Color.Transparent,
                     focusedTextColor = TextPrimary,
                     unfocusedTextColor = TextPrimary,
-                    cursorColor = OrangePrimary
+                    cursorColor = ToscaPrimary
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = {
@@ -259,7 +273,7 @@ fun SearchScreen(
                                         ) {
                                             Text(
                                                 text = tag.label,
-                                                color = OrangePrimary,
+                                                color = ToscaPrimary,
                                                 fontSize = 13.sp,
                                                 fontWeight = FontWeight.Medium
                                             )
@@ -273,14 +287,14 @@ fun SearchScreen(
                             items(3) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .width(140.dp)
+                                            .width(160.dp)
                                             .height(20.dp)
                                             .clip(RoundedCornerShape(6.dp))
-                                            .background(DarkSurface)
+                                            .background(shimmerBrush)
                                     )
                                     LazyRow(
                                         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -288,10 +302,10 @@ fun SearchScreen(
                                         items(4) {
                                             Box(
                                                 modifier = Modifier
-                                                    .width(135.dp)
-                                                    .height(175.dp)
+                                                    .width(148.dp)
+                                                    .height(204.dp)
                                                     .clip(RoundedCornerShape(16.dp))
-                                                    .background(DarkSurface)
+                                                    .background(shimmerBrush)
                                             )
                                         }
                                     }
@@ -329,7 +343,7 @@ fun SearchScreen(
                                                 if (!section.query.isNullOrBlank()) {
                                                     Text(
                                                         text = "See all",
-                                                        color = OrangePrimary,
+                                                        color = ToscaPrimary,
                                                         fontSize = 12.sp,
                                                         fontWeight = FontWeight.SemiBold,
                                                         modifier = Modifier.clickable { searchViewModel.searchCategory(section.query) }
@@ -404,7 +418,7 @@ fun SearchScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = OrangePrimary,
+                            color = ToscaPrimary,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(36.dp)
                         )
@@ -462,7 +476,7 @@ fun SearchScreen(
                         Icon(
                             imageVector = Icons.Rounded.ErrorOutline,
                             contentDescription = null,
-                            tint = OrangeDark,
+                            tint = ToscaDark,
                             modifier = Modifier.size(48.dp)
                         )
 
@@ -479,7 +493,7 @@ fun SearchScreen(
 
                         Button(
                             onClick = { searchViewModel.searchNow() },
-                            colors = ButtonDefaults.buttonColors(containerColor = OrangePrimary)
+                            colors = ButtonDefaults.buttonColors(containerColor = ToscaPrimary)
                         ) {
                             Text("Retry", color = BlackBackground, fontWeight = FontWeight.Bold)
                         }
@@ -544,30 +558,56 @@ private fun VisualizerIndicator(
                 .width(3.dp)
                 .height(if (isPlaying) bar1Height.dp else 8.dp)
                 .clip(CircleShape)
-                .background(OrangePrimary)
+                .background(ToscaPrimary)
         )
         Box(
             modifier = Modifier
                 .width(3.dp)
                 .height(if (isPlaying) bar2Height.dp else 15.dp)
                 .clip(CircleShape)
-                .background(OrangePrimary)
+                .background(ToscaPrimary)
         )
         Box(
             modifier = Modifier
                 .width(3.dp)
                 .height(if (isPlaying) bar3Height.dp else 20.dp)
                 .clip(CircleShape)
-                .background(OrangePrimary)
+                .background(ToscaPrimary)
         )
         Box(
             modifier = Modifier
                 .width(3.dp)
                 .height(if (isPlaying) bar4Height.dp else 10.dp)
                 .clip(CircleShape)
-                .background(OrangePrimary)
+                .background(ToscaPrimary)
         )
     }
+}
+
+@Composable
+private fun rememberShimmerBrush(): Brush {
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val translateAnim by transition.animateFloat(
+        initialValue = -300f,
+        targetValue = 900f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1200, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "shimmer_translate"
+    )
+
+    return Brush.linearGradient(
+        colors = listOf(
+            DarkSurfaceVariant.copy(alpha = 0.5f),
+            DarkSurfaceVariant.copy(alpha = 0.85f),
+            ToscaPrimary.copy(alpha = 0.16f),
+            DarkSurfaceVariant.copy(alpha = 0.85f),
+            DarkSurfaceVariant.copy(alpha = 0.5f)
+        ),
+        start = androidx.compose.ui.geometry.Offset(translateAnim, translateAnim),
+        end = androidx.compose.ui.geometry.Offset(translateAnim + 260f, translateAnim + 260f)
+    )
 }
 
 @Composable
@@ -581,17 +621,40 @@ private fun TrendingTrackCard(
     onDownloadClick: (Song) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "card_scale"
+    )
+
     Column(
         modifier = modifier
-            .width(135.dp)
+            .width(148.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
             .clip(RoundedCornerShape(16.dp))
-            .background(DarkSurface)
-            .clickable { onSongClick(song) }
-            .padding(8.dp)
+            .background(if (isSelected) DarkSurfaceVariant else DarkSurface)
+            .border(
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = if (isSelected) ToscaPrimary.copy(alpha = 0.55f) else DividerColor.copy(alpha = 0.4f)
+                ),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onSongClick(song) }
+            .padding(9.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(119.dp)
+                .fillMaxWidth()
+                .height(130.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(DarkSurfaceVariant)
         ) {
@@ -602,19 +665,38 @@ private fun TrendingTrackCard(
                 modifier = Modifier.fillMaxSize()
             )
 
+            // Bottom gradient scrim
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(44.dp)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.70f))
+                        )
+                    )
+            )
+
+            // Modern floating glassmorphic play button
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(6.dp)
-                    .size(30.dp)
+                    .size(32.dp)
                     .clip(CircleShape)
-                    .background(OrangePrimary),
+                    .background(if (isSelected && isPlaying) ToscaPrimary else Color.Black.copy(alpha = 0.65f))
+                    .border(
+                        width = 1.dp,
+                        color = if (isSelected && isPlaying) Color.Transparent else Color.White.copy(alpha = 0.25f),
+                        shape = CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (isSelected && isPlaying) Icons.Rounded.GraphicEq else Icons.Rounded.PlayArrow,
                     contentDescription = null,
-                    tint = Color.Black,
+                    tint = if (isSelected && isPlaying) Color.Black else ToscaPrimary,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -622,14 +704,19 @@ private fun TrendingTrackCard(
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Title with maxLines = 2, minLines = 2
         Text(
             text = song.title,
-            color = if (isSelected) OrangePrimary else TextPrimary,
+            color = if (isSelected) ToscaPrimary else TextPrimary,
             fontSize = 13.sp,
             fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
+            lineHeight = 17.sp,
+            maxLines = 2,
+            minLines = 2,
             overflow = TextOverflow.Ellipsis
         )
+
+        Spacer(modifier = Modifier.height(4.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -647,7 +734,7 @@ private fun TrendingTrackCard(
 
             if (isDownloading) {
                 CircularProgressIndicator(
-                    color = OrangePrimary,
+                    color = ToscaPrimary,
                     strokeWidth = 2.dp,
                     modifier = Modifier.size(16.dp)
                 )
@@ -655,13 +742,13 @@ private fun TrendingTrackCard(
                 Icon(
                     imageVector = Icons.Rounded.CheckCircle,
                     contentDescription = null,
-                    tint = OrangePrimary,
+                    tint = ToscaPrimary,
                     modifier = Modifier.size(16.dp)
                 )
             } else {
                 IconButton(
                     onClick = { onDownloadClick(song) },
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(22.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.DownloadForOffline,
@@ -681,37 +768,71 @@ private fun GenreCategoryCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val startColor = parseHexColor(category.startColor, OrangePrimary)
-    val endColor = parseHexColor(category.endColor, OrangeDark)
+    val baseColor = parseHexColor(category.startColor, ToscaPrimary)
     val icon = getCategoryIcon(category.icon)
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "genre_scale"
+    )
 
     Box(
         modifier = modifier
-            .height(78.dp)
-            .clip(RoundedCornerShape(14.dp))
+            .height(86.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(RoundedCornerShape(16.dp))
             .background(
                 Brush.linearGradient(
-                    colors = listOf(startColor, endColor)
+                    colors = listOf(
+                        baseColor.copy(alpha = 0.85f),
+                        DarkSurfaceVariant
+                    ),
+                    start = androidx.compose.ui.geometry.Offset(0f, 0f),
+                    end = androidx.compose.ui.geometry.Offset(350f, 350f)
                 )
             )
-            .clickable(onClick = onClick)
-            .padding(12.dp)
+            .border(
+                width = 1.dp,
+                color = Color.White.copy(alpha = 0.12f),
+                shape = RoundedCornerShape(16.dp)
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            )
+            .padding(horizontal = 14.dp, vertical = 12.dp)
     ) {
+        // Spotify-style rotated icon cutout in bottom right corner
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = Color.White.copy(alpha = 0.22f),
             modifier = Modifier
-                .size(46.dp)
+                .size(54.dp)
                 .align(Alignment.BottomEnd)
+                .offset(x = 10.dp, y = 10.dp)
+                .rotate(-18f)
         )
 
+        // Bold category title with maxLines = 2
         Text(
             text = category.title,
             color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.TopStart)
+            fontSize = 15.sp,
+            fontWeight = FontWeight.ExtraBold,
+            lineHeight = 19.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .fillMaxWidth(0.72f)
         )
     }
 }
