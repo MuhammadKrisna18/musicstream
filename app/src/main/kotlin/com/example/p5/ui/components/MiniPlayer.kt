@@ -6,14 +6,18 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,14 +33,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,13 +50,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.p5.domain.model.PlayerState
-import com.example.p5.ui.theme.DarkSurface
-import com.example.p5.ui.theme.DarkSurfaceVariant
-import com.example.p5.ui.theme.OrangeDark
-import com.example.p5.ui.theme.OrangePrimary
+import com.example.p5.ui.components.glass.ambientGlow
+import com.example.p5.ui.components.glass.glassBorder
+import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AuroraCyan
+import com.example.p5.ui.theme.GlassBorderBright
+import com.example.p5.ui.theme.GlassBorderMedium
+import com.example.p5.ui.theme.GlassBorderSubtle
+import com.example.p5.ui.theme.GlassFillSubtle
+import com.example.p5.ui.theme.ObsidianBlack
+import com.example.p5.ui.theme.ObsidianFloating
+import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
+import com.example.p5.ui.theme.ToscaGlassBorder
+import com.example.p5.ui.theme.ToscaGlowSubtle
+import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun MiniPlayer(
@@ -61,67 +77,92 @@ fun MiniPlayer(
     onSkipNext: () -> Unit = {}
 ) {
     val currentSong = playerState.currentSong
+    val islandShape = remember { RoundedCornerShape(22.dp) }
+    val playInteractionSource = remember { MutableInteractionSource() }
 
     AnimatedVisibility(
         visible = currentSong != null,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it }),
+        enter = slideInVertically(
+            initialOffsetY = { it },
+            animationSpec = tween(durationMillis = 350)
+        ) + fadeIn(animationSpec = tween(durationMillis = 300)),
+        exit = slideOutVertically(
+            targetOffsetY = { it },
+            animationSpec = tween(durationMillis = 300)
+        ) + fadeOut(animationSpec = tween(durationMillis = 250)),
         modifier = modifier
     ) {
         if (currentSong == null) return@AnimatedVisibility
 
-        val infiniteTransition = rememberInfiniteTransition(label = "vinyl_rotate")
+        val infiniteTransition = rememberInfiniteTransition(label = "island_art_rotate")
         val rotationAngle by infiniteTransition.animateFloat(
             initialValue = 0f,
             targetValue = 360f,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 10000, easing = LinearEasing)
+                animation = tween(durationMillis = 12000, easing = LinearEasing)
             ),
-            label = "vinyl_angle"
+            label = "island_art_angle"
         )
 
         val progress = if (playerState.durationMs > 0) {
             (playerState.currentPositionMs.toFloat() / playerState.durationMs.toFloat()).coerceIn(0f, 1f)
         } else 0f
 
-        Surface(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp)
-                .clip(RoundedCornerShape(14.dp))
-                .clickable(onClick = onOpenFullPlayer),
-            color = DarkSurface,
-            tonalElevation = 6.dp,
-            shadowElevation = 8.dp
+                .padding(horizontal = 14.dp, vertical = 4.dp)
+                .ambientGlow(
+                    color = ToscaGlowSubtle,
+                    alpha = if (playerState.isPlaying) 0.6f else 0.2f,
+                    shape = islandShape
+                )
+                .clip(islandShape)
+                .background(ObsidianFloating)
+                .then(
+                    if (playerState.isPlaying) {
+                        Modifier.glassBorder(
+                            shape = islandShape,
+                            strokeWidth = 1.dp,
+                            startColor = ToscaGlassBorder,
+                            endColor = GlassBorderSubtle
+                        )
+                    } else {
+                        Modifier.glassBorder(
+                            shape = islandShape,
+                            strokeWidth = 1.dp,
+                            startColor = GlassBorderBright.copy(alpha = 0.35f),
+                            endColor = GlassBorderSubtle
+                        )
+                    }
+                )
+                .clickable(onClick = onOpenFullPlayer)
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.5.dp),
-                    color = OrangePrimary,
-                    trackColor = DarkSurfaceVariant
-                )
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
+                        .padding(start = 10.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
                             .size(46.dp)
-                            .clip(CircleShape)
-                            .background(DarkSurfaceVariant)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(ObsidianSurfaceVariant)
+                            .glassBorder(
+                                shape = RoundedCornerShape(14.dp),
+                                strokeWidth = 0.5.dp,
+                                startColor = GlassBorderMedium,
+                                endColor = Color.Transparent
+                            )
                     ) {
                         AsyncImage(
                             model = currentSong.thumbnailUrl,
                             contentDescription = currentSong.title,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .size(46.dp)
+                                .fillMaxSize()
                                 .rotate(if (playerState.isPlaying) rotationAngle else 0f)
                         )
                     }
@@ -142,7 +183,8 @@ fun MiniPlayer(
                             color = TextSecondary,
                             fontSize = 12.sp,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 1.dp)
                         )
                     }
 
@@ -150,26 +192,37 @@ fun MiniPlayer(
 
                     if (playerState.isBuffering) {
                         CircularProgressIndicator(
-                            color = OrangePrimary,
+                            color = ToscaPrimary,
                             strokeWidth = 2.dp,
                             modifier = Modifier.size(28.dp)
                         )
                     } else {
-                        IconButton(
-                            onClick = onTogglePlayPause,
+                        Box(
                             modifier = Modifier
                                 .size(38.dp)
+                                .pressedScale(
+                                    targetScale = 0.9f,
+                                    interactionSource = playInteractionSource
+                                )
                                 .clip(CircleShape)
-                                .background(OrangePrimary)
+                                .background(ToscaPrimary)
+                                .clickable(
+                                    interactionSource = playInteractionSource,
+                                    indication = null,
+                                    onClick = onTogglePlayPause
+                                ),
+                            contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = if (playerState.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                                 contentDescription = null,
-                                tint = DarkSurface,
+                                tint = ObsidianBlack,
                                 modifier = Modifier.size(22.dp)
                             )
                         }
                     }
+
+                    Spacer(modifier = Modifier.width(4.dp))
 
                     IconButton(
                         onClick = onSkipNext,
@@ -180,9 +233,27 @@ fun MiniPlayer(
                             imageVector = Icons.Rounded.SkipNext,
                             contentDescription = "Berikutnya",
                             tint = if (playerState.hasNext) TextPrimary else TextMuted,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                     }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.5.dp)
+                        .background(GlassFillSubtle)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = progress)
+                            .height(2.5.dp)
+                            .background(
+                                brush = Brush.horizontalGradient(
+                                    colors = listOf(ToscaPrimary, AuroraCyan)
+                                )
+                            )
+                    )
                 }
             }
         }

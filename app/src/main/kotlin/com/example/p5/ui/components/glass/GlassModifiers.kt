@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,17 +36,11 @@ import androidx.compose.ui.unit.dp
 import com.example.p5.ui.theme.GlassBorderBright
 import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
 import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.GlassFillSubtle
-import com.example.p5.ui.theme.ToscaGlassBorder
 import com.example.p5.ui.theme.ToscaGlow
 import com.example.p5.ui.theme.ToscaPrimary
 
-/**
- * Reusable glassmorphic background modifier.
- * Simulates light refraction with a subtle vertical gradient.
- */
 fun Modifier.glassBackground(
     shape: Shape = RoundedCornerShape(16.dp),
     topColor: Color = GlassFillMedium,
@@ -61,10 +54,6 @@ fun Modifier.glassBackground(
         shape = shape
     )
 
-/**
- * Specular highlight border for glass surfaces.
- * Creates an angled light sheen from top-left to bottom-right.
- */
 fun Modifier.glassBorder(
     shape: Shape = RoundedCornerShape(16.dp),
     strokeWidth: Dp = 1.dp,
@@ -95,10 +84,6 @@ fun Modifier.glassBorder(
     )
 }
 
-/**
- * All-in-one glassmorphic card modifier.
- * Combines clipped gradient background and angled specular border stroke.
- */
 fun Modifier.glassCard(
     shape: Shape = RoundedCornerShape(16.dp),
     topColor: Color = GlassFillMedium,
@@ -121,9 +106,6 @@ fun Modifier.glassCard(
         accentGlow = accentBorder
     )
 
-/**
- * Ambient glow effect drawn behind a component.
- */
 fun Modifier.ambientGlow(
     color: Color = ToscaGlow,
     alpha: Float = 0.35f,
@@ -135,9 +117,6 @@ fun Modifier.ambientGlow(
     )
 }
 
-/**
- * Tactile micro-interaction: subtle spring scale down on press.
- */
 @Composable
 fun Modifier.pressedScale(
     targetScale: Float = 0.97f,
@@ -158,9 +137,6 @@ fun Modifier.pressedScale(
     }
 }
 
-/**
- * Reusable Glass Surface container Box.
- */
 @Composable
 fun GlassSurface(
     modifier: Modifier = Modifier,
@@ -187,10 +163,6 @@ fun GlassSurface(
     )
 }
 
-/**
- * High-end Animated Mini Equalizer (3 dynamic pulsing bars).
- * Perfect for track playing indicator, mini player, and ambient states.
- */
 @Composable
 fun MiniEqualizer(
     modifier: Modifier = Modifier,
@@ -234,7 +206,6 @@ fun MiniEqualizer(
         horizontalArrangement = Arrangement.spacedBy(2.5.dp),
         verticalAlignment = Alignment.Bottom
     ) {
-        // Bar 1
         Box(
             modifier = Modifier
                 .width(3.dp)
@@ -242,7 +213,6 @@ fun MiniEqualizer(
                 .clip(RoundedCornerShape(2.dp))
                 .background(barColor)
         )
-        // Bar 2
         Box(
             modifier = Modifier
                 .width(3.dp)
@@ -250,7 +220,6 @@ fun MiniEqualizer(
                 .clip(RoundedCornerShape(2.dp))
                 .background(barColor)
         )
-        // Bar 3
         Box(
             modifier = Modifier
                 .width(3.dp)
@@ -260,4 +229,3 @@ fun MiniEqualizer(
         )
     }
 }
-

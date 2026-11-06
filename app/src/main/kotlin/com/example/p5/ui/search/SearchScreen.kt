@@ -252,7 +252,7 @@ fun SearchScreen(
                     ) {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 100.dp),
+                            contentPadding = PaddingValues(bottom = 140.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                         if (searchHistory.isNotEmpty()) {
@@ -520,7 +520,7 @@ fun SearchScreen(
                 is SearchUiState.Success -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 100.dp),
+                        contentPadding = PaddingValues(bottom = 140.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         itemsIndexed(

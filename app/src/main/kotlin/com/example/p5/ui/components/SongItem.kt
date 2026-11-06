@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -34,13 +33,8 @@ import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
-import com.example.p5.ui.theme.GlassBorderBright
 import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.GlassFillMedium
-import com.example.p5.ui.theme.GlassFillSubtle
-import com.example.p5.ui.theme.ObsidianCard
 import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
@@ -109,7 +103,6 @@ fun SongItem(
             .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Thumbnail with rounded corners and animated equalizer when playing
         Box(
             modifier = Modifier
                 .size(52.dp)
@@ -152,7 +145,6 @@ fun SongItem(
 
         Spacer(modifier = Modifier.width(14.dp))
 
-        // Title and Artist Column
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -177,7 +169,6 @@ fun SongItem(
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // Trailing Content (Custom or Duration)
         if (trailingContent != null) {
             trailingContent()
         } else {
