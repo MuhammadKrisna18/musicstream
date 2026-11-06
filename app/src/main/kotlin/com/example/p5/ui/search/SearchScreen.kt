@@ -41,9 +41,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bolt
-import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material.icons.rounded.DownloadForOffline
 import androidx.compose.material.icons.rounded.ElectricBolt
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.GraphicEq
@@ -110,10 +108,7 @@ import com.example.p5.ui.theme.ToscaPrimary
 fun SearchScreen(
     searchViewModel: SearchViewModel,
     playerState: PlayerState,
-    downloadingIds: Set<String>,
-    downloadedIds: Set<String>,
     onSongClick: (Song) -> Unit,
-    onDownloadClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
     onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) }
 ) {
@@ -362,10 +357,7 @@ fun SearchScreen(
                                                         song = song,
                                                         isPlaying = playerState.isPlaying,
                                                         isSelected = playerState.currentSong?.id == song.id,
-                                                        isDownloaded = downloadedIds.contains(song.id),
-                                                        isDownloading = downloadingIds.contains(song.id),
-                                                        onSongClick = { onPlayQueue(section.tracks, index) },
-                                                        onDownloadClick = onDownloadClick
+                                                        onSongClick = { onPlayQueue(section.tracks, index) }
                                                     )
                                                 }
                                             }
@@ -436,17 +428,12 @@ fun SearchScreen(
                             key = { _, item -> item.id }
                         ) { index, song ->
                             val isSelected = playerState.currentSong?.id == song.id
-                            val isDownloaded = downloadedIds.contains(song.id)
-                            val isDownloading = downloadingIds.contains(song.id)
 
                             SongItem(
                                 song = song,
                                 isPlaying = playerState.isPlaying,
                                 isSelected = isSelected,
-                                isDownloaded = isDownloaded,
-                                isDownloading = isDownloading,
-                                onClick = { onPlayQueue(state.songs, index) },
-                                onDownloadClick = { onDownloadClick(song) }
+                                onClick = { onPlayQueue(state.songs, index) }
                             )
                         }
                     }
@@ -615,10 +602,7 @@ private fun TrendingTrackCard(
     song: Song,
     isPlaying: Boolean,
     isSelected: Boolean,
-    isDownloaded: Boolean,
-    isDownloading: Boolean,
     onSongClick: (Song) -> Unit,
-    onDownloadClick: (Song) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -732,31 +716,13 @@ private fun TrendingTrackCard(
                 modifier = Modifier.weight(1f)
             )
 
-            if (isDownloading) {
-                CircularProgressIndicator(
-                    color = ToscaPrimary,
-                    strokeWidth = 2.dp,
-                    modifier = Modifier.size(16.dp)
+            if (song.durationFormatted.isNotBlank()) {
+                Text(
+                    text = song.durationFormatted,
+                    color = TextMuted,
+                    fontSize = 10.sp,
+                    modifier = Modifier.padding(start = 4.dp)
                 )
-            } else if (isDownloaded) {
-                Icon(
-                    imageVector = Icons.Rounded.CheckCircle,
-                    contentDescription = null,
-                    tint = ToscaPrimary,
-                    modifier = Modifier.size(16.dp)
-                )
-            } else {
-                IconButton(
-                    onClick = { onDownloadClick(song) },
-                    modifier = Modifier.size(22.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.DownloadForOffline,
-                        contentDescription = null,
-                        tint = TextMuted,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
             }
         }
     }

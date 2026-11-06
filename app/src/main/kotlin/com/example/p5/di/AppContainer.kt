@@ -1,24 +1,19 @@
 package com.example.p5.di
 
 import android.content.Context
-import com.example.p5.data.downloader.MusicDownloaderImpl
 import com.example.p5.data.local.MusicDatabaseHelper
 import com.example.p5.data.remote.YouTubeNativeDataSource
-import com.example.p5.data.repository.DownloadRepositoryImpl
 import com.example.p5.data.repository.FavoriteRepositoryImpl
+import com.example.p5.data.repository.HistoryRepositoryImpl
 import com.example.p5.data.repository.LyricsRepositoryImpl
 import com.example.p5.data.repository.MusicRepositoryImpl
 import com.example.p5.data.repository.UpdateRepositoryImpl
-import com.example.p5.domain.repository.FavoriteRepository
-import com.example.p5.domain.repository.LyricsRepository
-import com.example.p5.domain.repository.UpdateRepository
-import com.example.p5.domain.downloader.MusicDownloader
 import com.example.p5.domain.player.AudioPlayer
-import com.example.p5.domain.repository.DownloadRepository
+import com.example.p5.domain.repository.FavoriteRepository
+import com.example.p5.domain.repository.HistoryRepository
+import com.example.p5.domain.repository.LyricsRepository
 import com.example.p5.domain.repository.MusicRepository
-import com.example.p5.domain.usecase.DeleteDownloadedSongUseCase
-import com.example.p5.domain.usecase.DownloadSongUseCase
-import com.example.p5.domain.usecase.GetDownloadedSongsUseCase
+import com.example.p5.domain.repository.UpdateRepository
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
 import com.example.p5.domain.usecase.GetStreamAudioUseCase
@@ -31,23 +26,18 @@ import java.util.concurrent.TimeUnit
 
 interface AppContainer {
     val musicRepository: MusicRepository
-    val downloadRepository: DownloadRepository
-    val musicDownloader: MusicDownloader
-
     val searchMusicUseCase: SearchMusicUseCase
     val getStreamAudioUseCase: GetStreamAudioUseCase
     val getTrendingMusicUseCase: GetTrendingMusicUseCase
     val getHomeCategoriesUseCase: GetHomeCategoriesUseCase
     val getHomeFeedUseCase: GetHomeFeedUseCase
-    val downloadSongUseCase: DownloadSongUseCase
-    val getDownloadedSongsUseCase: GetDownloadedSongsUseCase
-    val deleteDownloadedSongUseCase: DeleteDownloadedSongUseCase
 
     val audioPlayer: AudioPlayer
     val musicPlayerManager: MusicPlayerManager
     val updateRepository: UpdateRepository
     val lyricsRepository: LyricsRepository
     val favoriteRepository: FavoriteRepository
+    val historyRepository: HistoryRepository
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -73,14 +63,6 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         MusicRepositoryImpl(youTubeDataSource)
     }
 
-    override val downloadRepository: DownloadRepository by lazy {
-        DownloadRepositoryImpl(dbHelper)
-    }
-
-    override val musicDownloader: MusicDownloader by lazy {
-        MusicDownloaderImpl(context, musicRepository, okHttpClient)
-    }
-
     override val searchMusicUseCase: SearchMusicUseCase by lazy {
         SearchMusicUseCase(musicRepository)
     }
@@ -101,18 +83,6 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         GetHomeFeedUseCase(musicRepository)
     }
 
-    override val downloadSongUseCase: DownloadSongUseCase by lazy {
-        DownloadSongUseCase(musicDownloader, downloadRepository)
-    }
-
-    override val getDownloadedSongsUseCase: GetDownloadedSongsUseCase by lazy {
-        GetDownloadedSongsUseCase(downloadRepository)
-    }
-
-    override val deleteDownloadedSongUseCase: DeleteDownloadedSongUseCase by lazy {
-        DeleteDownloadedSongUseCase(downloadRepository)
-    }
-
     override val audioPlayer: AudioPlayer by lazy {
         MediaSessionAudioPlayer(context)
     }
@@ -125,8 +95,12 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         FavoriteRepositoryImpl(dbHelper)
     }
 
+    override val historyRepository: HistoryRepository by lazy {
+        HistoryRepositoryImpl(dbHelper)
+    }
+
     override val musicPlayerManager: MusicPlayerManager by lazy {
-        MusicPlayerManager(audioPlayer, getStreamAudioUseCase, downloadRepository, lyricsRepository, favoriteRepository)
+        MusicPlayerManager(audioPlayer, getStreamAudioUseCase, lyricsRepository, favoriteRepository, historyRepository)
     }
 
     override val updateRepository: UpdateRepository by lazy {

@@ -13,13 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.DownloadForOffline
 import androidx.compose.material.icons.rounded.GraphicEq
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,11 +28,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.p5.domain.model.Song
+import com.example.p5.ui.theme.BlackBackground
 import com.example.p5.ui.theme.DarkSurfaceVariant
-import com.example.p5.ui.theme.OrangePrimary
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
+import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun SongItem(
@@ -45,18 +41,15 @@ fun SongItem(
     isPlaying: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isDownloaded: Boolean = false,
-    isDownloading: Boolean = false,
-    onDownloadClick: (() -> Unit)? = null
+    modifier: Modifier = Modifier
 ) {
     val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) DarkSurfaceVariant.copy(alpha = 0.6f) else MaterialTheme.colorScheme.background,
+        targetValue = if (isSelected) DarkSurfaceVariant.copy(alpha = 0.6f) else BlackBackground,
         label = "item_bg"
     )
 
     val titleColor by animateColorAsState(
-        targetValue = if (isSelected) OrangePrimary else TextPrimary,
+        targetValue = if (isSelected) ToscaPrimary else TextPrimary,
         label = "title_color"
     )
 
@@ -86,13 +79,13 @@ fun SongItem(
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .background(OrangePrimary.copy(alpha = 0.4f)),
+                        .background(ToscaPrimary.copy(alpha = 0.45f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.GraphicEq,
                         contentDescription = null,
-                        tint = TextPrimary,
+                        tint = BlackBackground,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -131,40 +124,5 @@ fun SongItem(
             fontSize = 12.sp,
             fontWeight = FontWeight.Normal
         )
-
-        if (onDownloadClick != null) {
-            Spacer(modifier = Modifier.width(4.dp))
-
-            if (isDownloading) {
-                CircularProgressIndicator(
-                    color = OrangePrimary,
-                    strokeWidth = 2.dp,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(18.dp)
-                )
-            } else if (isDownloaded) {
-                Icon(
-                    imageVector = Icons.Rounded.CheckCircle,
-                    contentDescription = null,
-                    tint = OrangePrimary,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(20.dp)
-                )
-            } else {
-                IconButton(
-                    onClick = onDownloadClick,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.DownloadForOffline,
-                        contentDescription = null,
-                        tint = TextMuted,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-            }
-        }
     }
 }

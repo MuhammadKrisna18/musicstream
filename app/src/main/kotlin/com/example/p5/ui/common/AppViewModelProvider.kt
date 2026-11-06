@@ -27,10 +27,8 @@ object AppViewModelProvider {
         }
         initializer {
             LibraryViewModel(
-                musicApplication().container.getDownloadedSongsUseCase,
-                musicApplication().container.downloadSongUseCase,
-                musicApplication().container.deleteDownloadedSongUseCase,
-                musicApplication().container.favoriteRepository
+                musicApplication().container.favoriteRepository,
+                musicApplication().container.historyRepository
             )
         }
         initializer {

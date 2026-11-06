@@ -5,9 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.FavoriteRepository
-import com.example.p5.domain.usecase.DeleteDownloadedSongUseCase
-import com.example.p5.domain.usecase.DownloadSongUseCase
-import com.example.p5.domain.usecase.GetDownloadedSongsUseCase
+import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.playback.MediaCacheManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,31 +13,25 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class LibraryViewModel(
-    getDownloadedSongsUseCase: GetDownloadedSongsUseCase,
-    private val downloadSongUseCase: DownloadSongUseCase,
-    private val deleteDownloadedSongUseCase: DeleteDownloadedSongUseCase,
-    private val favoriteRepository: FavoriteRepository
+    private val favoriteRepository: FavoriteRepository,
+    private val historyRepository: HistoryRepository
 ) : ViewModel() {
 
-    private val downloadingIdsFlow = MutableStateFlow<Set<String>>(emptySet())
     private val messageFlow = MutableStateFlow<String?>(null)
     private val cacheSizeBytesFlow = MutableStateFlow(0L)
 
     val uiState: StateFlow<LibraryUiState> = combine(
-        getDownloadedSongsUseCase(),
         favoriteRepository.getAllFavoriteSongs(),
-        downloadingIdsFlow,
+        historyRepository.getRecentlyPlayed(50),
         messageFlow,
         cacheSizeBytesFlow
-    ) { downloaded, favorites, downloadingIds, message, cacheSize ->
+    ) { favorites, history, message, cacheSize ->
         LibraryUiState(
-            downloadedSongs = downloaded,
             favoriteSongs = favorites,
-            downloadingIds = downloadingIds,
+            historySongs = history,
             message = message,
             cacheSizeBytes = cacheSize
         )
@@ -73,35 +65,16 @@ class LibraryViewModel(
         }
     }
 
-    fun downloadSong(song: Song) {
-        if (downloadingIdsFlow.value.contains(song.id)) return
-
-        downloadingIdsFlow.update { it + song.id }
+    fun clearHistory() {
         viewModelScope.launch {
-            downloadSongUseCase(song)
+            historyRepository.clearHistory()
                 .onSuccess {
-                    messageFlow.value = "Downloaded ${song.title}"
-                }
-                .onFailure { throwable ->
-                    messageFlow.value = "Failed to download ${song.title}: ${throwable.localizedMessage}"
-                }
-            downloadingIdsFlow.update { it - song.id }
-        }
-    }
-
-    fun deleteSong(songId: String) {
-        viewModelScope.launch {
-            deleteDownloadedSongUseCase(songId)
-                .onSuccess {
-                    messageFlow.value = "Removed from downloads"
-                }
-                .onFailure { throwable ->
-                    messageFlow.value = "Failed to delete: ${throwable.localizedMessage}"
+                    messageFlow.value = "Riwayat pemutaran dibersihkan"
                 }
         }
     }
 
-    fun clearMessage() {
+    fun clearUserMessage() {
         messageFlow.value = null
     }
 }

@@ -5,8 +5,8 @@ import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.RepeatMode
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.player.AudioPlayer
-import com.example.p5.domain.repository.DownloadRepository
 import com.example.p5.domain.repository.FavoriteRepository
+import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.LyricsRepository
 import com.example.p5.domain.usecase.GetStreamAudioUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -15,14 +15,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.io.File
 
 class MusicPlayerManager(
     private val audioPlayer: AudioPlayer,
     private val getStreamAudioUseCase: GetStreamAudioUseCase,
-    private val downloadRepository: DownloadRepository,
     private val lyricsRepository: LyricsRepository,
     private val favoriteRepository: FavoriteRepository,
+    private val historyRepository: HistoryRepository,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
 ) {
     val playerState: StateFlow<PlayerState> = audioPlayer.playerState
@@ -263,27 +262,11 @@ class MusicPlayerManager(
             audioPlayer.updateFavoriteState(isFav)
         }
 
-        loadSongJob = scope.launch {
-            val offlineSong = downloadRepository.getDownloadedSongById(song.id)
-            if (offlineSong != null) {
-                val file = File(offlineSong.localFilePath)
-                if (file.exists() && file.length() > 0) {
-                    val localStream = AudioStream(
-                        id = offlineSong.id,
-                        title = offlineSong.title,
-                        artist = offlineSong.artist,
-                        streamUrl = file.toURI().toString(),
-                        durationSeconds = offlineSong.durationSeconds,
-                        durationFormatted = offlineSong.durationFormatted,
-                        thumbnailUrl = offlineSong.thumbnailUrl,
-                        format = "local",
-                        bitrate = null
-                    )
-                    audioPlayer.play(song, localStream)
-                    return@launch
-                }
-            }
+        scope.launch {
+            historyRepository.recordPlay(song)
+        }
 
+        loadSongJob = scope.launch {
             getStreamAudioUseCase(song.id)
                 .onSuccess { stream ->
                     audioPlayer.play(song, stream)

@@ -73,10 +73,6 @@ fun MainScreen(
     var isFullPlayerVisible by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val downloadedIds = remember(libraryUiState.downloadedSongs) {
-        libraryUiState.downloadedSongs.map { it.id }.toSet()
-    }
-
     LaunchedEffect(playerState.errorMessage) {
         playerState.errorMessage?.let { error ->
             snackbarHostState.showSnackbar(error)
@@ -86,7 +82,7 @@ fun MainScreen(
     LaunchedEffect(libraryUiState.message) {
         libraryUiState.message?.let { message ->
             snackbarHostState.showSnackbar(message)
-            libraryViewModel.clearMessage()
+            libraryViewModel.clearUserMessage()
         }
     }
 
@@ -164,13 +160,13 @@ fun MainScreen(
                         icon = {
                             BadgedBox(
                                 badge = {
-                                    if (libraryUiState.downloadedSongs.isNotEmpty()) {
+                                    if (libraryUiState.favoriteSongs.isNotEmpty()) {
                                         Badge(
                                             containerColor = ToscaPrimary,
                                             contentColor = Color.Black
                                         ) {
                                             Text(
-                                                "${libraryUiState.downloadedSongs.size}",
+                                                "${libraryUiState.favoriteSongs.size}",
                                                 fontWeight = FontWeight.Bold,
                                                 fontSize = 10.sp
                                             )
@@ -224,11 +220,8 @@ fun MainScreen(
                         SearchScreen(
                             searchViewModel = searchViewModel,
                             playerState = playerState,
-                            downloadingIds = libraryUiState.downloadingIds,
-                            downloadedIds = downloadedIds,
                             onSongClick = { song -> playerViewModel.playSong(song) },
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
-                            onDownloadClick = { song -> libraryViewModel.downloadSong(song) },
                             modifier = Modifier.fillMaxSize()
                         )
                     }

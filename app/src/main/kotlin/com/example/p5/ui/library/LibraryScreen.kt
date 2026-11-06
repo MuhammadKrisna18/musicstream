@@ -1,8 +1,5 @@
 package com.example.p5.ui.library
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,17 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DeleteOutline
-import androidx.compose.material.icons.rounded.DownloadDone
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.GraphicEq
-import androidx.compose.material.icons.rounded.MusicNote
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.material3.Icon
@@ -53,16 +47,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.example.p5.domain.model.DownloadedSong
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.theme.BlackBackground
 import com.example.p5.ui.theme.DarkSurface
 import com.example.p5.ui.theme.DarkSurfaceVariant
-import com.example.p5.ui.theme.OrangePrimary
+import com.example.p5.ui.theme.DividerColor
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
+import com.example.p5.ui.theme.ToscaPrimary
 import java.util.Locale
 
 @Composable
@@ -76,8 +70,8 @@ fun LibraryScreen(
     onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) }
 ) {
     val uiState by libraryViewModel.uiState.collectAsStateWithLifecycle()
-    val downloadedSongs = uiState.downloadedSongs
     val favoriteSongs = uiState.favoriteSongs
+    val historySongs = uiState.historySongs
     val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -106,7 +100,7 @@ fun LibraryScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = if (selectedTab == 0) "${downloadedSongs.size} lagu offline" else "${favoriteSongs.size} lagu disukai",
+                    text = if (selectedTab == 0) "${favoriteSongs.size} lagu disukai" else "${historySongs.size} riwayat diputar",
                     color = TextSecondary,
                     fontSize = 13.sp
                 )
@@ -121,7 +115,7 @@ fun LibraryScreen(
                 Icon(
                     imageVector = Icons.Rounded.SystemUpdate,
                     contentDescription = "Cek Pembaruan",
-                    tint = OrangePrimary,
+                    tint = ToscaPrimary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -129,7 +123,7 @@ fun LibraryScreen(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // Tab Selector (Offline vs Favorit)
+        // Tab Selector (Favorit vs Riwayat)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,8 +133,8 @@ fun LibraryScreen(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             val tabs = listOf(
-                "Offline (${downloadedSongs.size})",
-                "Favorit (${favoriteSongs.size})"
+                "Favorit (${favoriteSongs.size})",
+                "Riwayat (${historySongs.size})"
             )
             tabs.forEachIndexed { index, title ->
                 val selected = selectedTab == index
@@ -148,7 +142,7 @@ fun LibraryScreen(
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(if (selected) OrangePrimary else Color.Transparent)
+                        .background(if (selected) ToscaPrimary else Color.Transparent)
                         .clickable { selectedTab = index }
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
@@ -179,7 +173,7 @@ fun LibraryScreen(
                 Icon(
                     imageVector = Icons.Rounded.Storage,
                     contentDescription = null,
-                    tint = OrangePrimary,
+                    tint = ToscaPrimary,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -193,7 +187,7 @@ fun LibraryScreen(
             if (uiState.cacheSizeBytes > 0) {
                 Text(
                     text = "Bersihkan",
-                    color = OrangePrimary,
+                    color = ToscaPrimary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
@@ -206,67 +200,7 @@ fun LibraryScreen(
         Spacer(modifier = Modifier.height(14.dp))
 
         if (selectedTab == 0) {
-            if (downloadedSongs.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 48.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(72.dp)
-                            .clip(CircleShape)
-                            .background(DarkSurfaceVariant),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.DownloadDone,
-                            contentDescription = null,
-                            tint = OrangePrimary,
-                            modifier = Modifier.size(36.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    Text(
-                        text = "Belum Ada Lagu Offline",
-                        color = TextPrimary,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    Text(
-                        text = "Cari dan unduh lagu untuk didengarkan kapan saja tanpa koneksi internet.",
-                        color = TextSecondary,
-                        fontSize = 13.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp)
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 100.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    itemsIndexed(
-                        items = downloadedSongs,
-                        key = { _, item -> item.id }
-                    ) { index, downloadedSong ->
-                        val isSelected = playerState.currentSong?.id == downloadedSong.id
-                        DownloadedSongItem(
-                            downloadedSong = downloadedSong,
-                            isSelected = isSelected,
-                            isPlaying = playerState.isPlaying,
-                            onClick = { onPlayQueue(downloadedSongs.map { it.toSong() }, index) },
-                            onDeleteClick = { libraryViewModel.deleteSong(downloadedSong.id) }
-                        )
-                    }
-                }
-            }
-        } else {
+            // Tab Favorit
             if (favoriteSongs.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -284,7 +218,7 @@ fun LibraryScreen(
                         Icon(
                             imageVector = Icons.Rounded.FavoriteBorder,
                             contentDescription = null,
-                            tint = OrangePrimary,
+                            tint = ToscaPrimary,
                             modifier = Modifier.size(36.dp)
                         )
                     }
@@ -327,94 +261,94 @@ fun LibraryScreen(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun DownloadedSongItem(
-    downloadedSong: DownloadedSong,
-    isSelected: Boolean,
-    isPlaying: Boolean,
-    onClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (isSelected) DarkSurfaceVariant.copy(alpha = 0.6f) else BlackBackground)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(52.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(DarkSurfaceVariant)
-        ) {
-            AsyncImage(
-                model = downloadedSong.thumbnailUrl,
-                contentDescription = downloadedSong.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(52.dp)
-            )
-
-            if (isSelected && isPlaying) {
-                Box(
+        } else {
+            // Tab Riwayat
+            if (historySongs.isEmpty()) {
+                Column(
                     modifier = Modifier
-                        .matchParentSize()
-                        .background(OrangePrimary.copy(alpha = 0.4f)),
-                    contentAlignment = Alignment.Center
+                        .fillMaxSize()
+                        .padding(top = 48.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.GraphicEq,
-                        contentDescription = null,
-                        tint = TextPrimary,
-                        modifier = Modifier.size(24.dp)
+                    Box(
+                        modifier = Modifier
+                            .size(72.dp)
+                            .clip(CircleShape)
+                            .background(DarkSurfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.History,
+                            contentDescription = null,
+                            tint = ToscaPrimary,
+                            modifier = Modifier.size(36.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Belum Ada Riwayat Pemutaran",
+                        color = TextPrimary,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+
+                    Text(
+                        text = "Lagu yang kamu dengarkan akan otomatis tercatat dan muncul di sini.",
+                        color = TextSecondary,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp)
                     )
                 }
+            } else {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Terakhir Didengarkan",
+                            color = TextSecondary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Text(
+                            text = "Hapus Riwayat",
+                            color = ToscaPrimary,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier
+                                .clickable { libraryViewModel.clearHistory() }
+                                .padding(4.dp)
+                        )
+                    }
+
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = 100.dp),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        itemsIndexed(
+                            items = historySongs,
+                            key = { _, item -> item.id }
+                        ) { index, song ->
+                            val isSelected = playerState.currentSong?.id == song.id
+                            HistorySongItem(
+                                song = song,
+                                isSelected = isSelected,
+                                isPlaying = playerState.isPlaying,
+                                onClick = { onPlayQueue(historySongs, index) }
+                            )
+                        }
+                    }
+                }
             }
-        }
-
-        Spacer(modifier = Modifier.width(14.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = downloadedSong.title,
-                color = if (isSelected) OrangePrimary else TextPrimary,
-                fontSize = 15.sp,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            val sizeMb = String.format("%.1f MB", downloadedSong.fileSizeBytes / (1024.0 * 1024.0))
-
-            Text(
-                text = "${downloadedSong.artist} • $sizeMb",
-                color = TextSecondary,
-                fontSize = 12.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        IconButton(
-            onClick = onDeleteClick,
-            modifier = Modifier.size(36.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.DeleteOutline,
-                contentDescription = null,
-                tint = TextMuted,
-                modifier = Modifier.size(20.dp)
-            )
         }
     }
 }
@@ -447,20 +381,20 @@ private fun FavoriteSongItem(
                 model = song.thumbnailUrl,
                 contentDescription = song.title,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.size(52.dp)
+                modifier = Modifier.fillMaxSize()
             )
 
             if (isSelected && isPlaying) {
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .background(OrangePrimary.copy(alpha = 0.4f)),
+                        .background(ToscaPrimary.copy(alpha = 0.45f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.GraphicEq,
                         contentDescription = null,
-                        tint = TextPrimary,
+                        tint = BlackBackground,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -469,10 +403,12 @@ private fun FavoriteSongItem(
 
         Spacer(modifier = Modifier.width(14.dp))
 
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
             Text(
                 text = song.title,
-                color = if (isSelected) OrangePrimary else TextPrimary,
+                color = if (isSelected) ToscaPrimary else TextPrimary,
                 fontSize = 15.sp,
                 fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
                 maxLines = 1,
@@ -482,12 +418,20 @@ private fun FavoriteSongItem(
             Text(
                 text = song.artist,
                 color = TextSecondary,
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = song.durationFormatted,
+            color = TextMuted,
+            fontSize = 12.sp
+        )
 
         Spacer(modifier = Modifier.width(8.dp))
 
@@ -498,15 +442,101 @@ private fun FavoriteSongItem(
             Icon(
                 imageVector = Icons.Rounded.Favorite,
                 contentDescription = "Hapus dari Favorit",
-                tint = Color(0xFFFF3B30),
-                modifier = Modifier.size(22.dp)
+                tint = ToscaPrimary,
+                modifier = Modifier.size(20.dp)
             )
         }
     }
 }
 
+@Composable
+private fun HistorySongItem(
+    song: Song,
+    isSelected: Boolean,
+    isPlaying: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) DarkSurfaceVariant.copy(alpha = 0.6f) else BlackBackground)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(52.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(DarkSurfaceVariant)
+        ) {
+            AsyncImage(
+                model = song.thumbnailUrl,
+                contentDescription = song.title,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            if (isSelected && isPlaying) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(ToscaPrimary.copy(alpha = 0.45f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.GraphicEq,
+                        contentDescription = null,
+                        tint = BlackBackground,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = song.title,
+                color = if (isSelected) ToscaPrimary else TextPrimary,
+                fontSize = 15.sp,
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text = song.artist,
+                color = TextSecondary,
+                fontSize = 13.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Text(
+            text = song.durationFormatted,
+            color = TextMuted,
+            fontSize = 12.sp
+        )
+    }
+}
+
 private fun formatCacheBytes(bytes: Long): String {
-    if (bytes <= 0) return "0 MB"
-    val mb = bytes.toDouble() / (1024.0 * 1024.0)
-    return String.format(Locale.getDefault(), "%.1f MB", mb)
+    if (bytes <= 0) return "0 B"
+    val kb = bytes / 1024.0
+    val mb = kb / 1024.0
+    return if (mb >= 1.0) {
+        String.format(Locale.getDefault(), "%.1f MB", mb)
+    } else {
+        String.format(Locale.getDefault(), "%.1f KB", kb)
+    }
 }

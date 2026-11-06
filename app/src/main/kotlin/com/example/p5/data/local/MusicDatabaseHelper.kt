@@ -8,7 +8,7 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
 
     companion object {
         const val DATABASE_NAME = "music_offline.db"
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
 
         const val TABLE_NAME = "downloaded_songs"
         const val COLUMN_ID = "id"
@@ -30,6 +30,16 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         const val COLUMN_FAV_THUMBNAIL_URL = "thumbnail_url"
         const val COLUMN_FAV_WEB_URL = "web_url"
         const val COLUMN_FAV_LIKED_AT = "liked_at"
+
+        const val TABLE_HISTORY = "history_songs"
+        const val COLUMN_HIST_ID = "id"
+        const val COLUMN_HIST_TITLE = "title"
+        const val COLUMN_HIST_ARTIST = "artist"
+        const val COLUMN_HIST_DURATION = "duration"
+        const val COLUMN_HIST_DURATION_FORMATTED = "duration_formatted"
+        const val COLUMN_HIST_THUMBNAIL_URL = "thumbnail_url"
+        const val COLUMN_HIST_PLAYED_AT = "played_at"
+        const val COLUMN_HIST_PLAY_COUNT = "play_count"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -61,6 +71,20 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
             );
         """.trimIndent()
         db.execSQL(createFavoritesQuery)
+
+        val createHistoryQuery = """
+            CREATE TABLE IF NOT EXISTS $TABLE_HISTORY (
+                $COLUMN_HIST_ID TEXT PRIMARY KEY,
+                $COLUMN_HIST_TITLE TEXT NOT NULL,
+                $COLUMN_HIST_ARTIST TEXT NOT NULL,
+                $COLUMN_HIST_DURATION INTEGER NOT NULL,
+                $COLUMN_HIST_DURATION_FORMATTED TEXT NOT NULL,
+                $COLUMN_HIST_THUMBNAIL_URL TEXT NOT NULL,
+                $COLUMN_HIST_PLAYED_AT INTEGER NOT NULL,
+                $COLUMN_HIST_PLAY_COUNT INTEGER NOT NULL DEFAULT 1
+            );
+        """.trimIndent()
+        db.execSQL(createHistoryQuery)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -78,6 +102,21 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
                 );
             """.trimIndent()
             db.execSQL(createFavoritesQuery)
+        }
+        if (oldVersion < 3) {
+            val createHistoryQuery = """
+                CREATE TABLE IF NOT EXISTS $TABLE_HISTORY (
+                    $COLUMN_HIST_ID TEXT PRIMARY KEY,
+                    $COLUMN_HIST_TITLE TEXT NOT NULL,
+                    $COLUMN_HIST_ARTIST TEXT NOT NULL,
+                    $COLUMN_HIST_DURATION INTEGER NOT NULL,
+                    $COLUMN_HIST_DURATION_FORMATTED TEXT NOT NULL,
+                    $COLUMN_HIST_THUMBNAIL_URL TEXT NOT NULL,
+                    $COLUMN_HIST_PLAYED_AT INTEGER NOT NULL,
+                    $COLUMN_HIST_PLAY_COUNT INTEGER NOT NULL DEFAULT 1
+                );
+            """.trimIndent()
+            db.execSQL(createHistoryQuery)
         }
     }
 }
