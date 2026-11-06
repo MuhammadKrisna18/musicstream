@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
+import com.example.p5.domain.model.SleepTimerPresets
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
@@ -138,7 +139,7 @@ fun SleepTimerDialog(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(SpacingSm)
             ) {
-                val presets = listOf(15, 30, 45, 60)
+                val presets = SleepTimerPresets.defaultMinutes
 
                 presets.forEach { minutes ->
                     val isSelected = secondsRemaining != null && (secondsRemaining / 60) == minutes.toLong()

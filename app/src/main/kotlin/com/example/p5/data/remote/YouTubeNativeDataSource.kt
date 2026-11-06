@@ -1,5 +1,6 @@
 package com.example.p5.data.remote
 
+import com.example.p5.data.config.MusicConfig
 import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
@@ -31,10 +32,10 @@ class YouTubeNativeDataSource(
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
 
     @Volatile
-    private var cachedVisitorData: String = "CgtRRENOdVRKd3FPcyjWjobXBjIKCgJJRBIEGgAgUGKrAgqoAkN0c0JDQVVTalFFQkRCNlBERGgwUlRKTWNXaUhzNkRRZl9XVkNGQ0RoQ0VyODZvdHlsNHdERUZ4aTNQWVRKVTBteXpETF9wQW84bVVhdFZqOFBocnNycGp2aWZCa1hVd043dGpMVzNLZGFuVHNxQmFrX2syS2JxcTVfT3N5eEVwQ0tZYWxseGF3bWFUZXBiM3hJeGtuZ3cyVmZsU3ZHeERDanRRd2ttMk52eUZEeDRRYWNJSXFFOE5HLWxtY3NOTGlIQVNPZkVvQlRKRkFSeFk5V3F6OWxHU3V4dmVJSmloenJjR3hwNHFGaUwwTk1KRGtYV0FDMmdFSjQ5dllSbG83ZVkwb0lUeVR6OFA5R3lEOFIwUUtvTlc1WnRNVldmdWpXQnBodklL"
+    private var cachedVisitorData: String = MusicConfig.DEFAULT_VISITOR_DATA
 
     @Volatile
-    private var cachedSts: Int = 20751
+    private var cachedSts: Int = MusicConfig.DEFAULT_STS
 
     @Volatile
     private var lastSessionFetchTime: Long = 0L
@@ -43,35 +44,6 @@ class YouTubeNativeDataSource(
 
     @Volatile
     private var cachedHomeFeed: HomeFeed? = null
-
-    private val chartPlaylistIds = listOf(
-        "VLPL4fGSI1pDJn4lW6MJA2q37CfnraqAizqE", // Tangga Lagu Top 50 Indonesia
-        "VLPL4fGSI1pDJn40q9u1gXg7m3A0PZp0o28S", // Top 100 Global Hits
-        "VLPLFgquLnL59alW3xmYiWRaoz0o56HTr",    // Pop Terkini Indonesia
-        "VLPL4fGSI1pDJn5x6p9_2N14k9A44eB26Zp8", // Akustik & Santai
-        "VLPL4fGSI1pDJn4fGzC1bO8vO8S0B5D9l_x2"  // Fresh New Releases
-    )
-
-    private val staticMoodTags = listOf(
-        MoodTag("top_hits", "🔥 Top Hits", "Lagu Trending"),
-        MoodTag("santai", "☕ Santai", "Lagu Santai"),
-        MoodTag("olah_raga", "⚡ Olah Raga", "Lagu Workout"),
-        MoodTag("rock", "🎸 Rock", "Lagu Rock"),
-        MoodTag("akustik", "🌙 Akustik", "Lagu Akustik"),
-        MoodTag("pesta", "🎉 Pesta", "Lagu Pesta"),
-        MoodTag("fokus", "🎧 Fokus", "Lagu Fokus")
-    )
-
-    private val staticCategories = listOf(
-        Category("top_hits", "Top Hits", "Lagu Trending", "whatshot", "#00E5BF", "#004D40"),
-        Category("santai", "Santai & Rileks", "Lagu Santai", "nightlife", "#00BFA5", "#121519"),
-        Category("olah_raga", "Olah Raga & Energi", "Lagu Workout", "bolt", "#1DE9B6", "#004D40"),
-        Category("pop_vibes", "Populer Indonesia", "Lagu Pop Indonesia", "music_note", "#00B0FF", "#0D47A1"),
-        Category("indie_wave", "Indie & Senja", "Lagu Indie Indonesia", "headphones", "#7C4DFF", "#1A237E"),
-        Category("rock_metal", "Rock & Metal", "Lagu Rock", "electric_bolt", "#00E5BF", "#263238"),
-        Category("fokus_kerja", "Fokus & Belajar", "Lagu Fokus Lofi", "headphones", "#64FFDA", "#263238"),
-        Category("romantis", "Romantis & Cinta", "Lagu Romantis", "favorite", "#26A69A", "#004D40")
-    )
 
     suspend fun search(query: String, limit: Int = 20): List<Song> = withContext(ioDispatcher) {
         val payload = JSONObject().apply {
@@ -87,7 +59,7 @@ class YouTubeNativeDataSource(
         }
 
         val request = Request.Builder()
-            .url("https://www.youtube.com/youtubei/v1/search")
+            .url(MusicConfig.YOUTUBE_SEARCH_URL)
             .addHeader("Content-Type", "application/json")
             .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
             .post(payload.toString().toRequestBody(jsonMediaType))
@@ -132,11 +104,11 @@ class YouTubeNativeDataSource(
         }
 
         val request = Request.Builder()
-            .url("https://www.youtube.com/youtubei/v1/player")
+            .url(MusicConfig.YOUTUBE_PLAYER_URL)
             .addHeader("Content-Type", "application/json")
             .addHeader("X-YouTube-Client-Name", "101")
             .addHeader("X-YouTube-Client-Version", "1.02")
-            .addHeader("Origin", "https://www.youtube.com")
+            .addHeader("Origin", MusicConfig.YOUTUBE_BASE_ORIGIN)
             .addHeader("X-Goog-Visitor-Id", cachedVisitorData)
             .addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15")
             .post(payload.toString().toRequestBody(jsonMediaType))
@@ -172,9 +144,9 @@ class YouTubeNativeDataSource(
 
     private suspend fun fetchNativeMusicFeed(randomize: Boolean = false): HomeFeed = coroutineScope {
         val selectedChartId = if (randomize) {
-            chartPlaylistIds.shuffled().first()
+            MusicConfig.chartPlaylistIds.shuffled().first()
         } else {
-            chartPlaylistIds.first()
+            MusicConfig.chartPlaylistIds.first()
         }
 
         val homeDeferred = async { runCatching { fetchBrowse("FEmusic_home") }.getOrNull() }
@@ -223,8 +195,8 @@ class YouTubeNativeDataSource(
             filteredSections
         }
 
-        val baseMoodTags = if (dynamicMoodTags.isNotEmpty()) dynamicMoodTags else staticMoodTags
-        val baseCategories = if (dynamicCategories.isNotEmpty()) dynamicCategories else staticCategories
+        val baseMoodTags = if (dynamicMoodTags.isNotEmpty()) dynamicMoodTags else MusicConfig.staticMoodTags
+        val baseCategories = if (dynamicCategories.isNotEmpty()) dynamicCategories else MusicConfig.staticCategories
 
         HomeFeed(
             sections = finalSections,
@@ -247,11 +219,11 @@ class YouTubeNativeDataSource(
         }
 
         val request = Request.Builder()
-            .url("https://music.youtube.com/youtubei/v1/browse")
+            .url(MusicConfig.YOUTUBE_BROWSE_URL)
             .addHeader("Content-Type", "application/json")
             .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
-            .addHeader("Referer", "https://music.youtube.com/")
-            .addHeader("Origin", "https://music.youtube.com")
+            .addHeader("Referer", MusicConfig.YOUTUBE_MUSIC_REFERER)
+            .addHeader("Origin", MusicConfig.YOUTUBE_MUSIC_ORIGIN)
             .post(payload.toString().toRequestBody(jsonMediaType))
             .build()
 
@@ -276,7 +248,6 @@ class YouTubeNativeDataSource(
 
         val contentsRoot = root.optJSONObject("contents")
 
-        // Handle playlist/chart responses (twoColumnBrowseResultsRenderer)
         val twoCol = contentsRoot?.optJSONObject("twoColumnBrowseResultsRenderer")
         if (twoCol != null) {
             val secContents = twoCol.optJSONObject("secondaryContents")
@@ -308,7 +279,6 @@ class YouTubeNativeDataSource(
             return ParsedBrowse(sections, parsedMoodTags, parsedCategories)
         }
 
-        // Handle standard browse pages (singleColumnBrowseResultsRenderer)
         val tabs = contentsRoot
             ?.optJSONObject("singleColumnBrowseResultsRenderer")
             ?.optJSONArray("tabs") ?: JSONArray()
@@ -341,7 +311,6 @@ class YouTubeNativeDataSource(
             for (j in 0 until items.length()) {
                 val item = items.optJSONObject(j) ?: continue
 
-                // 1. Mood & Genre Navigation Button
                 val navButton = item.optJSONObject("musicNavigationButtonRenderer")
                 if (navButton != null) {
                     val btnText = navButton.optJSONObject("buttonText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
@@ -374,14 +343,12 @@ class YouTubeNativeDataSource(
                     continue
                 }
 
-                // 2. Responsive list item (Standard YouTube Music Single Song)
                 val responsive = item.optJSONObject("musicResponsiveListItemRenderer")
                 if (responsive != null) {
                     parseSongFromResponsive(responsive)?.let { tracks.add(it) }
                     continue
                 }
 
-                // 3. Two-row item (Music video / single track card)
                 val twoRow = item.optJSONObject("musicTwoRowItemRenderer")
                 if (twoRow != null) {
                     parseSongFromTwoRow(twoRow)?.let { tracks.add(it) }
@@ -457,9 +424,9 @@ class YouTubeNativeDataSource(
 
         val thumbnailUrl = if (thumbs != null && thumbs.length() > 0) {
             thumbs.optJSONObject(thumbs.length() - 1)?.optString("url")
-                ?: "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+                ?: MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
         } else {
-            "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+            MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
         }
 
         val durationSec = parseDurationToSeconds(durationFormatted)
@@ -471,7 +438,7 @@ class YouTubeNativeDataSource(
             durationSeconds = durationSec,
             durationFormatted = durationFormatted,
             thumbnailUrl = thumbnailUrl,
-            webUrl = "https://www.youtube.com/watch?v=$videoId"
+            webUrl = MusicConfig.WATCH_URL_TEMPLATE.format(videoId)
         )
     }
 
@@ -505,9 +472,9 @@ class YouTubeNativeDataSource(
 
         val thumbnailUrl = if (thumbs != null && thumbs.length() > 0) {
             thumbs.optJSONObject(thumbs.length() - 1)?.optString("url")
-                ?: "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+                ?: MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
         } else {
-            "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+            MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
         }
 
         return Song(
@@ -517,7 +484,7 @@ class YouTubeNativeDataSource(
             durationSeconds = 210,
             durationFormatted = "3:30",
             thumbnailUrl = thumbnailUrl,
-            webUrl = "https://www.youtube.com/watch?v=$videoId"
+            webUrl = MusicConfig.WATCH_URL_TEMPLATE.format(videoId)
         )
     }
 
@@ -585,8 +552,8 @@ class YouTubeNativeDataSource(
 
         HomeFeed(
             sections = sections,
-            moodTags = if (randomize) staticMoodTags.shuffled() else staticMoodTags,
-            categories = if (randomize) staticCategories.shuffled() else staticCategories
+            moodTags = if (randomize) MusicConfig.staticMoodTags.shuffled() else MusicConfig.staticMoodTags,
+            categories = if (randomize) MusicConfig.staticCategories.shuffled() else MusicConfig.staticCategories
         )
     }
 
@@ -599,8 +566,8 @@ class YouTubeNativeDataSource(
             )
         } else {
             HomeCategories(
-                moodTags = staticMoodTags,
-                categories = staticCategories
+                moodTags = MusicConfig.staticMoodTags,
+                categories = MusicConfig.staticCategories
             )
         }
     }
@@ -660,7 +627,6 @@ class YouTubeNativeDataSource(
                 val durationFormatted = if (durationSimple.isNotEmpty()) durationSimple.replace('.', ':') else "3:30"
                 val durationSec = parseDurationToSeconds(durationFormatted)
 
-                // Filter out compilation/playlist videos (> 10 minutes or > 6 minutes with compilation keywords)
                 val isLikelyCompilation = durationSec > 600 || (durationSec > 360 && (
                     title.contains("playlist", ignoreCase = true) ||
                     title.contains("full album", ignoreCase = true) ||
@@ -675,9 +641,9 @@ class YouTubeNativeDataSource(
                 val thumbnails = vr.optJSONObject("thumbnail")?.optJSONArray("thumbnails")
                 val thumbnailUrl = if (thumbnails != null && thumbnails.length() > 0) {
                     thumbnails.optJSONObject(thumbnails.length() - 1)?.optString("url")
-                        ?: "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+                        ?: MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
                 } else {
-                    "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+                    MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
                 }
 
                 songs.add(
@@ -688,7 +654,7 @@ class YouTubeNativeDataSource(
                         durationSeconds = durationSec,
                         durationFormatted = durationFormatted,
                         thumbnailUrl = thumbnailUrl,
-                        webUrl = "https://www.youtube.com/watch?v=$videoId"
+                        webUrl = MusicConfig.WATCH_URL_TEMPLATE.format(videoId)
                     )
                 )
             }
@@ -742,7 +708,7 @@ class YouTubeNativeDataSource(
         val title = videoDetails?.optString("title") ?: "Unknown Title"
         val author = videoDetails?.optString("author") ?: "YouTube Music"
         val lengthSeconds = videoDetails?.optString("lengthSeconds")?.toIntOrNull() ?: 0
-        val thumbUrl = "https://i.ytimg.com/vi/$videoId/hqdefault.jpg"
+        val thumbUrl = MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
 
         return AudioStream(
             id = videoId,
@@ -764,7 +730,7 @@ class YouTubeNativeDataSource(
 
         try {
             val request = Request.Builder()
-                .url("https://www.youtube.com")
+                .url(MusicConfig.YOUTUBE_BASE_ORIGIN)
                 .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
                 .build()
 
