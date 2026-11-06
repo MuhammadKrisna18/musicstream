@@ -1,7 +1,10 @@
 package com.example.p5.ui.library
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +24,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material.icons.rounded.SystemUpdate
@@ -38,25 +40,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.AsyncImage
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
-import com.example.p5.ui.theme.BlackBackground
-import com.example.p5.ui.theme.DarkSurface
-import com.example.p5.ui.theme.DarkSurfaceVariant
-import com.example.p5.ui.theme.DividerColor
+import com.example.p5.ui.components.glass.ambientGlow
+import com.example.p5.ui.components.glass.glassBorder
+import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.GlassBorderBright
+import com.example.p5.ui.theme.GlassBorderMedium
+import com.example.p5.ui.theme.GlassBorderSubtle
+import com.example.p5.ui.theme.GlassFillLight
+import com.example.p5.ui.theme.GlassFillMedium
+import com.example.p5.ui.theme.GlassFillSubtle
+import com.example.p5.ui.theme.ObsidianBackground
+import com.example.p5.ui.theme.ObsidianCardHigh
+import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
+import com.example.p5.ui.theme.ToscaContainer
+import com.example.p5.ui.theme.ToscaGlassBorder
+import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaPrimary
 import java.util.Locale
 
@@ -83,10 +93,10 @@ fun LibraryScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(BlackBackground)
+            .background(ObsidianBackground)
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -98,40 +108,61 @@ fun LibraryScreen(
                     text = "Koleksi Saya",
                     color = TextPrimary,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = (-0.5).sp
                 )
                 Text(
-                    text = if (selectedTab == 0) "${favoriteSongs.size} lagu disukai" else "${historySongs.size} riwayat diputar",
+                    text = if (selectedTab == 0) "${favoriteSongs.size} lagu disukai" else "${historySongs.size} trek pernah diputar",
                     color = TextSecondary,
-                    fontSize = 13.sp
+                    fontSize = 12.sp
                 )
             }
 
-            IconButton(
-                onClick = onCheckForUpdate,
+            val updateSource = remember { MutableInteractionSource() }
+            Box(
                 modifier = Modifier
+                    .size(38.dp)
+                    .pressedScale(targetScale = 0.92f, interactionSource = updateSource)
                     .clip(CircleShape)
-                    .background(DarkSurfaceVariant)
+                    .background(GlassFillLight)
+                    .glassBorder(
+                        shape = CircleShape,
+                        strokeWidth = 1.dp,
+                        startColor = GlassBorderBright.copy(alpha = 0.35f),
+                        endColor = GlassBorderSubtle
+                    )
+                    .clickable(
+                        interactionSource = updateSource,
+                        indication = null,
+                        onClick = onCheckForUpdate
+                    ),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Rounded.SystemUpdate,
                     contentDescription = "Cek Pembaruan",
                     tint = ToscaPrimary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(19.dp)
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        // Tab Selector (Favorit vs Riwayat)
+        val tabContainerShape = remember { RoundedCornerShape(22.dp) }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(DarkSurface)
+                .clip(tabContainerShape)
+                .background(GlassFillLight)
+                .glassBorder(
+                    shape = tabContainerShape,
+                    strokeWidth = 1.dp,
+                    startColor = GlassBorderBright.copy(alpha = 0.35f),
+                    endColor = GlassBorderSubtle
+                )
                 .padding(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             val tabs = listOf(
                 "Favorit (${favoriteSongs.size})",
@@ -139,18 +170,49 @@ fun LibraryScreen(
             )
             tabs.forEachIndexed { index, title ->
                 val selected = selectedTab == index
+                val itemShape = remember { RoundedCornerShape(18.dp) }
+                val itemSource = remember { MutableInteractionSource() }
+
+                val itemBg by animateColorAsState(
+                    targetValue = if (selected) ToscaPrimary.copy(alpha = 0.16f) else Color.Transparent,
+                    animationSpec = tween(200),
+                    label = "tab_bg"
+                )
+
+                val textColor by animateColorAsState(
+                    targetValue = if (selected) ToscaPrimary else TextSecondary,
+                    animationSpec = tween(200),
+                    label = "tab_text"
+                )
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (selected) ToscaPrimary else Color.Transparent)
-                        .clickable { selectedTab = index }
-                        .padding(vertical = 8.dp),
+                        .pressedScale(targetScale = 0.96f, interactionSource = itemSource)
+                        .clip(itemShape)
+                        .background(itemBg)
+                        .then(
+                            if (selected) {
+                                Modifier.glassBorder(
+                                    shape = itemShape,
+                                    strokeWidth = 1.dp,
+                                    startColor = ToscaGlassBorder,
+                                    endColor = GlassBorderSubtle
+                                )
+                            } else {
+                                Modifier
+                            }
+                        )
+                        .clickable(
+                            interactionSource = itemSource,
+                            indication = null
+                        ) { selectedTab = index }
+                        .padding(vertical = 9.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = title,
-                        color = if (selected) BlackBackground else TextSecondary,
+                        color = textColor,
                         fontSize = 13.sp,
                         fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
                     )
@@ -160,13 +222,19 @@ fun LibraryScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Streaming Cache Bar
+        val cacheShape = remember { RoundedCornerShape(16.dp) }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(DarkSurface)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .clip(cacheShape)
+                .background(GlassFillSubtle)
+                .glassBorder(
+                    shape = cacheShape,
+                    strokeWidth = 0.75.dp,
+                    startColor = GlassBorderBright.copy(alpha = 0.25f),
+                    endColor = Color.Transparent
+                )
+                .padding(horizontal = 14.dp, vertical = 9.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -181,19 +249,26 @@ fun LibraryScreen(
                 Text(
                     text = "Cache Streaming: ${formatCacheBytes(uiState.cacheSizeBytes)}",
                     color = TextSecondary,
-                    fontSize = 12.sp
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
 
             if (uiState.cacheSizeBytes > 0) {
+                val clearSource = remember { MutableInteractionSource() }
                 Text(
                     text = "Bersihkan",
                     color = ToscaPrimary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
-                        .clickable { libraryViewModel.clearStreamingCache(context) }
-                        .padding(4.dp)
+                        .pressedScale(targetScale = 0.92f, interactionSource = clearSource)
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable(
+                            interactionSource = clearSource,
+                            indication = null
+                        ) { libraryViewModel.clearStreamingCache(context) }
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
                 )
             }
         }
@@ -201,7 +276,6 @@ fun LibraryScreen(
         Spacer(modifier = Modifier.height(14.dp))
 
         if (selectedTab == 0) {
-            // Tab Favorit
             if (favoriteSongs.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -211,9 +285,16 @@ fun LibraryScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(72.dp)
+                            .size(76.dp)
+                            .ambientGlow(color = ToscaGlowSubtle, alpha = 0.5f, shape = CircleShape)
                             .clip(CircleShape)
-                            .background(DarkSurfaceVariant),
+                            .background(GlassFillLight)
+                            .glassBorder(
+                                shape = CircleShape,
+                                strokeWidth = 1.dp,
+                                startColor = GlassBorderBright.copy(alpha = 0.35f),
+                                endColor = GlassBorderSubtle
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -230,7 +311,7 @@ fun LibraryScreen(
                         text = "Belum Ada Lagu Favorit",
                         color = TextPrimary,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold
                     )
 
                     Text(
@@ -263,7 +344,6 @@ fun LibraryScreen(
                 }
             }
         } else {
-            // Tab Riwayat
             if (historySongs.isEmpty()) {
                 Column(
                     modifier = Modifier
@@ -273,9 +353,16 @@ fun LibraryScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(72.dp)
+                            .size(76.dp)
+                            .ambientGlow(color = ToscaGlowSubtle, alpha = 0.5f, shape = CircleShape)
                             .clip(CircleShape)
-                            .background(DarkSurfaceVariant),
+                            .background(GlassFillLight)
+                            .glassBorder(
+                                shape = CircleShape,
+                                strokeWidth = 1.dp,
+                                startColor = GlassBorderBright.copy(alpha = 0.35f),
+                                endColor = GlassBorderSubtle
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -292,7 +379,7 @@ fun LibraryScreen(
                         text = "Belum Ada Riwayat Pemutaran",
                         color = TextPrimary,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold
                     )
 
                     Text(
@@ -325,8 +412,9 @@ fun LibraryScreen(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
                                 .clickable { libraryViewModel.clearHistory() }
-                                .padding(4.dp)
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
                         )
                     }
 

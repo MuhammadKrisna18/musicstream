@@ -1,6 +1,8 @@
 package com.example.p5.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,21 +29,32 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.domain.model.UpdateInfo
-import com.example.p5.ui.theme.DarkSurface
-import com.example.p5.ui.theme.DarkSurfaceVariant
-import com.example.p5.ui.theme.OrangeContainer
-import com.example.p5.ui.theme.OrangePrimary
+import com.example.p5.ui.components.glass.ambientGlow
+import com.example.p5.ui.components.glass.glassBorder
+import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.GlassBorderBright
+import com.example.p5.ui.theme.GlassBorderSubtle
+import com.example.p5.ui.theme.GlassFillLight
+import com.example.p5.ui.theme.ObsidianBlack
+import com.example.p5.ui.theme.ObsidianCardHigh
+import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
+import com.example.p5.ui.theme.ToscaContainer
+import com.example.p5.ui.theme.ToscaGlassBorder
+import com.example.p5.ui.theme.ToscaGlowSubtle
+import com.example.p5.ui.theme.ToscaPrimary
 import java.io.File
 
 @Composable
@@ -55,12 +68,26 @@ fun UpdateDialog(
     onInstall: () -> Unit
 ) {
     val isDownloaded = downloadedFile != null
+    val dialogShape = remember { RoundedCornerShape(26.dp) }
 
     AlertDialog(
         onDismissRequest = {
             if (!isDownloading) onDismiss()
         },
-        containerColor = DarkSurface,
+        modifier = Modifier
+            .ambientGlow(
+                color = ToscaGlowSubtle,
+                alpha = 0.5f,
+                shape = dialogShape
+            )
+            .clip(dialogShape)
+            .glassBorder(
+                shape = dialogShape,
+                strokeWidth = 1.dp,
+                startColor = GlassBorderBright.copy(alpha = 0.45f),
+                endColor = GlassBorderSubtle
+            ),
+        containerColor = ObsidianCardHigh,
         titleContentColor = TextPrimary,
         textContentColor = TextSecondary,
         title = {
@@ -70,30 +97,36 @@ fun UpdateDialog(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(42.dp)
                         .clip(CircleShape)
-                        .background(OrangeContainer),
+                        .background(ToscaContainer)
+                        .glassBorder(
+                            shape = CircleShape,
+                            strokeWidth = 1.dp,
+                            startColor = ToscaGlassBorder,
+                            endColor = Color.Transparent
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = if (isDownloaded) Icons.Rounded.CheckCircle else Icons.Rounded.SystemUpdate,
                         contentDescription = null,
-                        tint = OrangePrimary,
-                        modifier = Modifier.size(24.dp)
+                        tint = ToscaPrimary,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
 
                 Column {
                     Text(
-                        text = if (isDownloaded) "Update Siap Dipasang" else "Pembaruan Tersedia!",
-                        fontSize = 18.sp,
+                        text = if (isDownloaded) "Pembaruan Siap Dipasang" else "Pembaruan Baru Tersedia",
+                        fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
                     )
                     Text(
-                        text = "Versi terbaru: ${updateInfo.latestVersion}",
-                        fontSize = 13.sp,
-                        color = OrangePrimary,
+                        text = "Versi rilis: ${updateInfo.latestVersion}",
+                        fontSize = 12.sp,
+                        color = ToscaPrimary,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -105,23 +138,29 @@ fun UpdateDialog(
                     Text(
                         text = "Catatan Rilis:",
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = TextMuted,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextSecondary,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(max = 160.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(DarkSurfaceVariant)
-                            .padding(10.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(GlassFillLight)
+                            .glassBorder(
+                                shape = RoundedCornerShape(12.dp),
+                                strokeWidth = 0.75.dp,
+                                startColor = GlassBorderBright.copy(alpha = 0.25f),
+                                endColor = Color.Transparent
+                            )
+                            .padding(12.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
                         Text(
                             text = updateInfo.releaseNotes,
                             fontSize = 13.sp,
-                            color = TextSecondary,
+                            color = TextPrimary,
                             lineHeight = 18.sp
                         )
                     }
@@ -139,26 +178,26 @@ fun UpdateDialog(
                                 .fillMaxWidth()
                                 .height(8.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            color = OrangePrimary,
-                            trackColor = DarkSurfaceVariant,
+                            color = ToscaPrimary,
+                            trackColor = ObsidianSurfaceVariant,
                             strokeCap = StrokeCap.Round
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Mengunduh pembaruan... ${(downloadProgress * 100).toInt()}%",
+                            text = "Mengunduh file APK... ${(downloadProgress * 100).toInt()}%",
                             fontSize = 12.sp,
                             color = TextSecondary
                         )
                     }
                 } else if (isDownloaded) {
                     Text(
-                        text = "File pembaruan (${updateInfo.apkFileName}) telah berhasil diunduh. Tekan Pasang Sekarang untuk memperbarui aplikasi.",
+                        text = "File instalasi (${updateInfo.apkFileName}) berhasil diunduh. Tekan tombol pasang untuk memperbarui.",
                         fontSize = 13.sp,
                         color = TextSecondary
                     )
                 } else {
                     Text(
-                        text = "Perbarui aplikasi ke versi terbaru langsung dari GitHub Release tanpa perlu menghubungkan kabel USB.",
+                        text = "Perbarui aplikasi ke versi terbaru langsung dari GitHub Release untuk menikmati fitur & perbaikan terkini.",
                         fontSize = 13.sp,
                         color = TextSecondary
                     )
@@ -166,14 +205,16 @@ fun UpdateDialog(
             }
         },
         confirmButton = {
+            val confirmSource = remember { MutableInteractionSource() }
             if (isDownloaded) {
                 Button(
                     onClick = onInstall,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = OrangePrimary,
-                        contentColor = TextPrimary
+                        containerColor = ToscaPrimary,
+                        contentColor = ObsidianBlack
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.pressedScale(targetScale = 0.94f, interactionSource = confirmSource)
                 ) {
                     Text("Pasang Sekarang", fontWeight = FontWeight.Bold)
                 }
@@ -182,10 +223,10 @@ fun UpdateDialog(
                     onClick = {},
                     enabled = false,
                     colors = ButtonDefaults.buttonColors(
-                        disabledContainerColor = OrangeContainer,
+                        disabledContainerColor = ToscaContainer,
                         disabledContentColor = TextMuted
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Mengunduh...")
                 }
@@ -193,12 +234,13 @@ fun UpdateDialog(
                 Button(
                     onClick = onStartDownload,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = OrangePrimary,
-                        contentColor = TextPrimary
+                        containerColor = ToscaPrimary,
+                        contentColor = ObsidianBlack
                     ),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.pressedScale(targetScale = 0.94f, interactionSource = confirmSource)
                 ) {
-                    Text("Update Sekarang", fontWeight = FontWeight.Bold)
+                    Text("Unduh Update", fontWeight = FontWeight.Bold)
                 }
             }
         },
@@ -206,7 +248,7 @@ fun UpdateDialog(
             if (!isDownloading) {
                 OutlinedButton(
                     onClick = onDismiss,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(if (isDownloaded) "Tutup" else "Nanti", color = TextSecondary)
                 }
@@ -214,4 +256,3 @@ fun UpdateDialog(
         }
     )
 }
-
