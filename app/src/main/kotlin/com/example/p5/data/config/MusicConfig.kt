@@ -45,3 +45,4 @@ object MusicConfig {
         Category("romantis", "Romantis & Cinta", "Lagu Romantis", "favorite", "#26A69A", "#004D40")
     )
 }
+

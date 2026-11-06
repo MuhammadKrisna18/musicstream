@@ -1,8 +1,34 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.compose.compiler)
   alias(libs.plugins.kotlin.serialization)
 }
+
+val keystorePropertiesFile = rootProject.file("local.properties")
+val keystoreProperties = Properties().apply {
+  if (keystorePropertiesFile.exists()) {
+    load(FileInputStream(keystorePropertiesFile))
+  }
+}
+
+val releaseStoreFilePath = System.getenv("KEYSTORE_FILE")
+  ?: keystoreProperties.getProperty("KEYSTORE_FILE")
+  ?: "keystore/release.jks"
+
+val releaseStorePassword = System.getenv("KEYSTORE_PASSWORD")
+  ?: keystoreProperties.getProperty("KEYSTORE_PASSWORD")
+  ?: "musicstream123"
+
+val releaseKeyAlias = System.getenv("KEYSTORE_ALIAS")
+  ?: keystoreProperties.getProperty("KEYSTORE_ALIAS")
+  ?: "musicstream"
+
+val releaseKeyPassword = System.getenv("KEYSTORE_KEY_PASSWORD")
+  ?: keystoreProperties.getProperty("KEYSTORE_KEY_PASSWORD")
+  ?: "musicstream123"
 
 android {
   namespace = "com.example.p5"
@@ -17,10 +43,10 @@ android {
 
   signingConfigs {
     create("release") {
-      storeFile = file("keystore/release.jks")
-      storePassword = "musicstream123"
-      keyAlias = "musicstream"
-      keyPassword = "musicstream123"
+      storeFile = file(releaseStoreFilePath)
+      storePassword = releaseStorePassword
+      keyAlias = releaseKeyAlias
+      keyPassword = releaseKeyPassword
     }
   }
 
