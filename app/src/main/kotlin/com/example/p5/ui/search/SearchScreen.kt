@@ -72,6 +72,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -80,6 +81,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.p5.R
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
@@ -162,14 +164,14 @@ fun SearchScreen(
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Music",
+                        text = stringResource(R.string.app_title_music),
                         color = TextPrimary,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = (-0.5).sp
                     )
                     Text(
-                        text = "Stream",
+                        text = stringResource(R.string.app_title_stream),
                         color = ToscaPrimary,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -177,7 +179,7 @@ fun SearchScreen(
                     )
                 }
                 Text(
-                    text = "Kurasi musik & audio berkualitas",
+                    text = stringResource(R.string.home_subtitle),
                     color = TextSecondary,
                     fontSize = 12.sp
                 )
@@ -223,7 +225,7 @@ fun SearchScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Refresh,
-                        contentDescription = "Muat Ulang Beranda",
+                        contentDescription = stringResource(R.string.home_refresh_content_desc),
                         tint = if (isRefreshing) ToscaPrimary else TextSecondary,
                         modifier = Modifier
                             .size(20.dp)
@@ -252,7 +254,7 @@ fun SearchScreen(
                 onValueChange = searchViewModel::onQueryChanged,
                 placeholder = {
                     Text(
-                        text = "Cari lagu, artis, atau album...",
+                        text = stringResource(R.string.search_placeholder),
                         color = TextMuted,
                         fontSize = 14.sp
                     )
@@ -341,7 +343,7 @@ fun SearchScreen(
                                                     modifier = Modifier.size(16.dp)
                                                 )
                                                 Text(
-                                                    text = "Pencarian Terakhir",
+                                                    text = stringResource(R.string.search_recent_title),
                                                     color = TextPrimary,
                                                     fontSize = 14.sp,
                                                     fontWeight = FontWeight.Bold
@@ -349,7 +351,7 @@ fun SearchScreen(
                                             }
 
                                             Text(
-                                                text = "Hapus Semua",
+                                                text = stringResource(R.string.search_clear_all),
                                                 color = TextSecondary,
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Medium,
@@ -410,7 +412,7 @@ fun SearchScreen(
                                                         ) {
                                                             Icon(
                                                                 imageVector = Icons.Rounded.Close,
-                                                                contentDescription = "Hapus",
+                                                                contentDescription = stringResource(R.string.search_remove_item_desc),
                                                                 tint = TextMuted,
                                                                 modifier = Modifier.size(13.dp)
                                                             )
@@ -534,7 +536,7 @@ fun SearchScreen(
 
                                                     if (!section.query.isNullOrBlank()) {
                                                         Text(
-                                                            text = "Lihat Semua",
+                                                            text = stringResource(R.string.section_see_all),
                                                             color = ToscaPrimary,
                                                             fontSize = 12.sp,
                                                             fontWeight = FontWeight.SemiBold,
@@ -568,7 +570,7 @@ fun SearchScreen(
                                 item {
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "Kategori & Mood Eksklusif",
+                                        text = stringResource(R.string.categories_title),
                                         color = TextPrimary,
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold,
@@ -646,7 +648,7 @@ fun SearchScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Lagu tidak ditemukan untuk \"$query\"",
+                            text = stringResource(R.string.search_empty_message, query),
                             color = TextSecondary,
                             fontSize = 14.sp
                         )
@@ -683,7 +685,7 @@ fun SearchScreen(
                             onClick = { searchViewModel.searchNow() },
                             colors = ButtonDefaults.buttonColors(containerColor = ToscaPrimary)
                         ) {
-                            Text("Coba Lagi", color = ObsidianBlack, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.action_retry), color = ObsidianBlack, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -775,7 +777,7 @@ private fun EditorialHeroCard(
                     modifier = Modifier.size(14.dp)
                 )
                 Text(
-                    text = "PILIHAN REDAKSI",
+                    text = stringResource(R.string.editorial_spotlight_badge),
                     color = ToscaPrimary,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.ExtraBold,
@@ -827,7 +829,7 @@ private fun EditorialHeroCard(
                     } else {
                         Icon(
                             imageVector = Icons.Rounded.PlayArrow,
-                            contentDescription = "Putar",
+                            contentDescription = stringResource(R.string.action_play),
                             tint = ObsidianBlack,
                             modifier = Modifier.size(24.dp)
                         )

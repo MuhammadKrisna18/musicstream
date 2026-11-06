@@ -44,11 +44,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
@@ -231,7 +233,7 @@ fun MiniPlayer(
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.SkipNext,
-                            contentDescription = "Berikutnya",
+                            contentDescription = stringResource(R.string.mini_player_next_desc),
                             tint = if (playerState.hasNext) TextPrimary else TextMuted,
                             modifier = Modifier.size(22.dp)
                         )

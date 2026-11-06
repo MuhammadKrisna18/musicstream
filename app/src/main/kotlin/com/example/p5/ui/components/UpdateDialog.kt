@@ -35,9 +35,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.p5.R
 import com.example.p5.domain.model.UpdateInfo
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
@@ -118,13 +120,13 @@ fun UpdateDialog(
 
                 Column {
                     Text(
-                        text = if (isDownloaded) "Pembaruan Siap Dipasang" else "Pembaruan Baru Tersedia",
+                        text = if (isDownloaded) stringResource(R.string.update_ready_title) else stringResource(R.string.update_available_title),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
                     )
                     Text(
-                        text = "Versi rilis: ${updateInfo.latestVersion}",
+                        text = stringResource(R.string.update_version_label, updateInfo.latestVersion),
                         fontSize = 12.sp,
                         color = ToscaPrimary,
                         fontWeight = FontWeight.SemiBold
@@ -136,7 +138,7 @@ fun UpdateDialog(
             Column(modifier = Modifier.fillMaxWidth()) {
                 if (updateInfo.releaseNotes.isNotBlank()) {
                     Text(
-                        text = "Catatan Rilis:",
+                        text = stringResource(R.string.update_release_notes_label),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = TextSecondary,
@@ -184,20 +186,20 @@ fun UpdateDialog(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Mengunduh file APK... ${(downloadProgress * 100).toInt()}%",
+                            text = stringResource(R.string.update_downloading_progress, (downloadProgress * 100).toInt()),
                             fontSize = 12.sp,
                             color = TextSecondary
                         )
                     }
                 } else if (isDownloaded) {
                     Text(
-                        text = "File instalasi (${updateInfo.apkFileName}) berhasil diunduh. Tekan tombol pasang untuk memperbarui.",
+                        text = stringResource(R.string.update_downloaded_message, updateInfo.apkFileName),
                         fontSize = 13.sp,
                         color = TextSecondary
                     )
                 } else {
                     Text(
-                        text = "Perbarui aplikasi ke versi terbaru langsung dari GitHub Release untuk menikmati fitur & perbaikan terkini.",
+                        text = stringResource(R.string.update_available_message),
                         fontSize = 13.sp,
                         color = TextSecondary
                     )
@@ -216,7 +218,7 @@ fun UpdateDialog(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.pressedScale(targetScale = 0.94f, interactionSource = confirmSource)
                 ) {
-                    Text("Pasang Sekarang", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.update_action_install), fontWeight = FontWeight.Bold)
                 }
             } else if (isDownloading) {
                 Button(
@@ -228,7 +230,7 @@ fun UpdateDialog(
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Mengunduh...")
+                    Text(stringResource(R.string.update_action_downloading))
                 }
             } else {
                 Button(
@@ -240,7 +242,7 @@ fun UpdateDialog(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.pressedScale(targetScale = 0.94f, interactionSource = confirmSource)
                 ) {
-                    Text("Unduh Update", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.update_action_download), fontWeight = FontWeight.Bold)
                 }
             }
         },
@@ -250,7 +252,7 @@ fun UpdateDialog(
                     onClick = onDismiss,
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(if (isDownloaded) "Tutup" else "Nanti", color = TextSecondary)
+                    Text(if (isDownloaded) stringResource(R.string.dialog_close) else stringResource(R.string.update_action_later), color = TextSecondary)
                 }
             }
         }

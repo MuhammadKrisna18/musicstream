@@ -41,11 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
@@ -105,14 +107,14 @@ fun LibraryScreen(
         ) {
             Column {
                 Text(
-                    text = "Koleksi Saya",
+                    text = stringResource(R.string.library_title),
                     color = TextPrimary,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = (-0.5).sp
                 )
                 Text(
-                    text = if (selectedTab == 0) "${favoriteSongs.size} lagu disukai" else "${historySongs.size} trek pernah diputar",
+                    text = if (selectedTab == 0) stringResource(R.string.library_subtitle_favorites, favoriteSongs.size) else stringResource(R.string.library_subtitle_history, historySongs.size),
                     color = TextSecondary,
                     fontSize = 12.sp
                 )
@@ -140,7 +142,7 @@ fun LibraryScreen(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.SystemUpdate,
-                    contentDescription = "Cek Pembaruan",
+                    contentDescription = stringResource(R.string.library_check_update_desc),
                     tint = ToscaPrimary,
                     modifier = Modifier.size(19.dp)
                 )
@@ -165,8 +167,8 @@ fun LibraryScreen(
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             val tabs = listOf(
-                "Favorit (${favoriteSongs.size})",
-                "Riwayat (${historySongs.size})"
+                stringResource(R.string.library_tab_favorites, favoriteSongs.size),
+                stringResource(R.string.library_tab_history, historySongs.size)
             )
             tabs.forEachIndexed { index, title ->
                 val selected = selectedTab == index
@@ -247,7 +249,7 @@ fun LibraryScreen(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Cache Streaming: ${formatCacheBytes(uiState.cacheSizeBytes)}",
+                    text = stringResource(R.string.library_cache_label, formatCacheBytes(uiState.cacheSizeBytes)),
                     color = TextSecondary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium
@@ -257,7 +259,7 @@ fun LibraryScreen(
             if (uiState.cacheSizeBytes > 0) {
                 val clearSource = remember { MutableInteractionSource() }
                 Text(
-                    text = "Bersihkan",
+                    text = stringResource(R.string.library_cache_clear),
                     color = ToscaPrimary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
@@ -308,14 +310,14 @@ fun LibraryScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Belum Ada Lagu Favorit",
+                        text = stringResource(R.string.library_empty_favorites_title),
                         color = TextPrimary,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "Ketuk ikon hati pada lagu yang sedang diputar untuk menyimpannya ke koleksi favorit Anda.",
+                        text = stringResource(R.string.library_empty_favorites_desc),
                         color = TextSecondary,
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center,
@@ -376,14 +378,14 @@ fun LibraryScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Belum Ada Riwayat Pemutaran",
+                        text = stringResource(R.string.library_empty_history_title),
                         color = TextPrimary,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
 
                     Text(
-                        text = "Lagu yang kamu dengarkan akan otomatis tercatat dan muncul di sini.",
+                        text = stringResource(R.string.library_empty_history_desc),
                         color = TextSecondary,
                         fontSize = 13.sp,
                         textAlign = TextAlign.Center,
@@ -400,14 +402,14 @@ fun LibraryScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Terakhir Didengarkan",
+                            text = stringResource(R.string.library_history_last_listened),
                             color = TextSecondary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         )
 
                         Text(
-                            text = "Hapus Riwayat",
+                            text = stringResource(R.string.library_history_clear),
                             color = ToscaPrimary,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
@@ -471,7 +473,7 @@ private fun FavoriteSongItem(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Favorite,
-                        contentDescription = "Hapus dari Favorit",
+                        contentDescription = stringResource(R.string.library_remove_favorite_desc),
                         tint = ToscaPrimary,
                         modifier = Modifier.size(20.dp)
                     )

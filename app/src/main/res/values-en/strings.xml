@@ -1,0 +1,80 @@
+<resources>
+    <string name="app_name">MusicStream</string>
+    <string name="app_title_music">Music</string>
+    <string name="app_title_stream">Stream</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_library">Library</string>
+
+    <string name="home_subtitle">Curated high quality music &amp; audio</string>
+    <string name="home_refresh_content_desc">Refresh Home Feed</string>
+    <string name="search_placeholder">Search songs, artists, or albums...</string>
+    <string name="search_recent_title">Recent Searches</string>
+    <string name="search_clear_all">Clear All</string>
+    <string name="search_remove_item_desc">Delete</string>
+    <string name="editorial_spotlight_badge">EDITOR\'S CHOICE</string>
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="section_see_all">See all</string>
+    <string name="categories_title">Exclusive Mood &amp; Genres</string>
+    <string name="search_empty_message">No songs found for \"%1$s\"</string>
+    <string name="action_retry">Retry</string>
+
+    <string name="mini_player_next_desc">Next</string>
+
+    <string name="library_title">My Library</string>
+    <string name="library_subtitle_favorites">%1$d favorite songs</string>
+    <string name="library_subtitle_history">%1$d tracks played</string>
+    <string name="library_check_update_desc">Check for Updates</string>
+    <string name="library_tab_favorites">Favorites (%1$d)</string>
+    <string name="library_tab_history">History (%1$d)</string>
+    <string name="library_cache_label">Streaming Cache: %1$s</string>
+    <string name="library_cache_clear">Clear</string>
+    <string name="library_empty_favorites_title">No Favorite Songs Yet</string>
+    <string name="library_empty_favorites_desc">Tap the heart icon on any playing song to save it to your favorites.</string>
+    <string name="library_empty_history_title">No Playback History Yet</string>
+    <string name="library_empty_history_desc">Songs you listen to will automatically be recorded and appear here.</string>
+    <string name="library_history_last_listened">Recently Listened</string>
+    <string name="library_history_clear">Clear History</string>
+    <string name="library_remove_favorite_desc">Remove from Favorites</string>
+    <string name="library_add_favorite_desc">Add to Favorites</string>
+
+    <string name="player_header_now_playing">NOW PLAYING</string>
+    <string name="player_header_queue">UP NEXT QUEUE</string>
+    <string name="player_header_lyrics">REAL-TIME LYRICS</string>
+    <string name="player_dismiss_desc">Dismiss</string>
+    <string name="player_queue_title">Next Songs (%1$d)</string>
+    <string name="player_queue_empty">No tracks in queue</string>
+    <string name="player_lyrics_loading">Syncing lyrics...</string>
+    <string name="player_lyrics_not_found_title">Lyrics Unavailable</string>
+    <string name="player_lyrics_not_found_desc">Lyrics for this track are not yet available in the database</string>
+    <string name="player_lyrics_retry">Retry Fetching</string>
+    <string name="player_instrumental_title">Instrumental Track</string>
+    <string name="player_instrumental_desc">This track has no vocal performance</string>
+    <string name="player_shuffle_desc">Shuffle</string>
+    <string name="player_previous_desc">Previous</string>
+    <string name="player_repeat_desc">Repeat</string>
+
+    <string name="sleep_timer_title">Sleep Timer</string>
+    <string name="sleep_timer_subtitle_end_of_track">Stop at the end of this track</string>
+    <string name="sleep_timer_subtitle_countdown">Stop in %1$s</string>
+    <string name="sleep_timer_subtitle_idle">Stop playback automatically</string>
+    <string name="sleep_timer_minutes_option">%1$d Minutes</string>
+    <string name="sleep_timer_end_of_track_option">End of This Track</string>
+    <string name="sleep_timer_cancel">Turn Off Sleep Timer</string>
+    <string name="sleep_timer_cancel_icon_desc">Cancel</string>
+    <string name="dialog_close">Close</string>
+
+    <string name="update_ready_title">Update Ready to Install</string>
+    <string name="update_available_title">New Update Available</string>
+    <string name="update_version_label">Release version: %1$s</string>
+    <string name="update_release_notes_label">Release Notes:</string>
+    <string name="update_downloading_progress">Downloading APK file... %1$d%%</string>
+    <string name="update_downloaded_message">Update package (%1$s) has been downloaded. Press install to proceed.</string>
+    <string name="update_available_message">Update the app to the latest version directly from GitHub Release for the latest improvements.</string>
+    <string name="update_action_install">Install Now</string>
+    <string name="update_action_downloading">Downloading...</string>
+    <string name="update_action_download">Download Update</string>
+    <string name="update_action_later">Later</string>
+</resources>
+

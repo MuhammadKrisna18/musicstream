@@ -76,12 +76,14 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.RepeatMode
 import com.example.p5.ui.components.glass.MiniEqualizer
@@ -241,7 +243,7 @@ fun FullPlayerSheet(
                     ) {
                         Icon(
                             imageVector = Icons.Rounded.KeyboardArrowDown,
-                            contentDescription = "Tutup",
+                            contentDescription = stringResource(R.string.player_dismiss_desc),
                             tint = TextPrimary,
                             modifier = Modifier.size(26.dp)
                         )
@@ -249,9 +251,9 @@ fun FullPlayerSheet(
 
                     Text(
                         text = when (centerView) {
-                            PlayerCenterView.ALBUM -> "NOW PLAYING"
-                            PlayerCenterView.QUEUE -> "ANTREAN PUTAR"
-                            PlayerCenterView.LYRICS -> "LIRIK REAL-TIME"
+                            PlayerCenterView.ALBUM -> stringResource(R.string.player_header_now_playing)
+                            PlayerCenterView.QUEUE -> stringResource(R.string.player_header_queue)
+                            PlayerCenterView.LYRICS -> stringResource(R.string.player_header_lyrics)
                         },
                         color = TextSecondary,
                         fontSize = 11.sp,
@@ -395,7 +397,7 @@ fun FullPlayerSheet(
                                         ) {
                                             Icon(
                                                 imageVector = if (playerState.isCurrentSongFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                                                contentDescription = if (playerState.isCurrentSongFavorite) "Hapus dari Favorit" else "Tambah ke Favorit",
+                                                contentDescription = if (playerState.isCurrentSongFavorite) stringResource(R.string.library_remove_favorite_desc) else stringResource(R.string.library_add_favorite_desc),
                                                 tint = if (playerState.isCurrentSongFavorite) Color(0xFFFF3B30) else TextMuted,
                                                 modifier = Modifier.size(24.dp)
                                             )
@@ -420,7 +422,7 @@ fun FullPlayerSheet(
                                         .padding(14.dp)
                                 ) {
                                     Text(
-                                        text = "Lagu Berikutnya (${playerState.queue.size})",
+                                        text = stringResource(R.string.player_queue_title, playerState.queue.size),
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = TextPrimary,
@@ -432,7 +434,7 @@ fun FullPlayerSheet(
                                             modifier = Modifier.fillMaxSize(),
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            Text("Tidak ada antrean putar", color = TextMuted, fontSize = 13.sp)
+                                            Text(stringResource(R.string.player_queue_empty), color = TextMuted, fontSize = 13.sp)
                                         }
                                     } else {
                                         LazyColumn(
@@ -566,7 +568,7 @@ fun FullPlayerSheet(
                                             )
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
-                                                text = "Sinkronisasi lirik...",
+                                                text = stringResource(R.string.player_lyrics_loading),
                                                 color = TextSecondary,
                                                 fontSize = 13.sp
                                             )
@@ -585,13 +587,13 @@ fun FullPlayerSheet(
                                             )
                                             Spacer(modifier = Modifier.height(10.dp))
                                             Text(
-                                                text = "Lirik Belum Tersedia",
+                                                text = stringResource(R.string.player_lyrics_not_found_title),
                                                 color = TextPrimary,
                                                 fontSize = 15.sp,
                                                 fontWeight = FontWeight.Bold
                                             )
                                             Text(
-                                                text = "Lirik untuk lagu ini belum ditemukan di arsip",
+                                                text = stringResource(R.string.player_lyrics_not_found_desc),
                                                 color = TextSecondary,
                                                 fontSize = 12.sp,
                                                 textAlign = TextAlign.Center,
@@ -612,7 +614,7 @@ fun FullPlayerSheet(
                                                     modifier = Modifier.size(16.dp)
                                                 )
                                                 Spacer(modifier = Modifier.width(6.dp))
-                                                Text("Coba Muat Ulang", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                                Text(stringResource(R.string.player_lyrics_retry), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                                             }
                                         }
                                     } else if (lyrics.isInstrumental) {
@@ -629,13 +631,13 @@ fun FullPlayerSheet(
                                                 )
                                                 Spacer(modifier = Modifier.height(8.dp))
                                                 Text(
-                                                    text = "Musik Instrumental",
+                                                    text = stringResource(R.string.player_instrumental_title),
                                                     color = TextPrimary,
                                                     fontSize = 16.sp,
                                                     fontWeight = FontWeight.Bold
                                                 )
                                                 Text(
-                                                    text = "Trek ini dinikmati tanpa vokal",
+                                                    text = stringResource(R.string.player_instrumental_desc),
                                                     color = TextSecondary,
                                                     fontSize = 13.sp
                                                 )
@@ -760,14 +762,14 @@ fun FullPlayerSheet(
                 ) {
                     PlayerIconButton(
                         icon = Icons.Rounded.Shuffle,
-                        contentDescription = "Acak",
+                        contentDescription = stringResource(R.string.player_shuffle_desc),
                         isActive = playerState.isShuffleEnabled,
                         onClick = onToggleShuffle
                     )
 
                     PlayerIconButton(
                         icon = Icons.Rounded.SkipPrevious,
-                        contentDescription = "Sebelumnya",
+                        contentDescription = stringResource(R.string.player_previous_desc),
                         enabled = playerState.hasPrevious,
                         size = 32.dp,
                         onClick = onSkipPrevious
@@ -801,7 +803,7 @@ fun FullPlayerSheet(
                         } else {
                             Icon(
                                 imageVector = if (playerState.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                                contentDescription = if (playerState.isPlaying) "Jeda" else "Putar",
+                                contentDescription = if (playerState.isPlaying) stringResource(R.string.action_pause) else stringResource(R.string.action_play),
                                 tint = ObsidianBlack,
                                 modifier = Modifier.size(36.dp)
                             )
@@ -810,7 +812,7 @@ fun FullPlayerSheet(
 
                     PlayerIconButton(
                         icon = Icons.Rounded.SkipNext,
-                        contentDescription = "Berikutnya",
+                        contentDescription = stringResource(R.string.mini_player_next_desc),
                         enabled = playerState.hasNext,
                         size = 32.dp,
                         onClick = onSkipNext
@@ -818,7 +820,7 @@ fun FullPlayerSheet(
 
                     PlayerIconButton(
                         icon = if (playerState.repeatMode == RepeatMode.ONE) Icons.Rounded.RepeatOne else Icons.Rounded.Repeat,
-                        contentDescription = "Ulangi",
+                        contentDescription = stringResource(R.string.player_repeat_desc),
                         isActive = playerState.repeatMode != RepeatMode.OFF,
                         onClick = onToggleRepeatMode
                     )

@@ -28,9 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.p5.R
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
@@ -104,16 +106,16 @@ fun SleepTimerDialog(
 
                 Column {
                     Text(
-                        text = "Pengatur Waktu Tidur",
+                        text = stringResource(R.string.sleep_timer_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = TextPrimary
                     )
                     Text(
                         text = if (isTimerActive) {
-                            if (isEndOfTrack) "Berhenti di akhir lagu ini"
-                            else "Berhenti dalam ${formatCountdown(secondsRemaining ?: 0L)}"
-                        } else "Hentikan pemutaran otomatis",
+                            if (isEndOfTrack) stringResource(R.string.sleep_timer_subtitle_end_of_track)
+                            else stringResource(R.string.sleep_timer_subtitle_countdown, formatCountdown(secondsRemaining ?: 0L))
+                        } else stringResource(R.string.sleep_timer_subtitle_idle),
                         fontSize = 12.sp,
                         color = if (isTimerActive) ToscaPrimary else TextSecondary,
                         fontWeight = FontWeight.Medium
@@ -131,7 +133,7 @@ fun SleepTimerDialog(
                 presets.forEach { minutes ->
                     val isSelected = secondsRemaining != null && (secondsRemaining / 60) == minutes.toLong()
                     TimerOptionItem(
-                        title = "$minutes Menit",
+                        title = stringResource(R.string.sleep_timer_minutes_option, minutes),
                         isSelected = isSelected,
                         onClick = {
                             onSetMinutes(minutes)
@@ -141,7 +143,7 @@ fun SleepTimerDialog(
                 }
 
                 TimerOptionItem(
-                    title = "Akhir Lagu Ini",
+                    title = stringResource(R.string.sleep_timer_end_of_track_option),
                     isSelected = isEndOfTrack,
                     onClick = {
                         onSetEndOfTrack()
@@ -176,14 +178,14 @@ fun SleepTimerDialog(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Matikan Pengatur Waktu",
+                            text = stringResource(R.string.sleep_timer_cancel),
                             color = ToscaPrimary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                         Icon(
                             imageVector = Icons.Rounded.Close,
-                            contentDescription = "Batal",
+                            contentDescription = stringResource(R.string.sleep_timer_cancel_icon_desc),
                             tint = ToscaPrimary,
                             modifier = Modifier.size(18.dp)
                         )
@@ -197,7 +199,7 @@ fun SleepTimerDialog(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Tutup", color = TextSecondary)
+                Text(stringResource(R.string.dialog_close), color = TextSecondary)
             }
         }
     )

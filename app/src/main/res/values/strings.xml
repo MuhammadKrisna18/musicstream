@@ -1,3 +1,79 @@
 <resources>
     <string name="app_name">MusicStream</string>
+    <string name="app_title_music">Music</string>
+    <string name="app_title_stream">Stream</string>
+
+    <string name="nav_home">Beranda</string>
+    <string name="nav_library">Koleksi</string>
+
+    <string name="home_subtitle">Kurasi musik &amp; audio berkualitas</string>
+    <string name="home_refresh_content_desc">Muat Ulang Beranda</string>
+    <string name="search_placeholder">Cari lagu, artis, atau album...</string>
+    <string name="search_recent_title">Pencarian Terakhir</string>
+    <string name="search_clear_all">Hapus Semua</string>
+    <string name="search_remove_item_desc">Hapus</string>
+    <string name="editorial_spotlight_badge">PILIHAN REDAKSI</string>
+    <string name="action_play">Putar</string>
+    <string name="action_pause">Jeda</string>
+    <string name="section_see_all">Lihat Semua</string>
+    <string name="categories_title">Kategori &amp; Mood Eksklusif</string>
+    <string name="search_empty_message">Lagu tidak ditemukan untuk \"%1$s\"</string>
+    <string name="action_retry">Coba Lagi</string>
+
+    <string name="mini_player_next_desc">Berikutnya</string>
+
+    <string name="library_title">Koleksi Saya</string>
+    <string name="library_subtitle_favorites">%1$d lagu disukai</string>
+    <string name="library_subtitle_history">%1$d trek pernah diputar</string>
+    <string name="library_check_update_desc">Cek Pembaruan</string>
+    <string name="library_tab_favorites">Favorit (%1$d)</string>
+    <string name="library_tab_history">Riwayat (%1$d)</string>
+    <string name="library_cache_label">Cache Streaming: %1$s</string>
+    <string name="library_cache_clear">Bersihkan</string>
+    <string name="library_empty_favorites_title">Belum Ada Lagu Favorit</string>
+    <string name="library_empty_favorites_desc">Ketuk ikon hati pada lagu yang sedang diputar untuk menyimpannya ke koleksi favorit Anda.</string>
+    <string name="library_empty_history_title">Belum Ada Riwayat Pemutaran</string>
+    <string name="library_empty_history_desc">Lagu yang kamu dengarkan akan otomatis tercatat dan muncul di sini.</string>
+    <string name="library_history_last_listened">Terakhir Didengarkan</string>
+    <string name="library_history_clear">Hapus Riwayat</string>
+    <string name="library_remove_favorite_desc">Hapus dari Favorit</string>
+    <string name="library_add_favorite_desc">Tambah ke Favorit</string>
+
+    <string name="player_header_now_playing">NOW PLAYING</string>
+    <string name="player_header_queue">ANTREAN PUTAR</string>
+    <string name="player_header_lyrics">LIRIK REAL-TIME</string>
+    <string name="player_dismiss_desc">Tutup</string>
+    <string name="player_queue_title">Lagu Berikutnya (%1$d)</string>
+    <string name="player_queue_empty">Tidak ada antrean putar</string>
+    <string name="player_lyrics_loading">Sinkronisasi lirik...</string>
+    <string name="player_lyrics_not_found_title">Lirik Belum Tersedia</string>
+    <string name="player_lyrics_not_found_desc">Lirik untuk lagu ini belum ditemukan di arsip</string>
+    <string name="player_lyrics_retry">Coba Muat Ulang</string>
+    <string name="player_instrumental_title">Musik Instrumental</string>
+    <string name="player_instrumental_desc">Trek ini dinikmati tanpa vokal</string>
+    <string name="player_shuffle_desc">Acak</string>
+    <string name="player_previous_desc">Sebelumnya</string>
+    <string name="player_repeat_desc">Ulangi</string>
+
+    <string name="sleep_timer_title">Pengatur Waktu Tidur</string>
+    <string name="sleep_timer_subtitle_end_of_track">Berhenti di akhir lagu ini</string>
+    <string name="sleep_timer_subtitle_countdown">Berhenti dalam %1$s</string>
+    <string name="sleep_timer_subtitle_idle">Hentikan pemutaran otomatis</string>
+    <string name="sleep_timer_minutes_option">%1$d Menit</string>
+    <string name="sleep_timer_end_of_track_option">Akhir Lagu Ini</string>
+    <string name="sleep_timer_cancel">Matikan Pengatur Waktu</string>
+    <string name="sleep_timer_cancel_icon_desc">Batal</string>
+    <string name="dialog_close">Tutup</string>
+
+    <string name="update_ready_title">Pembaruan Siap Dipasang</string>
+    <string name="update_available_title">Pembaruan Baru Tersedia</string>
+    <string name="update_version_label">Versi rilis: %1$s</string>
+    <string name="update_release_notes_label">Catatan Rilis:</string>
+    <string name="update_downloading_progress">Mengunduh file APK... %1$d%%</string>
+    <string name="update_downloaded_message">File instalasi (%1$s) berhasil diunduh. Tekan tombol pasang untuk memperbarui.</string>
+    <string name="update_available_message">Perbarui aplikasi ke versi terbaru langsung dari GitHub Release untuk menikmati fitur &amp; perbaikan terkini.</string>
+    <string name="update_action_install">Pasang Sekarang</string>
+    <string name="update_action_downloading">Mengunduh...</string>
+    <string name="update_action_download">Unduh Update</string>
+    <string name="update_action_later">Nanti</string>
 </resources>

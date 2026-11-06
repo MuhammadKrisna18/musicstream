@@ -33,9 +33,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.p5.R
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
@@ -90,7 +92,7 @@ fun FloatingDock(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FloatingDockItem(
-                    label = "Beranda",
+                    label = stringResource(R.string.nav_home),
                     icon = Icons.Rounded.Home,
                     isSelected = selectedTab == 0,
                     badgeCount = 0,
@@ -98,7 +100,7 @@ fun FloatingDock(
                 )
 
                 FloatingDockItem(
-                    label = "Koleksi",
+                    label = stringResource(R.string.nav_library),
                     icon = Icons.Rounded.LibraryMusic,
                     isSelected = selectedTab == 1,
                     badgeCount = favoriteCount,
