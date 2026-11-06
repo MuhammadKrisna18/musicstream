@@ -44,6 +44,14 @@ class YouTubeNativeDataSource(
     @Volatile
     private var cachedHomeFeed: HomeFeed? = null
 
+    private val chartPlaylistIds = listOf(
+        "VLPL4fGSI1pDJn4lW6MJA2q37CfnraqAizqE", // Tangga Lagu Top 50 Indonesia
+        "VLPL4fGSI1pDJn40q9u1gXg7m3A0PZp0o28S", // Top 100 Global Hits
+        "VLPLFgquLnL59alW3xmYiWRaoz0o56HTr",    // Pop Terkini Indonesia
+        "VLPL4fGSI1pDJn5x6p9_2N14k9A44eB26Zp8", // Akustik & Santai
+        "VLPL4fGSI1pDJn4fGzC1bO8vO8S0B5D9l_x2"  // Fresh New Releases
+    )
+
     private val staticMoodTags = listOf(
         MoodTag("top_hits", "🔥 Top Hits", "Lagu Trending"),
         MoodTag("santai", "☕ Santai", "Lagu Santai"),
@@ -149,7 +157,7 @@ class YouTubeNativeDataSource(
         }
 
         try {
-            val nativeFeed = fetchNativeMusicFeed()
+            val nativeFeed = fetchNativeMusicFeed(randomize = refresh)
             if (nativeFeed.sections.isNotEmpty()) {
                 cachedHomeFeed = nativeFeed
                 return@withContext nativeFeed
@@ -157,15 +165,21 @@ class YouTubeNativeDataSource(
         } catch (_: Exception) {
         }
 
-        val fallbackFeed = loadFallbackFeed()
+        val fallbackFeed = loadFallbackFeed(randomize = refresh)
         cachedHomeFeed = fallbackFeed
         fallbackFeed
     }
 
-    private suspend fun fetchNativeMusicFeed(): HomeFeed = coroutineScope {
+    private suspend fun fetchNativeMusicFeed(randomize: Boolean = false): HomeFeed = coroutineScope {
+        val selectedChartId = if (randomize) {
+            chartPlaylistIds.shuffled().first()
+        } else {
+            chartPlaylistIds.first()
+        }
+
         val homeDeferred = async { runCatching { fetchBrowse("FEmusic_home") }.getOrNull() }
         val exploreDeferred = async { runCatching { fetchBrowse("FEmusic_explore") }.getOrNull() }
-        val chartDeferred = async { runCatching { fetchBrowse("VLPL4fGSI1pDJn4lW6MJA2q37CfnraqAizqE") }.getOrNull() }
+        val chartDeferred = async { runCatching { fetchBrowse(selectedChartId) }.getOrNull() }
 
         val homeJson = homeDeferred.await()
         val exploreJson = exploreDeferred.await()
@@ -175,14 +189,14 @@ class YouTubeNativeDataSource(
         var dynamicMoodTags: List<MoodTag> = emptyList()
         var dynamicCategories: List<Category> = emptyList()
 
-        if (!homeJson.isNullOrEmpty()) {
-            val parsedHome = parseBrowseResponse(homeJson, prefixId = "home")
-            sections.addAll(parsedHome.sections)
-        }
-
         if (!chartJson.isNullOrEmpty()) {
             val parsedChart = parseBrowseResponse(chartJson, prefixId = "chart")
             sections.addAll(parsedChart.sections)
+        }
+
+        if (!homeJson.isNullOrEmpty()) {
+            val parsedHome = parseBrowseResponse(homeJson, prefixId = "home")
+            sections.addAll(parsedHome.sections)
         }
 
         if (!exploreJson.isNullOrEmpty()) {
@@ -196,10 +210,26 @@ class YouTubeNativeDataSource(
             }
         }
 
+        val filteredSections = sections.filter { it.tracks.isNotEmpty() }
+        val finalSections = if (randomize && filteredSections.size > 1) {
+            val first = filteredSections.first().let { sec ->
+                sec.copy(tracks = sec.tracks.shuffled())
+            }
+            val rest = filteredSections.drop(1).shuffled().map { sec ->
+                sec.copy(tracks = sec.tracks.shuffled())
+            }
+            listOf(first) + rest
+        } else {
+            filteredSections
+        }
+
+        val baseMoodTags = if (dynamicMoodTags.isNotEmpty()) dynamicMoodTags else staticMoodTags
+        val baseCategories = if (dynamicCategories.isNotEmpty()) dynamicCategories else staticCategories
+
         HomeFeed(
-            sections = sections.filter { it.tracks.isNotEmpty() },
-            moodTags = if (dynamicMoodTags.isNotEmpty()) dynamicMoodTags else staticMoodTags,
-            categories = if (dynamicCategories.isNotEmpty()) dynamicCategories else staticCategories
+            sections = finalSections,
+            moodTags = if (randomize) baseMoodTags.shuffled() else baseMoodTags,
+            categories = if (randomize) baseCategories.shuffled() else baseCategories
         )
     }
 
@@ -517,17 +547,29 @@ class YouTubeNativeDataSource(
         }
     }
 
-    private suspend fun loadFallbackFeed(): HomeFeed = coroutineScope {
-        val queries = listOf(
+    private suspend fun loadFallbackFeed(randomize: Boolean = false): HomeFeed = coroutineScope {
+        val allQueries = listOf(
             Triple("Trending Now", "Lagu paling populer dan viral saat ini", "top hits indonesia official video singles"),
             Triple("Rilisan Terbaru", "Karya musik terbaru dari para musisi", "latest official music video singles"),
-            Triple("Chill & Akustik", "Teman santai dan rileks hari ini", "acoustic chill pop singles")
+            Triple("Chill & Akustik", "Teman santai dan rileks hari ini", "acoustic chill pop singles"),
+            Triple("Indie & Senja", "Melodi tenang pengantar hari", "lagu indie indonesia hits"),
+            Triple("Populer Tanah Air", "Deretan hits terbaik anak bangsa", "populer tanah air musik indonesia"),
+            Triple("Workout & EDM", "Dentuman nada pemacu semangat", "workout edm upbeat tracks"),
+            Triple("Nostalgia Hits", "Koleksi tembang kenangan terfavorit", "lagu pop indonesia 2000an hits"),
+            Triple("Fokus & Belajar", "Irama santai pengiring konsentrasi", "lofi chill study beats instrumental")
         )
 
-        val sections = queries.map { (title, subtitle, q) ->
+        val selectedQueries = if (randomize) {
+            allQueries.shuffled().take(4)
+        } else {
+            allQueries.take(3)
+        }
+
+        val sections = selectedQueries.map { (title, subtitle, q) ->
             async {
                 val songs = try {
-                    search(q, limit = 8)
+                    val raw = search(q, limit = 10)
+                    if (randomize) raw.shuffled() else raw
                 } catch (_: Exception) {
                     emptyList()
                 }
@@ -543,8 +585,8 @@ class YouTubeNativeDataSource(
 
         HomeFeed(
             sections = sections,
-            moodTags = staticMoodTags,
-            categories = staticCategories
+            moodTags = if (randomize) staticMoodTags.shuffled() else staticMoodTags,
+            categories = if (randomize) staticCategories.shuffled() else staticCategories
         )
     }
 

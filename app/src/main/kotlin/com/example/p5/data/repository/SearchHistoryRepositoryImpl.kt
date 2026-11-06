@@ -110,3 +110,4 @@ class SearchHistoryRepositoryImpl(
         Unit
     }
 }
+

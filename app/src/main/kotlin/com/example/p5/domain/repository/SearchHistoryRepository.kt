@@ -8,3 +8,4 @@ interface SearchHistoryRepository {
     suspend fun deleteSearchQuery(query: String)
     suspend fun clearSearchHistory()
 }
+
