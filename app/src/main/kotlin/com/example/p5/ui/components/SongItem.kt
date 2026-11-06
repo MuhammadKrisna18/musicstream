@@ -33,9 +33,19 @@ import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.ArtworkTrackSize
+import com.example.p5.ui.theme.CornerRadiusCard
+import com.example.p5.ui.theme.CornerRadiusMd
+import com.example.p5.ui.theme.DurationFast
+import com.example.p5.ui.theme.DurationNormal
 import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.ObsidianSurfaceVariant
+import com.example.p5.ui.theme.ScalePressedSubtle
+import com.example.p5.ui.theme.SpacingSm
+import com.example.p5.ui.theme.StrokeWidthBorder
+import com.example.p5.ui.theme.StrokeWidthHairline
+import com.example.p5.ui.theme.StrokeWidthStandard
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
@@ -53,7 +63,7 @@ fun SongItem(
     trailingContent: (@Composable () -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val cardShape = remember { RoundedCornerShape(14.dp) }
+    val cardShape = remember { RoundedCornerShape(CornerRadiusCard) }
 
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) {
@@ -61,27 +71,27 @@ fun SongItem(
         } else {
             Color.Transparent
         },
-        animationSpec = tween(durationMillis = 250),
+        animationSpec = tween(durationMillis = DurationNormal),
         label = "song_item_bg"
     )
 
     val titleColor by animateColorAsState(
         targetValue = if (isSelected) ToscaPrimary else TextPrimary,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = DurationFast),
         label = "song_item_title_color"
     )
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .pressedScale(targetScale = 0.98f, interactionSource = interactionSource)
+            .pressedScale(targetScale = ScalePressedSubtle, interactionSource = interactionSource)
             .clip(cardShape)
             .background(backgroundColor)
             .then(
                 if (isSelected) {
                     Modifier.glassBorder(
                         shape = cardShape,
-                        strokeWidth = 1.dp,
+                        strokeWidth = StrokeWidthBorder,
                         startColor = ToscaGlassBorder,
                         endColor = GlassBorderSubtle,
                         accentGlow = ToscaPrimary.copy(alpha = 0.5f)
@@ -89,7 +99,7 @@ fun SongItem(
                 } else {
                     Modifier.glassBorder(
                         shape = cardShape,
-                        strokeWidth = 0.75.dp,
+                        strokeWidth = StrokeWidthStandard,
                         startColor = GlassBorderSubtle.copy(alpha = 0.35f),
                         endColor = Color.Transparent
                     )
@@ -100,17 +110,17 @@ fun SongItem(
                 indication = null,
                 onClick = onClick
             )
-            .padding(horizontal = 10.dp, vertical = 8.dp),
+            .padding(horizontal = 10.dp, vertical = SpacingSm),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(52.dp)
-                .clip(RoundedCornerShape(12.dp))
+                .size(ArtworkTrackSize)
+                .clip(RoundedCornerShape(CornerRadiusMd))
                 .background(ObsidianSurfaceVariant)
                 .glassBorder(
-                    shape = RoundedCornerShape(12.dp),
-                    strokeWidth = 0.5.dp,
+                    shape = RoundedCornerShape(CornerRadiusMd),
+                    strokeWidth = StrokeWidthHairline,
                     startColor = GlassBorderMedium,
                     endColor = Color.Transparent
                 )
@@ -167,7 +177,7 @@ fun SongItem(
             )
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(SpacingSm))
 
         if (trailingContent != null) {
             trailingContent()

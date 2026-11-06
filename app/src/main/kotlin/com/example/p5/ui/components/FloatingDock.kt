@@ -12,11 +12,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
@@ -41,15 +39,18 @@ import com.example.p5.R
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.CornerRadiusDock
+import com.example.p5.ui.theme.CornerRadiusHero
+import com.example.p5.ui.theme.DurationFast
 import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.GlassFillMedium
-import com.example.p5.ui.theme.GlassFillSubtle
+import com.example.p5.ui.theme.IconSizeSm
+import com.example.p5.ui.theme.IconSizeStandard
 import com.example.p5.ui.theme.ObsidianBlack
 import com.example.p5.ui.theme.ObsidianFloating
-import com.example.p5.ui.theme.TextPrimary
+import com.example.p5.ui.theme.ScalePressedDockItem
+import com.example.p5.ui.theme.SpacingSm
+import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaGlassBorder
 import com.example.p5.ui.theme.ToscaGlowSubtle
@@ -62,7 +63,7 @@ fun FloatingDock(
     favoriteCount: Int,
     modifier: Modifier = Modifier
 ) {
-    val dockShape = remember { RoundedCornerShape(32.dp) }
+    val dockShape = remember { RoundedCornerShape(CornerRadiusDock) }
 
     Box(
         modifier = modifier
@@ -81,7 +82,7 @@ fun FloatingDock(
                 .background(ObsidianFloating)
                 .glassBorder(
                     shape = dockShape,
-                    strokeWidth = 1.dp,
+                    strokeWidth = StrokeWidthBorder,
                     startColor = GlassBorderBright.copy(alpha = 0.45f),
                     endColor = GlassBorderSubtle
                 )
@@ -121,17 +122,17 @@ private fun FloatingDockItem(
     modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val itemShape = remember { RoundedCornerShape(24.dp) }
+    val itemShape = remember { RoundedCornerShape(CornerRadiusHero) }
 
     val contentColor by animateColorAsState(
         targetValue = if (isSelected) ToscaPrimary else TextSecondary,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = DurationFast),
         label = "dock_item_content_color"
     )
 
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) ToscaPrimary.copy(alpha = 0.15f) else Color.Transparent,
-        animationSpec = tween(durationMillis = 200),
+        animationSpec = tween(durationMillis = DurationFast),
         label = "dock_item_bg_color"
     )
 
@@ -143,14 +144,14 @@ private fun FloatingDockItem(
 
     Row(
         modifier = modifier
-            .pressedScale(targetScale = 0.94f, interactionSource = interactionSource)
+            .pressedScale(targetScale = ScalePressedDockItem, interactionSource = interactionSource)
             .clip(itemShape)
             .background(backgroundColor)
             .then(
                 if (isSelected) {
                     Modifier.glassBorder(
                         shape = itemShape,
-                        strokeWidth = 1.dp,
+                        strokeWidth = StrokeWidthBorder,
                         startColor = ToscaGlassBorder,
                         endColor = GlassBorderSubtle
                     )
@@ -173,7 +174,7 @@ private fun FloatingDockItem(
                     Badge(
                         containerColor = ToscaPrimary,
                         contentColor = ObsidianBlack,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(IconSizeSm)
                     ) {
                         Text(
                             text = if (badgeCount > 99) "99+" else "$badgeCount",
@@ -188,12 +189,12 @@ private fun FloatingDockItem(
                 imageVector = icon,
                 contentDescription = label,
                 tint = contentColor,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(IconSizeStandard)
             )
         }
 
         if (isSelected) {
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(SpacingSm))
             Text(
                 text = label,
                 color = contentColor,
@@ -203,4 +204,3 @@ private fun FloatingDockItem(
         }
     }
 }
-

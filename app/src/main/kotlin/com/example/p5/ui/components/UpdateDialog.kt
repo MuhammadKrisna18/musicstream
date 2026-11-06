@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,12 +43,22 @@ import com.example.p5.domain.model.UpdateInfo
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.CornerRadiusMd
+import com.example.p5.ui.theme.CornerRadiusModal
+import com.example.p5.ui.theme.CornerRadiusXs
 import com.example.p5.ui.theme.GlassBorderBright
 import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.GlassFillLight
+import com.example.p5.ui.theme.IconSizeHero
+import com.example.p5.ui.theme.IconSizeStandard
 import com.example.p5.ui.theme.ObsidianBlack
 import com.example.p5.ui.theme.ObsidianCardHigh
 import com.example.p5.ui.theme.ObsidianSurfaceVariant
+import com.example.p5.ui.theme.ScalePressedDockItem
+import com.example.p5.ui.theme.SpacingMd
+import com.example.p5.ui.theme.SpacingSm
+import com.example.p5.ui.theme.StrokeWidthBorder
+import com.example.p5.ui.theme.StrokeWidthStandard
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
@@ -70,7 +79,7 @@ fun UpdateDialog(
     onInstall: () -> Unit
 ) {
     val isDownloaded = downloadedFile != null
-    val dialogShape = remember { RoundedCornerShape(26.dp) }
+    val dialogShape = remember { RoundedCornerShape(CornerRadiusModal) }
 
     AlertDialog(
         onDismissRequest = {
@@ -85,7 +94,7 @@ fun UpdateDialog(
             .clip(dialogShape)
             .glassBorder(
                 shape = dialogShape,
-                strokeWidth = 1.dp,
+                strokeWidth = StrokeWidthBorder,
                 startColor = GlassBorderBright.copy(alpha = 0.45f),
                 endColor = GlassBorderSubtle
             ),
@@ -95,16 +104,16 @@ fun UpdateDialog(
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(SpacingMd)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
+                        .size(IconSizeHero)
                         .clip(CircleShape)
                         .background(ToscaContainer)
                         .glassBorder(
                             shape = CircleShape,
-                            strokeWidth = 1.dp,
+                            strokeWidth = StrokeWidthBorder,
                             startColor = ToscaGlassBorder,
                             endColor = Color.Transparent
                         ),
@@ -114,7 +123,7 @@ fun UpdateDialog(
                         imageVector = if (isDownloaded) Icons.Rounded.CheckCircle else Icons.Rounded.SystemUpdate,
                         contentDescription = null,
                         tint = ToscaPrimary,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(IconSizeStandard)
                     )
                 }
 
@@ -148,15 +157,15 @@ fun UpdateDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(max = 160.dp)
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(CornerRadiusMd))
                             .background(GlassFillLight)
                             .glassBorder(
-                                shape = RoundedCornerShape(12.dp),
-                                strokeWidth = 0.75.dp,
+                                shape = RoundedCornerShape(CornerRadiusMd),
+                                strokeWidth = StrokeWidthStandard,
                                 startColor = GlassBorderBright.copy(alpha = 0.25f),
                                 endColor = Color.Transparent
                             )
-                            .padding(12.dp)
+                            .padding(SpacingMd)
                             .verticalScroll(rememberScrollState())
                     ) {
                         Text(
@@ -178,13 +187,13 @@ fun UpdateDialog(
                             progress = { downloadProgress },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(RoundedCornerShape(4.dp)),
+                                .height(SpacingSm)
+                                .clip(RoundedCornerShape(CornerRadiusXs)),
                             color = ToscaPrimary,
                             trackColor = ObsidianSurfaceVariant,
                             strokeCap = StrokeCap.Round
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(SpacingSm))
                         Text(
                             text = stringResource(R.string.update_downloading_progress, (downloadProgress * 100).toInt()),
                             fontSize = 12.sp,
@@ -215,8 +224,8 @@ fun UpdateDialog(
                         containerColor = ToscaPrimary,
                         contentColor = ObsidianBlack
                     ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.pressedScale(targetScale = 0.94f, interactionSource = confirmSource)
+                    shape = RoundedCornerShape(CornerRadiusMd),
+                    modifier = Modifier.pressedScale(targetScale = ScalePressedDockItem, interactionSource = confirmSource)
                 ) {
                     Text(stringResource(R.string.update_action_install), fontWeight = FontWeight.Bold)
                 }
@@ -228,7 +237,7 @@ fun UpdateDialog(
                         disabledContainerColor = ToscaContainer,
                         disabledContentColor = TextMuted
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(CornerRadiusMd)
                 ) {
                     Text(stringResource(R.string.update_action_downloading))
                 }
@@ -239,8 +248,8 @@ fun UpdateDialog(
                         containerColor = ToscaPrimary,
                         contentColor = ObsidianBlack
                     ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.pressedScale(targetScale = 0.94f, interactionSource = confirmSource)
+                    shape = RoundedCornerShape(CornerRadiusMd),
+                    modifier = Modifier.pressedScale(targetScale = ScalePressedDockItem, interactionSource = confirmSource)
                 ) {
                     Text(stringResource(R.string.update_action_download), fontWeight = FontWeight.Bold)
                 }
@@ -250,7 +259,7 @@ fun UpdateDialog(
             if (!isDownloading) {
                 OutlinedButton(
                     onClick = onDismiss,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(CornerRadiusMd)
                 ) {
                     Text(if (isDownloaded) stringResource(R.string.dialog_close) else stringResource(R.string.update_action_later), color = TextSecondary)
                 }

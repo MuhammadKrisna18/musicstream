@@ -54,19 +54,33 @@ import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.ActionButtonSizeMd
+import com.example.p5.ui.theme.ActionButtonSizeSm
+import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.CornerRadiusDefault
+import com.example.p5.ui.theme.CornerRadiusPill
+import com.example.p5.ui.theme.CornerRadiusSm
+import com.example.p5.ui.theme.CornerRadiusTab
+import com.example.p5.ui.theme.CornerRadiusXs
+import com.example.p5.ui.theme.DurationFast
 import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.GlassFillSubtle
+import com.example.p5.ui.theme.IconSizeMd
+import com.example.p5.ui.theme.IconSizeSm
 import com.example.p5.ui.theme.ObsidianBackground
-import com.example.p5.ui.theme.ObsidianCardHigh
-import com.example.p5.ui.theme.ObsidianSurfaceVariant
+import com.example.p5.ui.theme.ScalePressedButton
+import com.example.p5.ui.theme.ScalePressedCard
+import com.example.p5.ui.theme.SpacingLg
+import com.example.p5.ui.theme.SpacingMd
+import com.example.p5.ui.theme.SpacingSm
+import com.example.p5.ui.theme.SpacingXs
+import com.example.p5.ui.theme.StrokeWidthBorder
+import com.example.p5.ui.theme.StrokeWidthStandard
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaContainer
 import com.example.p5.ui.theme.ToscaGlassBorder
 import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaPrimary
@@ -96,7 +110,7 @@ fun LibraryScreen(
         modifier = modifier
             .fillMaxSize()
             .background(ObsidianBackground)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = SpacingLg)
     ) {
         Spacer(modifier = Modifier.height(14.dp))
 
@@ -123,13 +137,13 @@ fun LibraryScreen(
             val updateSource = remember { MutableInteractionSource() }
             Box(
                 modifier = Modifier
-                    .size(38.dp)
-                    .pressedScale(targetScale = 0.92f, interactionSource = updateSource)
+                    .size(ActionButtonSizeMd)
+                    .pressedScale(targetScale = ScalePressedButton, interactionSource = updateSource)
                     .clip(CircleShape)
                     .background(GlassFillLight)
                     .glassBorder(
                         shape = CircleShape,
-                        strokeWidth = 1.dp,
+                        strokeWidth = StrokeWidthBorder,
                         startColor = GlassBorderBright.copy(alpha = 0.35f),
                         endColor = GlassBorderSubtle
                     )
@@ -151,7 +165,7 @@ fun LibraryScreen(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        val tabContainerShape = remember { RoundedCornerShape(22.dp) }
+        val tabContainerShape = remember { RoundedCornerShape(CornerRadiusPill) }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -159,11 +173,11 @@ fun LibraryScreen(
                 .background(GlassFillLight)
                 .glassBorder(
                     shape = tabContainerShape,
-                    strokeWidth = 1.dp,
+                    strokeWidth = StrokeWidthBorder,
                     startColor = GlassBorderBright.copy(alpha = 0.35f),
                     endColor = GlassBorderSubtle
                 )
-                .padding(4.dp),
+                .padding(SpacingXs),
             horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             val tabs = listOf(
@@ -172,32 +186,32 @@ fun LibraryScreen(
             )
             tabs.forEachIndexed { index, title ->
                 val selected = selectedTab == index
-                val itemShape = remember { RoundedCornerShape(18.dp) }
+                val itemShape = remember { RoundedCornerShape(CornerRadiusTab) }
                 val itemSource = remember { MutableInteractionSource() }
 
                 val itemBg by animateColorAsState(
                     targetValue = if (selected) ToscaPrimary.copy(alpha = 0.16f) else Color.Transparent,
-                    animationSpec = tween(200),
+                    animationSpec = tween(DurationFast),
                     label = "tab_bg"
                 )
 
                 val textColor by animateColorAsState(
                     targetValue = if (selected) ToscaPrimary else TextSecondary,
-                    animationSpec = tween(200),
+                    animationSpec = tween(DurationFast),
                     label = "tab_text"
                 )
 
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .pressedScale(targetScale = 0.96f, interactionSource = itemSource)
+                        .pressedScale(targetScale = ScalePressedCard, interactionSource = itemSource)
                         .clip(itemShape)
                         .background(itemBg)
                         .then(
                             if (selected) {
                                 Modifier.glassBorder(
                                     shape = itemShape,
-                                    strokeWidth = 1.dp,
+                                    strokeWidth = StrokeWidthBorder,
                                     startColor = ToscaGlassBorder,
                                     endColor = GlassBorderSubtle
                                 )
@@ -222,9 +236,9 @@ fun LibraryScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(SpacingMd))
 
-        val cacheShape = remember { RoundedCornerShape(16.dp) }
+        val cacheShape = remember { RoundedCornerShape(CornerRadiusDefault) }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -232,7 +246,7 @@ fun LibraryScreen(
                 .background(GlassFillSubtle)
                 .glassBorder(
                     shape = cacheShape,
-                    strokeWidth = 0.75.dp,
+                    strokeWidth = StrokeWidthStandard,
                     startColor = GlassBorderBright.copy(alpha = 0.25f),
                     endColor = Color.Transparent
                 )
@@ -245,9 +259,9 @@ fun LibraryScreen(
                     imageVector = Icons.Rounded.Storage,
                     contentDescription = null,
                     tint = ToscaPrimary,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(IconSizeSm)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(SpacingSm))
                 Text(
                     text = stringResource(R.string.library_cache_label, formatCacheBytes(uiState.cacheSizeBytes)),
                     color = TextSecondary,
@@ -264,8 +278,8 @@ fun LibraryScreen(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier
-                        .pressedScale(targetScale = 0.92f, interactionSource = clearSource)
-                        .clip(RoundedCornerShape(8.dp))
+                        .pressedScale(targetScale = ScalePressedButton, interactionSource = clearSource)
+                        .clip(RoundedCornerShape(CornerRadiusSm))
                         .clickable(
                             interactionSource = clearSource,
                             indication = null
@@ -293,7 +307,7 @@ fun LibraryScreen(
                             .background(GlassFillLight)
                             .glassBorder(
                                 shape = CircleShape,
-                                strokeWidth = 1.dp,
+                                strokeWidth = StrokeWidthBorder,
                                 startColor = GlassBorderBright.copy(alpha = 0.35f),
                                 endColor = GlassBorderSubtle
                             ),
@@ -303,11 +317,11 @@ fun LibraryScreen(
                             imageVector = Icons.Rounded.FavoriteBorder,
                             contentDescription = null,
                             tint = ToscaPrimary,
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(ActionButtonSizeSm)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(SpacingLg))
 
                     Text(
                         text = stringResource(R.string.library_empty_favorites_title),
@@ -327,7 +341,7 @@ fun LibraryScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 140.dp),
+                    contentPadding = PaddingValues(bottom = BottomScrollPadding),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     itemsIndexed(
@@ -361,7 +375,7 @@ fun LibraryScreen(
                             .background(GlassFillLight)
                             .glassBorder(
                                 shape = CircleShape,
-                                strokeWidth = 1.dp,
+                                strokeWidth = StrokeWidthBorder,
                                 startColor = GlassBorderBright.copy(alpha = 0.35f),
                                 endColor = GlassBorderSubtle
                             ),
@@ -371,11 +385,11 @@ fun LibraryScreen(
                             imageVector = Icons.Rounded.History,
                             contentDescription = null,
                             tint = ToscaPrimary,
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(ActionButtonSizeSm)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(SpacingLg))
 
                     Text(
                         text = stringResource(R.string.library_empty_history_title),
@@ -397,7 +411,7 @@ fun LibraryScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp),
+                            .padding(bottom = SpacingSm),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -414,7 +428,7 @@ fun LibraryScreen(
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
+                                .clip(RoundedCornerShape(CornerRadiusXs))
                                 .clickable { libraryViewModel.clearHistory() }
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         )
@@ -422,7 +436,7 @@ fun LibraryScreen(
 
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 140.dp),
+                        contentPadding = PaddingValues(bottom = BottomScrollPadding),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         itemsIndexed(
@@ -433,7 +447,7 @@ fun LibraryScreen(
                             HistorySongItem(
                                 song = song,
                                 isSelected = isSelected,
-                                isPlaying = playerState.isPlaying,
+                                livesPlaying = playerState.isPlaying,
                                 onClick = { onPlayQueue(historySongs, index) }
                             )
                         }
@@ -469,13 +483,13 @@ private fun FavoriteSongItem(
                 Spacer(modifier = Modifier.width(6.dp))
                 IconButton(
                     onClick = onRemoveFavorite,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(ActionButtonSizeSm)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Favorite,
                         contentDescription = stringResource(R.string.library_remove_favorite_desc),
                         tint = ToscaPrimary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(IconSizeMd)
                     )
                 }
             }
@@ -487,13 +501,13 @@ private fun FavoriteSongItem(
 private fun HistorySongItem(
     song: Song,
     isSelected: Boolean,
-    isPlaying: Boolean,
+    livesPlaying: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     SongItem(
         song = song,
-        isPlaying = isPlaying,
+        isPlaying = livesPlaying,
         isSelected = isSelected,
         onClick = onClick,
         modifier = modifier

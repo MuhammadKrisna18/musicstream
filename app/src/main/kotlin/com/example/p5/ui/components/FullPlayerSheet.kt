@@ -56,7 +56,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -90,25 +89,54 @@ import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.ActionButtonSizeLg
+import com.example.p5.ui.theme.ActionButtonSizeMd
+import com.example.p5.ui.theme.ActionButtonSizeSm
+import com.example.p5.ui.theme.ActionButtonSizeXl
+import com.example.p5.ui.theme.ArtworkQueueThumbSize
 import com.example.p5.ui.theme.AuroraCyan
 import com.example.p5.ui.theme.AuroraDeepIndigo
+import com.example.p5.ui.theme.CornerRadiusMd
+import com.example.p5.ui.theme.CornerRadiusModal
+import com.example.p5.ui.theme.CornerRadiusPill
+import com.example.p5.ui.theme.CornerRadiusSm
+import com.example.p5.ui.theme.DurationAuroraFlow
+import com.example.p5.ui.theme.DurationFast
+import com.example.p5.ui.theme.DurationNormal
 import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.GlassFillSubtle
+import com.example.p5.ui.theme.IconSizeAction
+import com.example.p5.ui.theme.IconSizeDisplay
+import com.example.p5.ui.theme.IconSizeHero
+import com.example.p5.ui.theme.IconSizeLg
+import com.example.p5.ui.theme.IconSizeSm
+import com.example.p5.ui.theme.IconSizeXl
 import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianCard
 import com.example.p5.ui.theme.ObsidianCardHigh
-import com.example.p5.ui.theme.ObsidianSurfaceVariant
+import com.example.p5.ui.theme.PlayButtonSizeFull
+import com.example.p5.ui.theme.ScaleActiveLyric
+import com.example.p5.ui.theme.ScaleAlbumPaused
+import com.example.p5.ui.theme.ScaleAlbumPlaying
+import com.example.p5.ui.theme.ScalePressedButton
+import com.example.p5.ui.theme.ScalePressedGlass
+import com.example.p5.ui.theme.ScalePressedIcon
+import com.example.p5.ui.theme.ScalePressedRound
+import com.example.p5.ui.theme.SpacingLg
+import com.example.p5.ui.theme.SpacingMd
+import com.example.p5.ui.theme.SpacingSm
+import com.example.p5.ui.theme.SpacingXl
+import com.example.p5.ui.theme.SpacingXs
+import com.example.p5.ui.theme.SpacingXxl
+import com.example.p5.ui.theme.StrokeWidthBorder
+import com.example.p5.ui.theme.StrokeWidthProgress
+import com.example.p5.ui.theme.StrokeWidthStandard
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaContainer
 import com.example.p5.ui.theme.ToscaGlassBorder
 import com.example.p5.ui.theme.ToscaGlow
-import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaPrimary
 
 enum class PlayerCenterView {
@@ -156,7 +184,7 @@ fun FullPlayerSheet(
         initialValue = 0f,
         targetValue = 180f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 14000, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = DurationAuroraFlow, easing = FastOutSlowInEasing),
             repeatMode = AnimRepeatMode.Reverse
         ),
         label = "aurora1"
@@ -204,13 +232,13 @@ fun FullPlayerSheet(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 24.dp)
-                    .padding(top = 12.dp, bottom = 28.dp),
+                    .padding(horizontal = SpacingXxl)
+                    .padding(top = SpacingMd, bottom = 28.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
-                        .size(width = 38.dp, height = 4.dp)
+                        .size(width = ActionButtonSizeMd, height = SpacingXs)
                         .clip(CircleShape)
                         .background(GlassBorderBright.copy(alpha = 0.45f))
                 )
@@ -224,13 +252,13 @@ fun FullPlayerSheet(
                     val dismissSource = remember { MutableInteractionSource() }
                     Box(
                         modifier = Modifier
-                            .size(38.dp)
-                            .pressedScale(targetScale = 0.92f, interactionSource = dismissSource)
+                            .size(ActionButtonSizeMd)
+                            .pressedScale(targetScale = ScalePressedButton, interactionSource = dismissSource)
                             .clip(CircleShape)
                             .background(GlassFillLight)
                             .glassBorder(
                                 shape = CircleShape,
-                                strokeWidth = 1.dp,
+                                strokeWidth = StrokeWidthBorder,
                                 startColor = GlassBorderBright.copy(alpha = 0.35f),
                                 endColor = GlassBorderSubtle
                             )
@@ -245,7 +273,7 @@ fun FullPlayerSheet(
                             imageVector = Icons.Rounded.KeyboardArrowDown,
                             contentDescription = stringResource(R.string.player_dismiss_desc),
                             tint = TextPrimary,
-                            modifier = Modifier.size(26.dp)
+                            modifier = Modifier.size(IconSizeAction)
                         )
                     }
 
@@ -291,7 +319,7 @@ fun FullPlayerSheet(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(SpacingLg))
 
                 Box(
                     modifier = Modifier
@@ -301,7 +329,7 @@ fun FullPlayerSheet(
                 ) {
                     AnimatedContent(
                         targetState = centerView,
-                        transitionSpec = { fadeIn(tween(250)) togetherWith fadeOut(tween(200)) },
+                        transitionSpec = { fadeIn(tween(DurationNormal)) togetherWith fadeOut(tween(DurationFast)) },
                         label = "center_view_switch"
                     ) { currentView ->
                         when (currentView) {
@@ -311,12 +339,12 @@ fun FullPlayerSheet(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     val albumScale by animateFloatAsState(
-                                        targetValue = if (playerState.isPlaying) 1.0f else 0.92f,
+                                        targetValue = if (playerState.isPlaying) ScaleAlbumPlaying else ScaleAlbumPaused,
                                         animationSpec = spring(dampingRatio = 0.72f, stiffness = 300f),
                                         label = "album_scale"
                                     )
 
-                                    val albumShape = remember { RoundedCornerShape(26.dp) }
+                                    val albumShape = remember { RoundedCornerShape(CornerRadiusModal) }
 
                                     Box(
                                         modifier = Modifier
@@ -332,7 +360,7 @@ fun FullPlayerSheet(
                                             .background(ObsidianCardHigh)
                                             .glassBorder(
                                                 shape = albumShape,
-                                                strokeWidth = 1.dp,
+                                                strokeWidth = StrokeWidthBorder,
                                                 startColor = GlassBorderBright.copy(alpha = 0.55f),
                                                 endColor = GlassBorderSubtle
                                             )
@@ -345,7 +373,7 @@ fun FullPlayerSheet(
                                         )
                                     }
 
-                                    Spacer(modifier = Modifier.height(26.dp))
+                                    Spacer(modifier = Modifier.height(CornerRadiusModal))
 
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
@@ -371,20 +399,20 @@ fun FullPlayerSheet(
                                                 fontWeight = FontWeight.SemiBold,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis,
-                                                modifier = Modifier.padding(top = 4.dp)
+                                                modifier = Modifier.padding(top = SpacingXs)
                                             )
                                         }
 
                                         val favSource = remember { MutableInteractionSource() }
                                         Box(
                                             modifier = Modifier
-                                                .size(42.dp)
-                                                .pressedScale(targetScale = 0.88f, interactionSource = favSource)
+                                                .size(ActionButtonSizeLg)
+                                                .pressedScale(targetScale = ScalePressedIcon, interactionSource = favSource)
                                                 .clip(CircleShape)
                                                 .background(GlassFillLight)
                                                 .glassBorder(
                                                     shape = CircleShape,
-                                                    strokeWidth = 1.dp,
+                                                    strokeWidth = StrokeWidthBorder,
                                                     startColor = GlassBorderBright.copy(alpha = 0.35f),
                                                     endColor = GlassBorderSubtle
                                                 )
@@ -399,7 +427,7 @@ fun FullPlayerSheet(
                                                 imageVector = if (playerState.isCurrentSongFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                                                 contentDescription = if (playerState.isCurrentSongFavorite) stringResource(R.string.library_remove_favorite_desc) else stringResource(R.string.library_add_favorite_desc),
                                                 tint = if (playerState.isCurrentSongFavorite) Color(0xFFFF3B30) else TextMuted,
-                                                modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(IconSizeLg)
                                             )
                                         }
                                     }
@@ -407,7 +435,7 @@ fun FullPlayerSheet(
                             }
 
                             PlayerCenterView.QUEUE -> {
-                                val queueShape = remember { RoundedCornerShape(22.dp) }
+                                val queueShape = remember { RoundedCornerShape(CornerRadiusPill) }
                                 Column(
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -415,7 +443,7 @@ fun FullPlayerSheet(
                                         .background(GlassFillLight)
                                         .glassBorder(
                                             shape = queueShape,
-                                            strokeWidth = 1.dp,
+                                            strokeWidth = StrokeWidthBorder,
                                             startColor = GlassBorderBright.copy(alpha = 0.35f),
                                             endColor = GlassBorderSubtle
                                         )
@@ -426,7 +454,7 @@ fun FullPlayerSheet(
                                         fontSize = 14.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = TextPrimary,
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                                        modifier = Modifier.padding(horizontal = SpacingSm, vertical = 6.dp)
                                     )
 
                                     if (playerState.queue.isEmpty()) {
@@ -443,27 +471,27 @@ fun FullPlayerSheet(
                                         ) {
                                             itemsIndexed(playerState.queue) { index, song ->
                                                 val isCurrent = index == playerState.currentQueueIndex
-                                                val rowShape = remember { RoundedCornerShape(12.dp) }
+                                                val rowShape = remember { RoundedCornerShape(CornerRadiusMd) }
                                                 val rowSource = remember { MutableInteractionSource() }
 
                                                 Row(
                                                     modifier = Modifier
                                                         .fillMaxWidth()
-                                                        .pressedScale(targetScale = 0.97f, interactionSource = rowSource)
+                                                        .pressedScale(targetScale = ScalePressedGlass, interactionSource = rowSource)
                                                         .clip(rowShape)
                                                         .background(if (isCurrent) ToscaPrimary.copy(alpha = 0.14f) else GlassFillSubtle)
                                                         .then(
                                                             if (isCurrent) {
                                                                 Modifier.glassBorder(
                                                                     shape = rowShape,
-                                                                    strokeWidth = 1.dp,
+                                                                    strokeWidth = StrokeWidthBorder,
                                                                     startColor = ToscaGlassBorder,
                                                                     endColor = GlassBorderSubtle
                                                                 )
                                                             } else {
                                                                 Modifier.glassBorder(
                                                                     shape = rowShape,
-                                                                    strokeWidth = 0.75.dp,
+                                                                    strokeWidth = StrokeWidthStandard,
                                                                     startColor = GlassBorderBright.copy(alpha = 0.2f),
                                                                     endColor = Color.Transparent
                                                                 )
@@ -473,11 +501,11 @@ fun FullPlayerSheet(
                                                             interactionSource = rowSource,
                                                             indication = null
                                                         ) { onPlayQueueIndex(index) }
-                                                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                                                        .padding(horizontal = 10.dp, vertical = SpacingSm),
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
                                                     Box(
-                                                        modifier = Modifier.size(24.dp),
+                                                        modifier = Modifier.size(IconSizeLg),
                                                         contentAlignment = Alignment.Center
                                                     ) {
                                                         if (isCurrent && playerState.isPlaying) {
@@ -492,15 +520,15 @@ fun FullPlayerSheet(
                                                         }
                                                     }
 
-                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Spacer(modifier = Modifier.width(SpacingSm))
 
                                                     AsyncImage(
                                                         model = song.thumbnailUrl,
                                                         contentDescription = song.title,
                                                         contentScale = ContentScale.Crop,
                                                         modifier = Modifier
-                                                            .size(40.dp)
-                                                            .clip(RoundedCornerShape(8.dp))
+                                                            .size(ArtworkQueueThumbSize)
+                                                            .clip(RoundedCornerShape(CornerRadiusSm))
                                                     )
 
                                                     Spacer(modifier = Modifier.width(10.dp))
@@ -523,7 +551,7 @@ fun FullPlayerSheet(
                                                         )
                                                     }
 
-                                                    Spacer(modifier = Modifier.width(8.dp))
+                                                    Spacer(modifier = Modifier.width(SpacingSm))
 
                                                     Text(
                                                         text = song.durationFormatted,
@@ -540,7 +568,7 @@ fun FullPlayerSheet(
                             PlayerCenterView.LYRICS -> {
                                 val lyrics = playerState.currentLyrics
                                 val isLyricsLoading = playerState.isLyricsLoading
-                                val lyricsShape = remember { RoundedCornerShape(22.dp) }
+                                val lyricsShape = remember { RoundedCornerShape(CornerRadiusPill) }
 
                                 Column(
                                     modifier = Modifier
@@ -549,11 +577,11 @@ fun FullPlayerSheet(
                                         .background(GlassFillLight)
                                         .glassBorder(
                                             shape = lyricsShape,
-                                            strokeWidth = 1.dp,
+                                            strokeWidth = StrokeWidthBorder,
                                             startColor = GlassBorderBright.copy(alpha = 0.35f),
                                             endColor = GlassBorderSubtle
                                         )
-                                        .padding(16.dp)
+                                        .padding(SpacingLg)
                                 ) {
                                     if (isLyricsLoading) {
                                         Column(
@@ -563,8 +591,8 @@ fun FullPlayerSheet(
                                         ) {
                                             CircularProgressIndicator(
                                                 color = ToscaPrimary,
-                                                strokeWidth = 3.dp,
-                                                modifier = Modifier.size(36.dp)
+                                                strokeWidth = StrokeWidthProgress,
+                                                modifier = Modifier.size(ActionButtonSizeSm)
                                             )
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Text(
@@ -583,7 +611,7 @@ fun FullPlayerSheet(
                                                 imageVector = Icons.Rounded.Lyrics,
                                                 contentDescription = null,
                                                 tint = TextMuted,
-                                                modifier = Modifier.size(46.dp)
+                                                modifier = Modifier.size(IconSizeDisplay)
                                             )
                                             Spacer(modifier = Modifier.height(10.dp))
                                             Text(
@@ -597,7 +625,7 @@ fun FullPlayerSheet(
                                                 color = TextSecondary,
                                                 fontSize = 12.sp,
                                                 textAlign = TextAlign.Center,
-                                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
+                                                modifier = Modifier.padding(horizontal = SpacingXxl, vertical = SpacingXs)
                                             )
                                             Spacer(modifier = Modifier.height(14.dp))
                                             Button(
@@ -606,12 +634,12 @@ fun FullPlayerSheet(
                                                     containerColor = ToscaPrimary.copy(alpha = 0.16f),
                                                     contentColor = ToscaPrimary
                                                 ),
-                                                shape = RoundedCornerShape(12.dp)
+                                                shape = RoundedCornerShape(CornerRadiusMd)
                                             ) {
                                                 Icon(
                                                     imageVector = Icons.Rounded.Refresh,
                                                     contentDescription = null,
-                                                    modifier = Modifier.size(16.dp)
+                                                    modifier = Modifier.size(IconSizeSm)
                                                 )
                                                 Spacer(modifier = Modifier.width(6.dp))
                                                 Text(stringResource(R.string.player_lyrics_retry), fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
@@ -627,9 +655,9 @@ fun FullPlayerSheet(
                                                     imageVector = Icons.Rounded.MusicNote,
                                                     contentDescription = null,
                                                     tint = ToscaPrimary,
-                                                    modifier = Modifier.size(42.dp)
+                                                    modifier = Modifier.size(IconSizeHero)
                                                 )
-                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Spacer(modifier = Modifier.height(SpacingSm))
                                                 Text(
                                                     text = stringResource(R.string.player_instrumental_title),
                                                     color = TextPrimary,
@@ -677,7 +705,7 @@ fun FullPlayerSheet(
                                                     lineHeight = if (isActive) 29.sp else 23.sp,
                                                     modifier = Modifier
                                                         .fillMaxWidth()
-                                                        .scale(if (isActive) 1.02f else 1.0f)
+                                                        .scale(if (isActive) ScaleActiveLyric else 1.0f)
                                                         .clickable(
                                                             interactionSource = lineSource,
                                                             indication = null
@@ -753,7 +781,7 @@ fun FullPlayerSheet(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(SpacingLg))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -771,20 +799,20 @@ fun FullPlayerSheet(
                         icon = Icons.Rounded.SkipPrevious,
                         contentDescription = stringResource(R.string.player_previous_desc),
                         enabled = playerState.hasPrevious,
-                        size = 32.dp,
+                        size = IconSizeXl,
                         onClick = onSkipPrevious
                     )
 
                     val playSource = remember { MutableInteractionSource() }
                     Box(
                         modifier = Modifier
-                            .size(70.dp)
+                            .size(PlayButtonSizeFull)
                             .ambientGlow(
                                 color = ToscaGlow,
                                 alpha = if (playerState.isPlaying) 0.8f else 0.3f,
                                 shape = CircleShape
                             )
-                            .pressedScale(targetScale = 0.92f, interactionSource = playSource)
+                            .pressedScale(targetScale = ScalePressedButton, interactionSource = playSource)
                             .clip(CircleShape)
                             .background(ToscaPrimary)
                             .clickable(
@@ -797,15 +825,15 @@ fun FullPlayerSheet(
                         if (playerState.isBuffering) {
                             CircularProgressIndicator(
                                 color = ObsidianBlack,
-                                strokeWidth = 3.dp,
-                                modifier = Modifier.size(32.dp)
+                                strokeWidth = StrokeWidthProgress,
+                                modifier = Modifier.size(IconSizeXl)
                             )
                         } else {
                             Icon(
                                 imageVector = if (playerState.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                                 contentDescription = if (playerState.isPlaying) stringResource(R.string.action_pause) else stringResource(R.string.action_play),
                                 tint = ObsidianBlack,
-                                modifier = Modifier.size(36.dp)
+                                modifier = Modifier.size(ActionButtonSizeSm)
                             )
                         }
                     }
@@ -814,7 +842,7 @@ fun FullPlayerSheet(
                         icon = Icons.Rounded.SkipNext,
                         contentDescription = stringResource(R.string.mini_player_next_desc),
                         enabled = playerState.hasNext,
-                        size = 32.dp,
+                        size = IconSizeXl,
                         onClick = onSkipNext
                     )
 
@@ -839,22 +867,22 @@ private fun PlayerTopActionIcon(
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = Modifier
-            .size(36.dp)
-            .pressedScale(targetScale = 0.9f, interactionSource = interactionSource)
+            .size(ActionButtonSizeSm)
+            .pressedScale(targetScale = ScalePressedRound, interactionSource = interactionSource)
             .clip(CircleShape)
             .background(if (isActive) ToscaPrimary.copy(alpha = 0.16f) else GlassFillLight)
             .then(
                 if (isActive) {
                     Modifier.glassBorder(
                         shape = CircleShape,
-                        strokeWidth = 1.dp,
+                        strokeWidth = StrokeWidthBorder,
                         startColor = ToscaGlassBorder,
                         endColor = GlassBorderSubtle
                     )
                 } else {
                     Modifier.glassBorder(
                         shape = CircleShape,
-                        strokeWidth = 0.75.dp,
+                        strokeWidth = StrokeWidthStandard,
                         startColor = GlassBorderBright.copy(alpha = 0.25f),
                         endColor = Color.Transparent
                     )
@@ -889,8 +917,8 @@ private fun PlayerIconButton(
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         modifier = modifier
-            .size(46.dp)
-            .pressedScale(targetScale = 0.9f, interactionSource = interactionSource)
+            .size(ActionButtonSizeXl)
+            .pressedScale(targetScale = ScalePressedRound, interactionSource = interactionSource)
             .clip(CircleShape)
             .clickable(
                 interactionSource = interactionSource,

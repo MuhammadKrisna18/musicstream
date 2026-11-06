@@ -33,16 +33,21 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.p5.ui.theme.CornerRadiusDefault
+import com.example.p5.ui.theme.CornerRadiusXs
+import com.example.p5.ui.theme.DurationSlow
 import com.example.p5.ui.theme.GlassBorderBright
 import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.GlassFillSubtle
+import com.example.p5.ui.theme.ScalePressedGlass
+import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.ToscaGlow
 import com.example.p5.ui.theme.ToscaPrimary
 
 fun Modifier.glassBackground(
-    shape: Shape = RoundedCornerShape(16.dp),
+    shape: Shape = RoundedCornerShape(CornerRadiusDefault),
     topColor: Color = GlassFillMedium,
     bottomColor: Color = GlassFillSubtle
 ): Modifier = this
@@ -55,8 +60,8 @@ fun Modifier.glassBackground(
     )
 
 fun Modifier.glassBorder(
-    shape: Shape = RoundedCornerShape(16.dp),
-    strokeWidth: Dp = 1.dp,
+    shape: Shape = RoundedCornerShape(CornerRadiusDefault),
+    strokeWidth: Dp = StrokeWidthBorder,
     startColor: Color = GlassBorderBright,
     endColor: Color = GlassBorderSubtle,
     accentGlow: Color? = null
@@ -85,10 +90,10 @@ fun Modifier.glassBorder(
 }
 
 fun Modifier.glassCard(
-    shape: Shape = RoundedCornerShape(16.dp),
+    shape: Shape = RoundedCornerShape(CornerRadiusDefault),
     topColor: Color = GlassFillMedium,
     bottomColor: Color = GlassFillSubtle,
-    strokeWidth: Dp = 1.dp,
+    strokeWidth: Dp = StrokeWidthBorder,
     borderColorStart: Color = GlassBorderMedium,
     borderColorEnd: Color = GlassBorderSubtle,
     accentBorder: Color? = null
@@ -109,7 +114,7 @@ fun Modifier.glassCard(
 fun Modifier.ambientGlow(
     color: Color = ToscaGlow,
     alpha: Float = 0.35f,
-    shape: Shape = RoundedCornerShape(16.dp)
+    shape: Shape = RoundedCornerShape(CornerRadiusDefault)
 ): Modifier = this.drawBehind {
     drawRoundRect(
         color = color.copy(alpha = alpha),
@@ -119,7 +124,7 @@ fun Modifier.ambientGlow(
 
 @Composable
 fun Modifier.pressedScale(
-    targetScale: Float = 0.97f,
+    targetScale: Float = ScalePressedGlass,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ): Modifier {
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -140,10 +145,10 @@ fun Modifier.pressedScale(
 @Composable
 fun GlassSurface(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(16.dp),
+    shape: Shape = RoundedCornerShape(CornerRadiusDefault),
     topColor: Color = GlassFillMedium,
     bottomColor: Color = GlassFillSubtle,
-    strokeWidth: Dp = 1.dp,
+    strokeWidth: Dp = StrokeWidthBorder,
     borderColorStart: Color = GlassBorderMedium,
     borderColorEnd: Color = GlassBorderSubtle,
     accentBorder: Color? = null,
@@ -175,7 +180,7 @@ fun MiniEqualizer(
         initialValue = 0.25f,
         targetValue = 0.95f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 450, easing = FastOutSlowInEasing),
+            animation = tween(durationMillis = DurationSlow, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "bar1"
@@ -210,21 +215,21 @@ fun MiniEqualizer(
             modifier = Modifier
                 .width(3.dp)
                 .fillMaxHeight(if (isPlaying) bar1Height else 0.35f)
-                .clip(RoundedCornerShape(2.dp))
+                .clip(RoundedCornerShape(CornerRadiusXs))
                 .background(barColor)
         )
         Box(
             modifier = Modifier
                 .width(3.dp)
                 .fillMaxHeight(if (isPlaying) bar2Height else 0.7f)
-                .clip(RoundedCornerShape(2.dp))
+                .clip(RoundedCornerShape(CornerRadiusXs))
                 .background(barColor)
         )
         Box(
             modifier = Modifier
                 .width(3.dp)
                 .fillMaxHeight(if (isPlaying) bar3Height else 0.45f)
-                .clip(RoundedCornerShape(2.dp))
+                .clip(RoundedCornerShape(CornerRadiusXs))
                 .background(barColor)
         )
     }

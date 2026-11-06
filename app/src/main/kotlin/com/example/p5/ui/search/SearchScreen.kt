@@ -90,6 +90,20 @@ import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.ArtworkCardHeight
+import com.example.p5.ui.theme.ArtworkCardWidth
+import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.CategoryCardHeight
+import com.example.p5.ui.theme.CornerRadiusCardLg
+import com.example.p5.ui.theme.CornerRadiusHero
+import com.example.p5.ui.theme.DurationShimmer
+import com.example.p5.ui.theme.HeroBannerHeight
+import com.example.p5.ui.theme.IconSizeHero
+import com.example.p5.ui.theme.IconSizeLg
+import com.example.p5.ui.theme.PlayButtonSizeHero
+import com.example.p5.ui.theme.ScalePressedCard
+import com.example.p5.ui.theme.ScalePressedSubtle
+import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.AuroraCyan
 import com.example.p5.ui.theme.GlassBorderBright
 import com.example.p5.ui.theme.GlassBorderMedium
@@ -316,7 +330,7 @@ fun SearchScreen(
                     ) {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 140.dp),
+                            contentPadding = PaddingValues(bottom = BottomScrollPadding),
                             verticalArrangement = Arrangement.spacedBy(18.dp)
                         ) {
                             if (searchHistory.isNotEmpty()) {
@@ -620,7 +634,7 @@ fun SearchScreen(
                 is SearchUiState.Success -> {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 140.dp),
+                        contentPadding = PaddingValues(bottom = BottomScrollPadding),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         itemsIndexed(
@@ -703,13 +717,13 @@ private fun EditorialHeroCard(
     modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val cardShape = remember { RoundedCornerShape(24.dp) }
+    val cardShape = remember { RoundedCornerShape(CornerRadiusHero) }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(205.dp)
-            .pressedScale(targetScale = 0.98f, interactionSource = interactionSource)
+            .height(HeroBannerHeight)
+            .pressedScale(targetScale = ScalePressedSubtle, interactionSource = interactionSource)
             .ambientGlow(
                 color = ToscaGlowSubtle,
                 alpha = 0.4f,
@@ -719,7 +733,7 @@ private fun EditorialHeroCard(
             .background(ObsidianCardHigh)
             .glassBorder(
                 shape = cardShape,
-                strokeWidth = 1.dp,
+                strokeWidth = StrokeWidthBorder,
                 startColor = GlassBorderBright.copy(alpha = 0.5f),
                 endColor = GlassBorderSubtle
             )
@@ -811,7 +825,7 @@ private fun EditorialHeroCard(
 
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
+                        .size(PlayButtonSizeHero)
                         .ambientGlow(
                             color = ToscaGlow,
                             alpha = 0.7f,
@@ -831,7 +845,7 @@ private fun EditorialHeroCard(
                             imageVector = Icons.Rounded.PlayArrow,
                             contentDescription = stringResource(R.string.action_play),
                             tint = ObsidianBlack,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(IconSizeLg)
                         )
                     }
                 }
@@ -849,20 +863,20 @@ private fun TrendingTrackCard(
     modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val cardShape = remember { RoundedCornerShape(20.dp) }
+    val cardShape = remember { RoundedCornerShape(CornerRadiusCardLg) }
 
     Box(
         modifier = modifier
-            .width(150.dp)
-            .height(212.dp)
-            .pressedScale(targetScale = 0.95f, interactionSource = interactionSource)
+            .width(ArtworkCardWidth)
+            .height(ArtworkCardHeight)
+            .pressedScale(targetScale = ScalePressedCard, interactionSource = interactionSource)
             .clip(cardShape)
             .background(ObsidianCard)
             .then(
                 if (isSelected) {
                     Modifier.glassBorder(
                         shape = cardShape,
-                        strokeWidth = 1.dp,
+                        strokeWidth = StrokeWidthBorder,
                         startColor = ToscaGlassBorder,
                         endColor = GlassBorderSubtle,
                         accentGlow = ToscaPrimary.copy(alpha = 0.5f)
@@ -870,7 +884,7 @@ private fun TrendingTrackCard(
                 } else {
                     Modifier.glassBorder(
                         shape = cardShape,
-                        strokeWidth = 1.dp,
+                        strokeWidth = StrokeWidthBorder,
                         startColor = GlassBorderBright.copy(alpha = 0.3f),
                         endColor = GlassBorderSubtle
                     )
@@ -973,13 +987,13 @@ private fun GenreCategoryCard(
 ) {
     val baseColor = parseHexColor(category.startColor, ToscaPrimary)
     val icon = getCategoryIcon(category.icon)
-    val cardShape = remember { RoundedCornerShape(20.dp) }
+    val cardShape = remember { RoundedCornerShape(CornerRadiusCardLg) }
     val interactionSource = remember { MutableInteractionSource() }
 
     Box(
         modifier = modifier
-            .height(92.dp)
-            .pressedScale(targetScale = 0.95f, interactionSource = interactionSource)
+            .height(CategoryCardHeight)
+            .pressedScale(targetScale = ScalePressedCard, interactionSource = interactionSource)
             .clip(cardShape)
             .background(
                 Brush.linearGradient(
@@ -991,7 +1005,7 @@ private fun GenreCategoryCard(
             )
             .glassBorder(
                 shape = cardShape,
-                strokeWidth = 1.dp,
+                strokeWidth = StrokeWidthBorder,
                 startColor = baseColor.copy(alpha = 0.45f),
                 endColor = GlassBorderSubtle
             )
@@ -1007,7 +1021,7 @@ private fun GenreCategoryCard(
             contentDescription = null,
             tint = baseColor.copy(alpha = 0.55f),
             modifier = Modifier
-                .size(42.dp)
+                .size(IconSizeHero)
                 .align(Alignment.BottomEnd)
         )
 
@@ -1033,7 +1047,7 @@ private fun rememberShimmerBrush(): Brush {
         initialValue = -300f,
         targetValue = 900f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200, easing = LinearEasing),
+            animation = tween(durationMillis = DurationShimmer, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "shimmer_translate"

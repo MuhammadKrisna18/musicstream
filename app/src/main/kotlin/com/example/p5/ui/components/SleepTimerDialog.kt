@@ -36,11 +36,21 @@ import com.example.p5.R
 import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.CornerRadiusCard
+import com.example.p5.ui.theme.CornerRadiusMd
+import com.example.p5.ui.theme.CornerRadiusModal
 import com.example.p5.ui.theme.GlassBorderBright
 import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.GlassFillLight
+import com.example.p5.ui.theme.IconSizeHero
+import com.example.p5.ui.theme.IconSizeStandard
 import com.example.p5.ui.theme.ObsidianCardHigh
-import com.example.p5.ui.theme.TextMuted
+import com.example.p5.ui.theme.ScalePressedCard
+import com.example.p5.ui.theme.SpacingMd
+import com.example.p5.ui.theme.SpacingSm
+import com.example.p5.ui.theme.SpacingXs
+import com.example.p5.ui.theme.StrokeWidthBorder
+import com.example.p5.ui.theme.StrokeWidthStandard
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaContainer
@@ -58,7 +68,7 @@ fun SleepTimerDialog(
     onDismiss: () -> Unit
 ) {
     val isTimerActive = secondsRemaining != null || isEndOfTrack
-    val dialogShape = remember { RoundedCornerShape(26.dp) }
+    val dialogShape = remember { RoundedCornerShape(CornerRadiusModal) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -71,7 +81,7 @@ fun SleepTimerDialog(
             .clip(dialogShape)
             .glassBorder(
                 shape = dialogShape,
-                strokeWidth = 1.dp,
+                strokeWidth = StrokeWidthBorder,
                 startColor = GlassBorderBright.copy(alpha = 0.45f),
                 endColor = GlassBorderSubtle
             ),
@@ -81,16 +91,16 @@ fun SleepTimerDialog(
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(SpacingMd)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
+                        .size(IconSizeHero)
                         .clip(CircleShape)
                         .background(ToscaContainer)
                         .glassBorder(
                             shape = CircleShape,
-                            strokeWidth = 1.dp,
+                            strokeWidth = StrokeWidthBorder,
                             startColor = ToscaGlassBorder,
                             endColor = Color.Transparent
                         ),
@@ -100,7 +110,7 @@ fun SleepTimerDialog(
                         imageVector = Icons.Rounded.Bedtime,
                         contentDescription = null,
                         tint = ToscaPrimary,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier.size(IconSizeStandard)
                     )
                 }
 
@@ -126,7 +136,7 @@ fun SleepTimerDialog(
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(SpacingSm)
             ) {
                 val presets = listOf(15, 30, 45, 60)
 
@@ -152,17 +162,17 @@ fun SleepTimerDialog(
                 )
 
                 if (isTimerActive) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(SpacingXs))
                     val cancelSource = remember { MutableInteractionSource() }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .pressedScale(targetScale = 0.96f, interactionSource = cancelSource)
-                            .clip(RoundedCornerShape(14.dp))
+                            .pressedScale(targetScale = ScalePressedCard, interactionSource = cancelSource)
+                            .clip(RoundedCornerShape(CornerRadiusCard))
                             .background(ToscaPrimary.copy(alpha = 0.12f))
                             .glassBorder(
-                                shape = RoundedCornerShape(14.dp),
-                                strokeWidth = 1.dp,
+                                shape = RoundedCornerShape(CornerRadiusCard),
+                                strokeWidth = StrokeWidthBorder,
                                 startColor = ToscaGlassBorder,
                                 endColor = GlassBorderSubtle
                             )
@@ -197,7 +207,7 @@ fun SleepTimerDialog(
         dismissButton = {
             OutlinedButton(
                 onClick = onDismiss,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(CornerRadiusMd)
             ) {
                 Text(stringResource(R.string.dialog_close), color = TextSecondary)
             }
@@ -212,26 +222,26 @@ private fun TimerOptionItem(
     onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val itemShape = remember { RoundedCornerShape(14.dp) }
+    val itemShape = remember { RoundedCornerShape(CornerRadiusCard) }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .pressedScale(targetScale = 0.96f, interactionSource = interactionSource)
+            .pressedScale(targetScale = ScalePressedCard, interactionSource = interactionSource)
             .clip(itemShape)
             .background(if (isSelected) ToscaPrimary.copy(alpha = 0.16f) else GlassFillLight)
             .then(
                 if (isSelected) {
                     Modifier.glassBorder(
                         shape = itemShape,
-                        strokeWidth = 1.dp,
+                        strokeWidth = StrokeWidthBorder,
                         startColor = ToscaGlassBorder,
                         endColor = GlassBorderSubtle
                     )
                 } else {
                     Modifier.glassBorder(
                         shape = itemShape,
-                        strokeWidth = 0.75.dp,
+                        strokeWidth = StrokeWidthStandard,
                         startColor = GlassBorderBright.copy(alpha = 0.25f),
                         endColor = Color.Transparent
                     )
@@ -242,7 +252,7 @@ private fun TimerOptionItem(
                 indication = null,
                 onClick = onClick
             )
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(horizontal = 14.dp, vertical = SpacingMd),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
