@@ -6,18 +6,18 @@ import androidx.compose.runtime.Composable
 
 private val DarkColorScheme = darkColorScheme(
     primary = ToscaPrimary,
-    onPrimary = BlackBackground,
+    onPrimary = ObsidianBlack,
     primaryContainer = ToscaContainer,
     onPrimaryContainer = ToscaLight,
     secondary = ToscaLight,
-    onSecondary = BlackBackground,
-    background = BlackBackground,
+    onSecondary = ObsidianBlack,
+    background = ObsidianBackground,
     onBackground = TextPrimary,
-    surface = DarkSurface,
+    surface = ObsidianSurface,
     onSurface = TextPrimary,
-    surfaceVariant = DarkSurfaceVariant,
+    surfaceVariant = ObsidianSurfaceVariant,
     onSurfaceVariant = TextSecondary,
-    outline = DividerColor
+    outline = GlassBorderSubtle
 )
 
 @Composable

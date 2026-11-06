@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
+import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.theme.BlackBackground
 import com.example.p5.ui.theme.DarkSurface
 import com.example.p5.ui.theme.DarkSurfaceVariant
@@ -362,91 +363,34 @@ private fun FavoriteSongItem(
     onRemoveFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (isSelected) DarkSurfaceVariant.copy(alpha = 0.6f) else BlackBackground)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(52.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(DarkSurfaceVariant)
-        ) {
-            AsyncImage(
-                model = song.thumbnailUrl,
-                contentDescription = song.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            if (isSelected && isPlaying) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(ToscaPrimary.copy(alpha = 0.45f)),
-                    contentAlignment = Alignment.Center
+    SongItem(
+        song = song,
+        isPlaying = isPlaying,
+        isSelected = isSelected,
+        onClick = onClick,
+        modifier = modifier,
+        trailingContent = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = song.durationFormatted,
+                    color = TextMuted,
+                    fontSize = 12.sp
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                IconButton(
+                    onClick = onRemoveFavorite,
+                    modifier = Modifier.size(36.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.GraphicEq,
-                        contentDescription = null,
-                        tint = BlackBackground,
-                        modifier = Modifier.size(24.dp)
+                        imageVector = Icons.Rounded.Favorite,
+                        contentDescription = "Hapus dari Favorit",
+                        tint = ToscaPrimary,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
         }
-
-        Spacer(modifier = Modifier.width(14.dp))
-
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = song.title,
-                color = if (isSelected) ToscaPrimary else TextPrimary,
-                fontSize = 15.sp,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = song.artist,
-                color = TextSecondary,
-                fontSize = 13.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = song.durationFormatted,
-            color = TextMuted,
-            fontSize = 12.sp
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        IconButton(
-            onClick = onRemoveFavorite,
-            modifier = Modifier.size(36.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Favorite,
-                contentDescription = "Hapus dari Favorit",
-                tint = ToscaPrimary,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
+    )
 }
 
 @Composable
@@ -457,77 +401,13 @@ private fun HistorySongItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    SongItem(
+        song = song,
+        isPlaying = isPlaying,
+        isSelected = isSelected,
+        onClick = onClick,
         modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (isSelected) DarkSurfaceVariant.copy(alpha = 0.6f) else BlackBackground)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(52.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(DarkSurfaceVariant)
-        ) {
-            AsyncImage(
-                model = song.thumbnailUrl,
-                contentDescription = song.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            if (isSelected && isPlaying) {
-                Box(
-                    modifier = Modifier
-                        .matchParentSize()
-                        .background(ToscaPrimary.copy(alpha = 0.45f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.GraphicEq,
-                        contentDescription = null,
-                        tint = BlackBackground,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.width(14.dp))
-
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = song.title,
-                color = if (isSelected) ToscaPrimary else TextPrimary,
-                fontSize = 15.sp,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                text = song.artist,
-                color = TextSecondary,
-                fontSize = 13.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(top = 2.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            text = song.durationFormatted,
-            color = TextMuted,
-            fontSize = 12.sp
-        )
-    }
+    )
 }
 
 private fun formatCacheBytes(bytes: Long): String {
