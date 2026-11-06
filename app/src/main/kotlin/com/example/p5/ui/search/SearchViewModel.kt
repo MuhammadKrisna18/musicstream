@@ -6,6 +6,7 @@ import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Song
+import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -25,7 +28,8 @@ class SearchViewModel(
     private val getTrendingMusicUseCase: GetTrendingMusicUseCase,
     private val getHomeCategoriesUseCase: GetHomeCategoriesUseCase,
     private val getHomeFeedUseCase: GetHomeFeedUseCase,
-    private val searchHistoryRepository: SearchHistoryRepository
+    private val searchHistoryRepository: SearchHistoryRepository,
+    private val historyRepository: HistoryRepository
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -41,8 +45,38 @@ class SearchViewModel(
             initialValue = emptyList()
         )
 
-    private val _homeSections = MutableStateFlow<List<HomeSection>>(emptyList())
-    val homeSections: StateFlow<List<HomeSection>> = _homeSections.asStateFlow()
+    private val _rawHomeSections = MutableStateFlow<List<HomeSection>>(emptyList())
+    private val _artistRecommendationSection = MutableStateFlow<HomeSection?>(null)
+
+    val homeSections: StateFlow<List<HomeSection>> = combine(
+        historyRepository.getTopPlayedSongs(10),
+        _artistRecommendationSection,
+        _rawHomeSections
+    ) { topPlayed, artistSec, rawSecs ->
+        val personalized = mutableListOf<HomeSection>()
+
+        if (topPlayed.isNotEmpty()) {
+            personalized.add(
+                HomeSection(
+                    id = "personalized_on_repeat",
+                    title = "Sering Kamu Putar",
+                    subtitle = "Lagu yang paling sering kamu dengarkan belakangan ini",
+                    query = "",
+                    tracks = topPlayed
+                )
+            )
+        }
+
+        if (artistSec != null && artistSec.tracks.isNotEmpty()) {
+            personalized.add(artistSec)
+        }
+
+        personalized + rawSecs
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
@@ -57,9 +91,42 @@ class SearchViewModel(
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private var searchJob: Job? = null
+    private var artistJob: Job? = null
 
     init {
         loadDynamicContent()
+        observeTopArtists()
+    }
+
+    private fun observeTopArtists() {
+        viewModelScope.launch {
+            historyRepository.getTopArtists(1).collect { artists ->
+                val topArtist = artists.firstOrNull()
+                if (topArtist.isNullOrBlank()) {
+                    _artistRecommendationSection.value = null
+                } else {
+                    loadArtistRecommendations(topArtist)
+                }
+            }
+        }
+    }
+
+    private fun loadArtistRecommendations(artist: String) {
+        artistJob?.cancel()
+        artistJob = viewModelScope.launch {
+            searchMusicUseCase("$artist official hits")
+                .onSuccess { songs ->
+                    if (songs.isNotEmpty()) {
+                        _artistRecommendationSection.value = HomeSection(
+                            id = "recommended_${artist.hashCode()}",
+                            title = "Spesial Untukmu: $artist",
+                            subtitle = "Koleksi lagu pilihan berdasarkan artis favoritmu",
+                            query = "$artist hits",
+                            tracks = songs.take(12)
+                        )
+                    }
+                }
+        }
     }
 
     fun loadDynamicContent() {
@@ -67,7 +134,7 @@ class SearchViewModel(
             _isHomeLoading.value = true
             getHomeFeedUseCase(refresh = false)
                 .onSuccess { feed ->
-                    _homeSections.value = feed.sections
+                    _rawHomeSections.value = feed.sections
                     _categories.value = feed.categories
                     _moodTags.value = feed.moodTags
                     _isHomeLoading.value = false
@@ -81,9 +148,14 @@ class SearchViewModel(
     fun refreshHomeFeed() {
         viewModelScope.launch {
             _isRefreshing.value = true
+            val topArtist = historyRepository.getTopArtists(1).firstOrNull()?.firstOrNull()
+            if (!topArtist.isNullOrBlank()) {
+                loadArtistRecommendations(topArtist)
+            }
+
             getHomeFeedUseCase(refresh = true)
                 .onSuccess { feed ->
-                    _homeSections.value = feed.sections
+                    _rawHomeSections.value = feed.sections
                     _categories.value = feed.categories
                     _moodTags.value = feed.moodTags
                     _isRefreshing.value = false
@@ -103,7 +175,7 @@ class SearchViewModel(
         getTrendingMusicUseCase(15)
             .onSuccess { songs ->
                 if (songs.isNotEmpty()) {
-                    _homeSections.value = listOf(
+                    _rawHomeSections.value = listOf(
                         HomeSection(
                             id = "trending",
                             title = "Trending Now",

@@ -32,11 +32,57 @@ class HistoryRepositoryImpl(
             .distinctUntilChanged()
     }
 
+    override fun getTopPlayedSongs(limit: Int): Flow<List<Song>> {
+        return updatesTrigger
+            .onStart { emit(Unit) }
+            .map { fetchTopPlayedInternal(limit) }
+            .distinctUntilChanged()
+    }
+
     override fun getTopArtists(limit: Int): Flow<List<String>> {
         return updatesTrigger
             .onStart { emit(Unit) }
             .map { fetchTopArtistsInternal(limit) }
             .distinctUntilChanged()
+    }
+
+    private fun fetchTopPlayedInternal(limit: Int): List<Song> {
+        val list = mutableListOf<Song>()
+        val db = dbHelper.readableDatabase
+        val cursor: Cursor = db.query(
+            MusicDatabaseHelper.TABLE_HISTORY,
+            null,
+            null,
+            null,
+            null,
+            null,
+            "${MusicDatabaseHelper.COLUMN_HIST_PLAY_COUNT} DESC, ${MusicDatabaseHelper.COLUMN_HIST_PLAYED_AT} DESC",
+            limit.toString()
+        )
+
+        cursor.use { c ->
+            val idIndex = c.getColumnIndexOrThrow(MusicDatabaseHelper.COLUMN_HIST_ID)
+            val titleIndex = c.getColumnIndexOrThrow(MusicDatabaseHelper.COLUMN_HIST_TITLE)
+            val artistIndex = c.getColumnIndexOrThrow(MusicDatabaseHelper.COLUMN_HIST_ARTIST)
+            val durationIndex = c.getColumnIndexOrThrow(MusicDatabaseHelper.COLUMN_HIST_DURATION)
+            val durationFormattedIndex = c.getColumnIndexOrThrow(MusicDatabaseHelper.COLUMN_HIST_DURATION_FORMATTED)
+            val thumbnailIndex = c.getColumnIndexOrThrow(MusicDatabaseHelper.COLUMN_HIST_THUMBNAIL_URL)
+
+            while (c.moveToNext()) {
+                list.add(
+                    Song(
+                        id = c.getString(idIndex),
+                        title = c.getString(titleIndex),
+                        artist = c.getString(artistIndex),
+                        durationSeconds = c.getInt(durationIndex),
+                        durationFormatted = c.getString(durationFormattedIndex),
+                        thumbnailUrl = c.getString(thumbnailIndex),
+                        webUrl = "https://www.youtube.com/watch?v=${c.getString(idIndex)}"
+                    )
+                )
+            }
+        }
+        return list
     }
 
     private fun fetchRecentlyPlayedInternal(limit: Int): List<Song> {
