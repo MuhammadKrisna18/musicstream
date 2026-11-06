@@ -7,12 +7,14 @@ import com.example.p5.data.repository.FavoriteRepositoryImpl
 import com.example.p5.data.repository.HistoryRepositoryImpl
 import com.example.p5.data.repository.LyricsRepositoryImpl
 import com.example.p5.data.repository.MusicRepositoryImpl
+import com.example.p5.data.repository.SearchHistoryRepositoryImpl
 import com.example.p5.data.repository.UpdateRepositoryImpl
 import com.example.p5.domain.player.AudioPlayer
 import com.example.p5.domain.repository.FavoriteRepository
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.LyricsRepository
 import com.example.p5.domain.repository.MusicRepository
+import com.example.p5.domain.repository.SearchHistoryRepository
 import com.example.p5.domain.repository.UpdateRepository
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
@@ -38,6 +40,7 @@ interface AppContainer {
     val lyricsRepository: LyricsRepository
     val favoriteRepository: FavoriteRepository
     val historyRepository: HistoryRepository
+    val searchHistoryRepository: SearchHistoryRepository
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -97,6 +100,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val historyRepository: HistoryRepository by lazy {
         HistoryRepositoryImpl(dbHelper)
+    }
+
+    override val searchHistoryRepository: SearchHistoryRepository by lazy {
+        SearchHistoryRepositoryImpl(dbHelper)
     }
 
     override val musicPlayerManager: MusicPlayerManager by lazy {

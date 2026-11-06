@@ -6,6 +6,7 @@ import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Song
+import com.example.p5.domain.repository.SearchHistoryRepository
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
 import com.example.p5.domain.usecase.GetTrendingMusicUseCase
@@ -13,15 +14,18 @@ import com.example.p5.domain.usecase.SearchMusicUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
     private val searchMusicUseCase: SearchMusicUseCase,
     private val getTrendingMusicUseCase: GetTrendingMusicUseCase,
     private val getHomeCategoriesUseCase: GetHomeCategoriesUseCase,
-    private val getHomeFeedUseCase: GetHomeFeedUseCase
+    private val getHomeFeedUseCase: GetHomeFeedUseCase,
+    private val searchHistoryRepository: SearchHistoryRepository
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -29,6 +33,13 @@ class SearchViewModel(
 
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
+
+    val searchHistory: StateFlow<List<String>> = searchHistoryRepository.getSearchHistory(15)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     private val _homeSections = MutableStateFlow<List<HomeSection>>(emptyList())
     val homeSections: StateFlow<List<HomeSection>> = _homeSections.asStateFlow()
@@ -138,7 +149,38 @@ class SearchViewModel(
         if (trimmed.isEmpty()) return
         searchJob?.cancel()
         searchJob = viewModelScope.launch {
+            searchHistoryRepository.addSearchQuery(trimmed)
             executeSearch(trimmed)
+        }
+    }
+
+    fun selectHistoryQuery(historyQuery: String) {
+        _query.value = historyQuery
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
+            searchHistoryRepository.addSearchQuery(historyQuery)
+            executeSearch(historyQuery)
+        }
+    }
+
+    fun onSongSelectedFromSearch(song: Song) {
+        val trimmed = _query.value.trim()
+        if (trimmed.length >= 2) {
+            viewModelScope.launch {
+                searchHistoryRepository.addSearchQuery(trimmed)
+            }
+        }
+    }
+
+    fun deleteSearchHistoryItem(query: String) {
+        viewModelScope.launch {
+            searchHistoryRepository.deleteSearchQuery(query)
+        }
+    }
+
+    fun clearSearchHistory() {
+        viewModelScope.launch {
+            searchHistoryRepository.clearSearchHistory()
         }
     }
 

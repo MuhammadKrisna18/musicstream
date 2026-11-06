@@ -8,7 +8,7 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
 
     companion object {
         const val DATABASE_NAME = "music_offline.db"
-        const val DATABASE_VERSION = 3
+        const val DATABASE_VERSION = 4
 
         const val TABLE_NAME = "downloaded_songs"
         const val COLUMN_ID = "id"
@@ -40,6 +40,10 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         const val COLUMN_HIST_THUMBNAIL_URL = "thumbnail_url"
         const val COLUMN_HIST_PLAYED_AT = "played_at"
         const val COLUMN_HIST_PLAY_COUNT = "play_count"
+
+        const val TABLE_SEARCH_HISTORY = "search_history"
+        const val COLUMN_SH_QUERY = "query"
+        const val COLUMN_SH_SEARCHED_AT = "searched_at"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -85,6 +89,14 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
             );
         """.trimIndent()
         db.execSQL(createHistoryQuery)
+
+        val createSearchHistoryQuery = """
+            CREATE TABLE IF NOT EXISTS $TABLE_SEARCH_HISTORY (
+                $COLUMN_SH_QUERY TEXT PRIMARY KEY,
+                $COLUMN_SH_SEARCHED_AT INTEGER NOT NULL
+            );
+        """.trimIndent()
+        db.execSQL(createSearchHistoryQuery)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -117,6 +129,15 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
                 );
             """.trimIndent()
             db.execSQL(createHistoryQuery)
+        }
+        if (oldVersion < 4) {
+            val createSearchHistoryQuery = """
+                CREATE TABLE IF NOT EXISTS $TABLE_SEARCH_HISTORY (
+                    $COLUMN_SH_QUERY TEXT PRIMARY KEY,
+                    $COLUMN_SH_SEARCHED_AT INTEGER NOT NULL
+                );
+            """.trimIndent()
+            db.execSQL(createSearchHistoryQuery)
         }
     }
 }

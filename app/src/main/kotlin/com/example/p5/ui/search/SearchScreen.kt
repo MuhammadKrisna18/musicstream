@@ -42,10 +42,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ElectricBolt
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Headphones
+import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.LibraryMusic
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Nightlife
@@ -114,6 +116,7 @@ fun SearchScreen(
 ) {
     val query by searchViewModel.query.collectAsStateWithLifecycle()
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
+    val searchHistory by searchViewModel.searchHistory.collectAsStateWithLifecycle()
     val homeSections by searchViewModel.homeSections.collectAsStateWithLifecycle()
     val categories by searchViewModel.categories.collectAsStateWithLifecycle()
     val moodTags by searchViewModel.moodTags.collectAsStateWithLifecycle()
@@ -252,6 +255,103 @@ fun SearchScreen(
                             contentPadding = PaddingValues(bottom = 100.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
+                        if (searchHistory.isNotEmpty()) {
+                            item {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 2.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.History,
+                                                contentDescription = null,
+                                                tint = ToscaPrimary,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Text(
+                                                text = "Pencarian Terakhir",
+                                                color = TextPrimary,
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+
+                                        Text(
+                                            text = "Hapus Semua",
+                                            color = TextMuted,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .clickable { searchViewModel.clearSearchHistory() }
+                                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                        )
+                                    }
+
+                                    LazyRow(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        contentPadding = PaddingValues(vertical = 2.dp)
+                                    ) {
+                                        items(searchHistory) { historyQuery ->
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(20.dp))
+                                                    .background(DarkSurfaceVariant)
+                                                    .border(
+                                                        width = 1.dp,
+                                                        color = DividerColor.copy(alpha = 0.5f),
+                                                        shape = RoundedCornerShape(20.dp)
+                                                    )
+                                                    .clickable {
+                                                        focusManager.clearFocus()
+                                                        searchViewModel.selectHistoryQuery(historyQuery)
+                                                    }
+                                                    .padding(start = 12.dp, end = 6.dp, top = 6.dp, bottom = 6.dp)
+                                            ) {
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                                ) {
+                                                    Text(
+                                                        text = historyQuery,
+                                                        color = TextPrimary,
+                                                        fontSize = 13.sp,
+                                                        fontWeight = FontWeight.Medium
+                                                    )
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(20.dp)
+                                                            .clip(CircleShape)
+                                                            .clickable {
+                                                                searchViewModel.deleteSearchHistoryItem(historyQuery)
+                                                            },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Icon(
+                                                            imageVector = Icons.Rounded.Close,
+                                                            contentDescription = "Hapus",
+                                                            tint = TextMuted,
+                                                            modifier = Modifier.size(13.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         if (moodTags.isNotEmpty()) {
                             item {
                                 LazyRow(
@@ -433,7 +533,10 @@ fun SearchScreen(
                                 song = song,
                                 isPlaying = playerState.isPlaying,
                                 isSelected = isSelected,
-                                onClick = { onPlayQueue(state.songs, index) }
+                                onClick = {
+                                    searchViewModel.onSongSelectedFromSearch(song)
+                                    onPlayQueue(state.songs, index)
+                                }
                             )
                         }
                     }
