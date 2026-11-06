@@ -36,7 +36,6 @@ class UpdateRepositoryImpl(
         try {
             val response = okHttpClient.newCall(request).execute()
             if (!response.isSuccessful) {
-                // If 404, no release exists yet
                 return@withContext null
             }
 
@@ -92,7 +91,6 @@ class UpdateRepositoryImpl(
             val responseBody = response.body ?: throw IllegalStateException("Response body kosong")
             val totalBytes = responseBody.contentLength()
 
-            // Save APK in app external files downloads folder so package manager can read it
             val downloadDir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: context.cacheDir
             if (!downloadDir.exists()) {
                 downloadDir.mkdirs()
