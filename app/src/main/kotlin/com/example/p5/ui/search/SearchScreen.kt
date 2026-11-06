@@ -3,21 +3,16 @@ package com.example.p5.ui.search
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +22,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,6 +34,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Close
@@ -65,20 +60,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
@@ -94,14 +84,30 @@ import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
-import com.example.p5.ui.theme.BlackBackground
-import com.example.p5.ui.theme.DarkSurface
-import com.example.p5.ui.theme.DarkSurfaceVariant
-import com.example.p5.ui.theme.DividerColor
+import com.example.p5.ui.components.glass.MiniEqualizer
+import com.example.p5.ui.components.glass.ambientGlow
+import com.example.p5.ui.components.glass.glassBorder
+import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AuroraCyan
+import com.example.p5.ui.theme.GlassBorderBright
+import com.example.p5.ui.theme.GlassBorderMedium
+import com.example.p5.ui.theme.GlassBorderSubtle
+import com.example.p5.ui.theme.GlassFillLight
+import com.example.p5.ui.theme.GlassFillMedium
+import com.example.p5.ui.theme.GlassFillSubtle
+import com.example.p5.ui.theme.ObsidianBackground
+import com.example.p5.ui.theme.ObsidianBlack
+import com.example.p5.ui.theme.ObsidianCard
+import com.example.p5.ui.theme.ObsidianCardHigh
+import com.example.p5.ui.theme.ObsidianSurface
+import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaDark
+import com.example.p5.ui.theme.ToscaGlassBorder
+import com.example.p5.ui.theme.ToscaGlow
+import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaLight
 import com.example.p5.ui.theme.ToscaPrimary
 
@@ -125,7 +131,7 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
     val shimmerBrush = rememberShimmerBrush()
 
-    val refreshTransition = rememberInfiniteTransition(label = "refreshAnim")
+    val refreshTransition = rememberInfiniteTransition(label = "refresh_angle")
     val refreshAngle by refreshTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -133,16 +139,20 @@ fun SearchScreen(
             animation = tween(durationMillis = 800, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
-        label = "refreshAngle"
+        label = "refresh_spin"
     )
+
+    val editorialFeaturedTrack = remember(homeSections) {
+        homeSections.firstOrNull { it.tracks.isNotEmpty() }?.tracks?.firstOrNull()
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(BlackBackground)
+            .background(ObsidianBackground)
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -150,16 +160,26 @@ fun SearchScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Music",
+                        color = TextPrimary,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = (-0.5).sp
+                    )
+                    Text(
+                        text = "Stream",
+                        color = ToscaPrimary,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        letterSpacing = (-0.5).sp
+                    )
+                }
                 Text(
-                    text = "MusicStream",
-                    color = TextPrimary,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Find and stream your favorite tracks",
+                    text = "Kurasi musik & audio berkualitas",
                     color = TextSecondary,
-                    fontSize = 13.sp
+                    fontSize = 12.sp
                 )
             }
 
@@ -167,40 +187,82 @@ fun SearchScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                VisualizerIndicator(isPlaying = playerState.isPlaying)
+                if (playerState.isPlaying) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(ToscaPrimary.copy(alpha = 0.12f))
+                            .glassBorder(
+                                shape = RoundedCornerShape(12.dp),
+                                strokeWidth = 1.dp,
+                                startColor = ToscaGlassBorder,
+                                endColor = GlassBorderSubtle
+                            )
+                            .padding(horizontal = 8.dp, vertical = 6.dp)
+                    ) {
+                        MiniEqualizer(isPlaying = true)
+                    }
+                }
 
-                IconButton(
-                    onClick = { searchViewModel.refreshHomeFeed() },
-                    enabled = !isRefreshing
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(CircleShape)
+                        .background(GlassFillLight)
+                        .glassBorder(
+                            shape = CircleShape,
+                            strokeWidth = 1.dp,
+                            startColor = GlassBorderBright.copy(alpha = 0.35f),
+                            endColor = GlassBorderSubtle
+                        )
+                        .clickable(
+                            enabled = !isRefreshing,
+                            onClick = { searchViewModel.refreshHomeFeed() }
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Refresh,
-                        contentDescription = "Refresh Feed",
+                        contentDescription = "Muat Ulang Beranda",
                         tint = if (isRefreshing) ToscaPrimary else TextSecondary,
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(20.dp)
                             .rotate(if (isRefreshing) refreshAngle else 0f)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(22.dp))
+                .background(GlassFillLight)
+                .glassBorder(
+                    shape = RoundedCornerShape(22.dp),
+                    strokeWidth = 1.dp,
+                    startColor = GlassBorderBright.copy(alpha = 0.4f),
+                    endColor = GlassBorderSubtle
+                )
         ) {
             OutlinedTextField(
                 value = query,
                 onValueChange = searchViewModel::onQueryChanged,
-                placeholder = { Text("Search songs, artists, albums...", color = TextMuted, fontSize = 14.sp) },
+                placeholder = {
+                    Text(
+                        text = "Cari lagu, artis, atau album...",
+                        color = TextMuted,
+                        fontSize = 14.sp
+                    )
+                },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.Search,
                         contentDescription = null,
-                        tint = ToscaPrimary
+                        tint = ToscaPrimary,
+                        modifier = Modifier.size(22.dp)
                     )
                 },
                 trailingIcon = {
@@ -216,10 +278,10 @@ fun SearchScreen(
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(22.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = DarkSurface,
-                    unfocusedContainerColor = DarkSurface,
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
                     focusedBorderColor = ToscaPrimary,
                     unfocusedBorderColor = Color.Transparent,
                     focusedTextColor = TextPrimary,
@@ -235,7 +297,7 @@ fun SearchScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         AnimatedContent(
             targetState = uiState,
@@ -253,256 +315,292 @@ fun SearchScreen(
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(bottom = 140.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                            verticalArrangement = Arrangement.spacedBy(18.dp)
                         ) {
-                        if (searchHistory.isNotEmpty()) {
-                            item {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 2.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
+                            if (searchHistory.isNotEmpty()) {
+                                item {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 2.dp),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
                                         Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Rounded.History,
-                                                contentDescription = null,
-                                                tint = ToscaPrimary,
-                                                modifier = Modifier.size(16.dp)
-                                            )
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Rounded.History,
+                                                    contentDescription = null,
+                                                    tint = ToscaPrimary,
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                                Text(
+                                                    text = "Pencarian Terakhir",
+                                                    color = TextPrimary,
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+
                                             Text(
-                                                text = "Pencarian Terakhir",
-                                                color = TextPrimary,
-                                                fontSize = 14.sp,
-                                                fontWeight = FontWeight.Bold
+                                                text = "Hapus Semua",
+                                                color = TextSecondary,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                modifier = Modifier
+                                                    .clip(RoundedCornerShape(6.dp))
+                                                    .clickable { searchViewModel.clearSearchHistory() }
+                                                    .padding(horizontal = 6.dp, vertical = 2.dp)
                                             )
                                         }
 
-                                        Text(
-                                            text = "Hapus Semua",
-                                            color = TextMuted,
-                                            fontSize = 12.sp,
-                                            fontWeight = FontWeight.Medium,
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(6.dp))
-                                                .clickable { searchViewModel.clearSearchHistory() }
-                                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                                        )
+                                        LazyRow(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            contentPadding = PaddingValues(vertical = 2.dp)
+                                        ) {
+                                            items(searchHistory) { historyQuery ->
+                                                val interactionSource = remember { MutableInteractionSource() }
+                                                Box(
+                                                    modifier = Modifier
+                                                        .pressedScale(
+                                                            targetScale = 0.94f,
+                                                            interactionSource = interactionSource
+                                                        )
+                                                        .clip(RoundedCornerShape(20.dp))
+                                                        .background(GlassFillLight)
+                                                        .glassBorder(
+                                                            shape = RoundedCornerShape(20.dp),
+                                                            strokeWidth = 1.dp,
+                                                            startColor = GlassBorderBright.copy(alpha = 0.35f),
+                                                            endColor = GlassBorderSubtle
+                                                        )
+                                                        .clickable(
+                                                            interactionSource = interactionSource,
+                                                            indication = null
+                                                        ) {
+                                                            focusManager.clearFocus()
+                                                            searchViewModel.selectHistoryQuery(historyQuery)
+                                                        }
+                                                        .padding(start = 12.dp, end = 6.dp, top = 6.dp, bottom = 6.dp)
+                                                ) {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = historyQuery,
+                                                            color = TextPrimary,
+                                                            fontSize = 13.sp,
+                                                            fontWeight = FontWeight.Medium
+                                                        )
+                                                        Box(
+                                                            modifier = Modifier
+                                                                .size(20.dp)
+                                                                .clip(CircleShape)
+                                                                .clickable {
+                                                                    searchViewModel.deleteSearchHistoryItem(historyQuery)
+                                                                },
+                                                            contentAlignment = Alignment.Center
+                                                        ) {
+                                                            Icon(
+                                                                imageVector = Icons.Rounded.Close,
+                                                                contentDescription = "Hapus",
+                                                                tint = TextMuted,
+                                                                modifier = Modifier.size(13.dp)
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
+                                }
+                            }
 
+                            if (editorialFeaturedTrack != null && query.isEmpty()) {
+                                item(key = "editorial_hero") {
+                                    EditorialHeroCard(
+                                        song = editorialFeaturedTrack,
+                                        isPlaying = playerState.isPlaying,
+                                        isSelected = playerState.currentSong?.id == editorialFeaturedTrack.id,
+                                        onClick = { onSongClick(editorialFeaturedTrack) }
+                                    )
+                                }
+                            }
+
+                            if (moodTags.isNotEmpty()) {
+                                item {
                                     LazyRow(
                                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         contentPadding = PaddingValues(vertical = 2.dp)
                                     ) {
-                                        items(searchHistory) { historyQuery ->
+                                        items(moodTags) { tag ->
+                                            val interactionSource = remember { MutableInteractionSource() }
                                             Box(
                                                 modifier = Modifier
+                                                    .pressedScale(
+                                                        targetScale = 0.94f,
+                                                        interactionSource = interactionSource
+                                                    )
                                                     .clip(RoundedCornerShape(20.dp))
-                                                    .background(DarkSurfaceVariant)
-                                                    .border(
-                                                        width = 1.dp,
-                                                        color = DividerColor.copy(alpha = 0.5f),
-                                                        shape = RoundedCornerShape(20.dp)
+                                                    .background(GlassFillLight)
+                                                    .glassBorder(
+                                                        shape = RoundedCornerShape(20.dp),
+                                                        strokeWidth = 1.dp,
+                                                        startColor = GlassBorderBright.copy(alpha = 0.35f),
+                                                        endColor = GlassBorderSubtle
                                                     )
-                                                    .clickable {
-                                                        focusManager.clearFocus()
-                                                        searchViewModel.selectHistoryQuery(historyQuery)
-                                                    }
-                                                    .padding(start = 12.dp, end = 6.dp, top = 6.dp, bottom = 6.dp)
+                                                    .clickable(
+                                                        interactionSource = interactionSource,
+                                                        indication = null
+                                                    ) { searchViewModel.searchCategory(tag.query) }
+                                                    .padding(horizontal = 14.dp, vertical = 7.dp)
                                             ) {
-                                                Row(
-                                                    verticalAlignment = Alignment.CenterVertically,
-                                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                                ) {
-                                                    Text(
-                                                        text = historyQuery,
-                                                        color = TextPrimary,
-                                                        fontSize = 13.sp,
-                                                        fontWeight = FontWeight.Medium
-                                                    )
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .size(20.dp)
-                                                            .clip(CircleShape)
-                                                            .clickable {
-                                                                searchViewModel.deleteSearchHistoryItem(historyQuery)
-                                                            },
-                                                        contentAlignment = Alignment.Center
-                                                    ) {
-                                                        Icon(
-                                                            imageVector = Icons.Rounded.Close,
-                                                            contentDescription = "Hapus",
-                                                            tint = TextMuted,
-                                                            modifier = Modifier.size(13.dp)
-                                                        )
-                                                    }
-                                                }
+                                                Text(
+                                                    text = tag.label,
+                                                    color = ToscaPrimary,
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        if (moodTags.isNotEmpty()) {
-                            item {
-                                LazyRow(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    contentPadding = PaddingValues(vertical = 4.dp)
-                                ) {
-                                    items(moodTags) { tag ->
+                            if (isHomeLoading && homeSections.isEmpty()) {
+                                items(3) {
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
                                         Box(
                                             modifier = Modifier
-                                                .clip(RoundedCornerShape(20.dp))
-                                                .background(DarkSurfaceVariant)
-                                                .clickable { searchViewModel.searchCategory(tag.query) }
-                                                .padding(horizontal = 14.dp, vertical = 8.dp)
+                                                .width(160.dp)
+                                                .height(20.dp)
+                                                .clip(RoundedCornerShape(6.dp))
+                                                .background(shimmerBrush)
+                                        )
+                                        LazyRow(
+                                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                                         ) {
-                                            Text(
-                                                text = tag.label,
-                                                color = ToscaPrimary,
-                                                fontSize = 13.sp,
-                                                fontWeight = FontWeight.Medium
-                                            )
+                                            items(4) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .width(150.dp)
+                                                        .height(210.dp)
+                                                        .clip(RoundedCornerShape(20.dp))
+                                                        .background(shimmerBrush)
+                                                )
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        }
-
-                        if (isHomeLoading && homeSections.isEmpty()) {
-                            items(3) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .width(160.dp)
-                                            .height(20.dp)
-                                            .clip(RoundedCornerShape(6.dp))
-                                            .background(shimmerBrush)
-                                    )
-                                    LazyRow(
-                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                    ) {
-                                        items(4) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .width(148.dp)
-                                                    .height(204.dp)
-                                                    .clip(RoundedCornerShape(16.dp))
-                                                    .background(shimmerBrush)
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            homeSections.forEach { section ->
-                                if (section.tracks.isNotEmpty()) {
-                                    item(key = section.id) {
-                                        Column(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            verticalArrangement = Arrangement.spacedBy(10.dp)
-                                        ) {
-                                            Row(
+                            } else {
+                                homeSections.forEach { section ->
+                                    if (section.tracks.isNotEmpty()) {
+                                        item(key = section.id) {
+                                            Column(
                                                 modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.SpaceBetween,
-                                                verticalAlignment = Alignment.CenterVertically
+                                                verticalArrangement = Arrangement.spacedBy(12.dp)
                                             ) {
-                                                Column(modifier = Modifier.weight(1f)) {
-                                                    Text(
-                                                        text = section.title,
-                                                        color = TextPrimary,
-                                                        fontSize = 18.sp,
-                                                        fontWeight = FontWeight.Bold
-                                                    )
-                                                    if (!section.subtitle.isNullOrBlank()) {
+                                                Row(
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Column(modifier = Modifier.weight(1f)) {
                                                         Text(
-                                                            text = section.subtitle,
-                                                            color = TextSecondary,
-                                                            fontSize = 12.sp
+                                                            text = section.title,
+                                                            color = TextPrimary,
+                                                            fontSize = 18.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            letterSpacing = (-0.3).sp
+                                                        )
+                                                        if (!section.subtitle.isNullOrBlank()) {
+                                                            Text(
+                                                                text = section.subtitle,
+                                                                color = TextSecondary,
+                                                                fontSize = 12.sp
+                                                            )
+                                                        }
+                                                    }
+
+                                                    if (!section.query.isNullOrBlank()) {
+                                                        Text(
+                                                            text = "Lihat Semua",
+                                                            color = ToscaPrimary,
+                                                            fontSize = 12.sp,
+                                                            fontWeight = FontWeight.SemiBold,
+                                                            modifier = Modifier.clickable { searchViewModel.searchCategory(section.query) }
                                                         )
                                                     }
                                                 }
 
-                                                if (!section.query.isNullOrBlank()) {
-                                                    Text(
-                                                        text = "See all",
-                                                        color = ToscaPrimary,
-                                                        fontSize = 12.sp,
-                                                        fontWeight = FontWeight.SemiBold,
-                                                        modifier = Modifier.clickable { searchViewModel.searchCategory(section.query) }
-                                                    )
-                                                }
-                                            }
-
-                                            LazyRow(
-                                                horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                            ) {
-                                                itemsIndexed(
-                                                    items = section.tracks,
-                                                    key = { _, item -> item.id }
-                                                ) { index, song ->
-                                                    TrendingTrackCard(
-                                                        song = song,
-                                                        isPlaying = playerState.isPlaying,
-                                                        isSelected = playerState.currentSong?.id == song.id,
-                                                        onSongClick = { onPlayQueue(section.tracks, index) }
-                                                    )
+                                                LazyRow(
+                                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                                ) {
+                                                    itemsIndexed(
+                                                        items = section.tracks,
+                                                        key = { _, item -> item.id }
+                                                    ) { index, song ->
+                                                        TrendingTrackCard(
+                                                            song = song,
+                                                            isPlaying = playerState.isPlaying,
+                                                            isSelected = playerState.currentSong?.id == song.id,
+                                                            onSongClick = { onPlayQueue(section.tracks, index) }
+                                                        )
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        if (categories.isNotEmpty()) {
-                            item {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "Browse by Mood & Genre",
-                                    color = TextPrimary,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-                            items(categories.chunked(2)) { pair ->
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
-                                    GenreCategoryCard(
-                                        category = pair[0],
-                                        onClick = { searchViewModel.searchCategory(pair[0].query) },
-                                        modifier = Modifier.weight(1f)
+                            if (categories.isNotEmpty()) {
+                                item {
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Kategori & Mood Eksklusif",
+                                        color = TextPrimary,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = (-0.3).sp
                                     )
-                                    if (pair.size > 1) {
+                                }
+
+                                items(categories.chunked(2)) { pair ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
                                         GenreCategoryCard(
-                                            category = pair[1],
-                                            onClick = { searchViewModel.searchCategory(pair[1].query) },
+                                            category = pair[0],
+                                            onClick = { searchViewModel.searchCategory(pair[0].query) },
                                             modifier = Modifier.weight(1f)
                                         )
-                                    } else {
-                                        Spacer(modifier = Modifier.weight(1f))
+                                        if (pair.size > 1) {
+                                            GenreCategoryCard(
+                                                category = pair[1],
+                                                onClick = { searchViewModel.searchCategory(pair[1].query) },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        } else {
+                                            Spacer(modifier = Modifier.weight(1f))
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
                 SearchUiState.Loading -> {
                     Box(
@@ -521,7 +619,7 @@ fun SearchScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = 140.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         itemsIndexed(
                             items = state.songs,
@@ -548,7 +646,7 @@ fun SearchScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No songs found for \"$query\"",
+                            text = "Lagu tidak ditemukan untuk \"$query\"",
                             color = TextSecondary,
                             fontSize = 14.sp
                         )
@@ -585,7 +683,7 @@ fun SearchScreen(
                             onClick = { searchViewModel.searchNow() },
                             colors = ButtonDefaults.buttonColors(containerColor = ToscaPrimary)
                         ) {
-                            Text("Retry", color = BlackBackground, fontWeight = FontWeight.Bold)
+                            Text("Coba Lagi", color = ObsidianBlack, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -595,81 +693,333 @@ fun SearchScreen(
 }
 
 @Composable
-private fun VisualizerIndicator(
+private fun EditorialHeroCard(
+    song: Song,
     isPlaying: Boolean,
+    isSelected: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "visualizer")
+    val interactionSource = remember { MutableInteractionSource() }
+    val cardShape = remember { RoundedCornerShape(24.dp) }
 
-    val bar1Height by infiniteTransition.animateFloat(
-        initialValue = 6f,
-        targetValue = 20f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 450, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bar1"
-    )
-    val bar2Height by infiniteTransition.animateFloat(
-        initialValue = 16f,
-        targetValue = 6f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 350, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bar2"
-    )
-    val bar3Height by infiniteTransition.animateFloat(
-        initialValue = 8f,
-        targetValue = 22f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 550, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bar3"
-    )
-    val bar4Height by infiniteTransition.animateFloat(
-        initialValue = 18f,
-        targetValue = 8f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 400, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "bar4"
-    )
-
-    Row(
-        modifier = modifier.height(24.dp),
-        horizontalArrangement = Arrangement.spacedBy(3.dp),
-        verticalAlignment = Alignment.Bottom
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(205.dp)
+            .pressedScale(targetScale = 0.98f, interactionSource = interactionSource)
+            .ambientGlow(
+                color = ToscaGlowSubtle,
+                alpha = 0.4f,
+                shape = cardShape
+            )
+            .clip(cardShape)
+            .background(ObsidianCardHigh)
+            .glassBorder(
+                shape = cardShape,
+                strokeWidth = 1.dp,
+                startColor = GlassBorderBright.copy(alpha = 0.5f),
+                endColor = GlassBorderSubtle
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            )
     ) {
-        Box(
-            modifier = Modifier
-                .width(3.dp)
-                .height(if (isPlaying) bar1Height.dp else 8.dp)
-                .clip(CircleShape)
-                .background(ToscaPrimary)
+        AsyncImage(
+            model = song.thumbnailUrl,
+            contentDescription = song.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
         )
+
         Box(
             modifier = Modifier
-                .width(3.dp)
-                .height(if (isPlaying) bar2Height.dp else 15.dp)
-                .clip(CircleShape)
-                .background(ToscaPrimary)
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Black.copy(alpha = 0.25f),
+                            Color.Black.copy(alpha = 0.65f),
+                            ObsidianBlack.copy(alpha = 0.94f)
+                        )
+                    )
+                )
         )
-        Box(
+
+        Column(
             modifier = Modifier
-                .width(3.dp)
-                .height(if (isPlaying) bar3Height.dp else 20.dp)
-                .clip(CircleShape)
-                .background(ToscaPrimary)
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(ToscaPrimary.copy(alpha = 0.2f))
+                    .glassBorder(
+                        shape = RoundedCornerShape(12.dp),
+                        strokeWidth = 1.dp,
+                        startColor = ToscaGlassBorder,
+                        endColor = GlassBorderSubtle
+                    )
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.AutoAwesome,
+                    contentDescription = null,
+                    tint = ToscaPrimary,
+                    modifier = Modifier.size(14.dp)
+                )
+                Text(
+                    text = "PILIHAN REDAKSI",
+                    color = ToscaPrimary,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 0.8.sp
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+                    Text(
+                        text = song.title,
+                        color = TextPrimary,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = song.artist,
+                        color = TextSecondary,
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .ambientGlow(
+                            color = ToscaGlow,
+                            alpha = 0.7f,
+                            shape = CircleShape
+                        )
+                        .clip(CircleShape)
+                        .background(ToscaPrimary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isSelected && isPlaying) {
+                        MiniEqualizer(
+                            barColor = ObsidianBlack,
+                            isPlaying = true
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Rounded.PlayArrow,
+                            contentDescription = "Putar",
+                            tint = ObsidianBlack,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrendingTrackCard(
+    song: Song,
+    isPlaying: Boolean,
+    isSelected: Boolean,
+    onSongClick: (Song) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val cardShape = remember { RoundedCornerShape(20.dp) }
+
+    Box(
+        modifier = modifier
+            .width(150.dp)
+            .height(212.dp)
+            .pressedScale(targetScale = 0.95f, interactionSource = interactionSource)
+            .clip(cardShape)
+            .background(ObsidianCard)
+            .then(
+                if (isSelected) {
+                    Modifier.glassBorder(
+                        shape = cardShape,
+                        strokeWidth = 1.dp,
+                        startColor = ToscaGlassBorder,
+                        endColor = GlassBorderSubtle,
+                        accentGlow = ToscaPrimary.copy(alpha = 0.5f)
+                    )
+                } else {
+                    Modifier.glassBorder(
+                        shape = cardShape,
+                        strokeWidth = 1.dp,
+                        startColor = GlassBorderBright.copy(alpha = 0.3f),
+                        endColor = GlassBorderSubtle
+                    )
+                }
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { onSongClick(song) }
+    ) {
+        AsyncImage(
+            model = song.thumbnailUrl,
+            contentDescription = song.title,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
         )
+
         Box(
             modifier = Modifier
-                .width(3.dp)
-                .height(if (isPlaying) bar4Height.dp else 10.dp)
-                .clip(CircleShape)
-                .background(ToscaPrimary)
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Transparent,
+                            Color.Black.copy(alpha = 0.45f),
+                            ObsidianBlack.copy(alpha = 0.92f)
+                        ),
+                        startY = 60f
+                    )
+                )
+        )
+
+        if (isSelected && isPlaying) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(ToscaPrimary.copy(alpha = 0.85f))
+                    .padding(horizontal = 6.dp, vertical = 4.dp)
+            ) {
+                MiniEqualizer(
+                    barColor = ObsidianBlack,
+                    isPlaying = true
+                )
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomStart)
+                .padding(10.dp)
+        ) {
+            Text(
+                text = song.title,
+                color = if (isSelected) ToscaPrimary else TextPrimary,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 17.sp,
+                maxLines = 2,
+                minLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = song.artist,
+                    color = TextSecondary,
+                    fontSize = 11.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+
+                if (song.durationFormatted.isNotBlank()) {
+                    Text(
+                        text = song.durationFormatted,
+                        color = TextMuted,
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GenreCategoryCard(
+    category: Category,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val baseColor = parseHexColor(category.startColor, ToscaPrimary)
+    val icon = getCategoryIcon(category.icon)
+    val cardShape = remember { RoundedCornerShape(20.dp) }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    Box(
+        modifier = modifier
+            .height(92.dp)
+            .pressedScale(targetScale = 0.95f, interactionSource = interactionSource)
+            .clip(cardShape)
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(
+                        baseColor.copy(alpha = 0.3f),
+                        ObsidianCardHigh
+                    )
+                )
+            )
+            .glassBorder(
+                shape = cardShape,
+                strokeWidth = 1.dp,
+                startColor = baseColor.copy(alpha = 0.45f),
+                endColor = GlassBorderSubtle
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick
+            )
+            .padding(horizontal = 14.dp, vertical = 12.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = baseColor.copy(alpha = 0.55f),
+            modifier = Modifier
+                .size(42.dp)
+                .align(Alignment.BottomEnd)
+        )
+
+        Text(
+            text = category.title,
+            color = TextPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 19.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .fillMaxWidth(0.72f)
         )
     }
 }
@@ -689,221 +1039,15 @@ private fun rememberShimmerBrush(): Brush {
 
     return Brush.linearGradient(
         colors = listOf(
-            DarkSurfaceVariant.copy(alpha = 0.5f),
-            DarkSurfaceVariant.copy(alpha = 0.85f),
+            ObsidianSurfaceVariant.copy(alpha = 0.5f),
+            ObsidianSurfaceVariant.copy(alpha = 0.85f),
             ToscaPrimary.copy(alpha = 0.16f),
-            DarkSurfaceVariant.copy(alpha = 0.85f),
-            DarkSurfaceVariant.copy(alpha = 0.5f)
+            ObsidianSurfaceVariant.copy(alpha = 0.85f),
+            ObsidianSurfaceVariant.copy(alpha = 0.5f)
         ),
         start = androidx.compose.ui.geometry.Offset(translateAnim, translateAnim),
         end = androidx.compose.ui.geometry.Offset(translateAnim + 260f, translateAnim + 260f)
     )
-}
-
-@Composable
-private fun TrendingTrackCard(
-    song: Song,
-    isPlaying: Boolean,
-    isSelected: Boolean,
-    onSongClick: (Song) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (isPressed) 0.96f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "card_scale"
-    )
-
-    Column(
-        modifier = modifier
-            .width(148.dp)
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .clip(RoundedCornerShape(16.dp))
-            .background(if (isSelected) DarkSurfaceVariant else DarkSurface)
-            .border(
-                border = BorderStroke(
-                    width = 1.dp,
-                    color = if (isSelected) ToscaPrimary.copy(alpha = 0.55f) else DividerColor.copy(alpha = 0.4f)
-                ),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) { onSongClick(song) }
-            .padding(9.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(130.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(DarkSurfaceVariant)
-        ) {
-            AsyncImage(
-                model = song.thumbnailUrl,
-                contentDescription = song.title,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            // Bottom gradient scrim
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(44.dp)
-                    .align(Alignment.BottomCenter)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.70f))
-                        )
-                    )
-            )
-
-            // Modern floating glassmorphic play button
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(6.dp)
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(if (isSelected && isPlaying) ToscaPrimary else Color.Black.copy(alpha = 0.65f))
-                    .border(
-                        width = 1.dp,
-                        color = if (isSelected && isPlaying) Color.Transparent else Color.White.copy(alpha = 0.25f),
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (isSelected && isPlaying) Icons.Rounded.GraphicEq else Icons.Rounded.PlayArrow,
-                    contentDescription = null,
-                    tint = if (isSelected && isPlaying) Color.Black else ToscaPrimary,
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Title with maxLines = 2, minLines = 2
-        Text(
-            text = song.title,
-            color = if (isSelected) ToscaPrimary else TextPrimary,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-            lineHeight = 17.sp,
-            maxLines = 2,
-            minLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = song.artist,
-                color = TextSecondary,
-                fontSize = 11.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
-            )
-
-            if (song.durationFormatted.isNotBlank()) {
-                Text(
-                    text = song.durationFormatted,
-                    color = TextMuted,
-                    fontSize = 10.sp,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun GenreCategoryCard(
-    category: Category,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val baseColor = parseHexColor(category.startColor, ToscaPrimary)
-    val icon = getCategoryIcon(category.icon)
-
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (isPressed) 0.96f else 1f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "genre_scale"
-    )
-
-    Box(
-        modifier = modifier
-            .height(86.dp)
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-            }
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                Brush.linearGradient(
-                    colors = listOf(
-                        baseColor.copy(alpha = 0.85f),
-                        DarkSurfaceVariant
-                    ),
-                    start = androidx.compose.ui.geometry.Offset(0f, 0f),
-                    end = androidx.compose.ui.geometry.Offset(350f, 350f)
-                )
-            )
-            .border(
-                width = 1.dp,
-                color = Color.White.copy(alpha = 0.12f),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            )
-            .padding(horizontal = 14.dp, vertical = 12.dp)
-    ) {
-        // Spotify-style rotated icon cutout in bottom right corner
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = Color.White.copy(alpha = 0.22f),
-            modifier = Modifier
-                .size(54.dp)
-                .align(Alignment.BottomEnd)
-                .offset(x = 10.dp, y = 10.dp)
-                .rotate(-18f)
-        )
-
-        // Bold category title with maxLines = 2
-        Text(
-            text = category.title,
-            color = Color.White,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.ExtraBold,
-            lineHeight = 19.sp,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .fillMaxWidth(0.72f)
-        )
-    }
 }
 
 private fun parseHexColor(hexString: String, fallback: Color): Color {
