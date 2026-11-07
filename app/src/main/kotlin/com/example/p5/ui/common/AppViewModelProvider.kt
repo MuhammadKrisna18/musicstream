@@ -30,7 +30,8 @@ object AppViewModelProvider {
         initializer {
             LibraryViewModel(
                 musicApplication().container.favoriteRepository,
-                musicApplication().container.historyRepository
+                musicApplication().container.historyRepository,
+                musicApplication().container.savedSongRepository
             )
         }
         initializer {

@@ -8,7 +8,7 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
 
     companion object {
         const val DATABASE_NAME = "music_offline.db"
-        const val DATABASE_VERSION = 4
+        const val DATABASE_VERSION = 5
 
         const val TABLE_NAME = "downloaded_songs"
         const val COLUMN_ID = "id"
@@ -30,6 +30,16 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
         const val COLUMN_FAV_THUMBNAIL_URL = "thumbnail_url"
         const val COLUMN_FAV_WEB_URL = "web_url"
         const val COLUMN_FAV_LIKED_AT = "liked_at"
+
+        const val TABLE_SAVED = "saved_songs"
+        const val COLUMN_SAVED_ID = "id"
+        const val COLUMN_SAVED_TITLE = "title"
+        const val COLUMN_SAVED_ARTIST = "artist"
+        const val COLUMN_SAVED_DURATION = "duration"
+        const val COLUMN_SAVED_DURATION_FORMATTED = "duration_formatted"
+        const val COLUMN_SAVED_THUMBNAIL_URL = "thumbnail_url"
+        const val COLUMN_SAVED_WEB_URL = "web_url"
+        const val COLUMN_SAVED_AT = "saved_at"
 
         const val TABLE_HISTORY = "history_songs"
         const val COLUMN_HIST_ID = "id"
@@ -75,6 +85,20 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
             );
         """.trimIndent()
         db.execSQL(createFavoritesQuery)
+
+        val createSavedQuery = """
+            CREATE TABLE IF NOT EXISTS $TABLE_SAVED (
+                $COLUMN_SAVED_ID TEXT PRIMARY KEY,
+                $COLUMN_SAVED_TITLE TEXT NOT NULL,
+                $COLUMN_SAVED_ARTIST TEXT NOT NULL,
+                $COLUMN_SAVED_DURATION INTEGER NOT NULL,
+                $COLUMN_SAVED_DURATION_FORMATTED TEXT NOT NULL,
+                $COLUMN_SAVED_THUMBNAIL_URL TEXT NOT NULL,
+                $COLUMN_SAVED_WEB_URL TEXT NOT NULL,
+                $COLUMN_SAVED_AT INTEGER NOT NULL
+            );
+        """.trimIndent()
+        db.execSQL(createSavedQuery)
 
         val createHistoryQuery = """
             CREATE TABLE IF NOT EXISTS $TABLE_HISTORY (
@@ -138,6 +162,21 @@ class MusicDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE
                 );
             """.trimIndent()
             db.execSQL(createSearchHistoryQuery)
+        }
+        if (oldVersion < 5) {
+            val createSavedQuery = """
+                CREATE TABLE IF NOT EXISTS $TABLE_SAVED (
+                    $COLUMN_SAVED_ID TEXT PRIMARY KEY,
+                    $COLUMN_SAVED_TITLE TEXT NOT NULL,
+                    $COLUMN_SAVED_ARTIST TEXT NOT NULL,
+                    $COLUMN_SAVED_DURATION INTEGER NOT NULL,
+                    $COLUMN_SAVED_DURATION_FORMATTED TEXT NOT NULL,
+                    $COLUMN_SAVED_THUMBNAIL_URL TEXT NOT NULL,
+                    $COLUMN_SAVED_WEB_URL TEXT NOT NULL,
+                    $COLUMN_SAVED_AT INTEGER NOT NULL
+                );
+            """.trimIndent()
+            db.execSQL(createSavedQuery)
         }
     }
 }
