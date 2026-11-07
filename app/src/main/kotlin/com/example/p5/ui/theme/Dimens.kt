@@ -33,6 +33,7 @@ val IconSizeXl = 32.dp
 val IconSizeHero = 42.dp
 val IconSizeDisplay = 46.dp
 
+val ActionButtonSizeXs = 28.dp
 val ActionButtonSizeSm = 36.dp
 val ActionButtonSizeMd = 38.dp
 val ActionButtonSizeLg = 42.dp

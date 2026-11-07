@@ -44,6 +44,7 @@ import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Headphones
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.LibraryMusic
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Nightlife
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -89,6 +90,7 @@ import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.ActionButtonSizeXs
 import com.example.p5.ui.theme.ArtworkCardHeight
 import com.example.p5.ui.theme.ArtworkCardWidth
 import com.example.p5.ui.theme.BottomScrollPadding
@@ -99,7 +101,9 @@ import com.example.p5.ui.theme.DurationShimmer
 import com.example.p5.ui.theme.HeroBannerHeight
 import com.example.p5.ui.theme.IconSizeHero
 import com.example.p5.ui.theme.IconSizeLg
+import com.example.p5.ui.theme.IconSizeSm
 import com.example.p5.ui.theme.PlayButtonSizeHero
+import com.example.p5.ui.theme.ScalePressedButton
 import com.example.p5.ui.theme.ScalePressedCard
 import com.example.p5.ui.theme.ScalePressedSubtle
 import com.example.p5.ui.theme.StrokeWidthBorder
@@ -131,7 +135,8 @@ fun SearchScreen(
     playerState: PlayerState,
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
-    onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) }
+    onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) },
+    onMoreOptionsClick: (Song) -> Unit = {}
 ) {
     val query by searchViewModel.query.collectAsStateWithLifecycle()
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -567,7 +572,8 @@ fun SearchScreen(
                                                             song = song,
                                                             isPlaying = playerState.isPlaying,
                                                             isSelected = playerState.currentSong?.id == song.id,
-                                                            onSongClick = { onPlayQueue(section.tracks, index) }
+                                                            onSongClick = { onPlayQueue(section.tracks, index) },
+                                                            onMoreOptionsClick = onMoreOptionsClick
                                                         )
                                                     }
                                                 }
@@ -647,7 +653,8 @@ fun SearchScreen(
                                 onClick = {
                                     searchViewModel.onSongSelectedFromSearch(song)
                                     onPlayQueue(state.songs, index)
-                                }
+                                },
+                                onMoreOptionsClick = onMoreOptionsClick
                             )
                         }
                     }
@@ -847,7 +854,8 @@ private fun TrendingTrackCard(
     isPlaying: Boolean,
     isSelected: Boolean,
     onSongClick: (Song) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMoreOptionsClick: ((Song) -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val cardShape = remember { RoundedCornerShape(CornerRadiusCardLg) }
@@ -907,7 +915,7 @@ private fun TrendingTrackCard(
         if (isSelected && isPlaying) {
             Box(
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
+                    .align(Alignment.TopStart)
                     .padding(8.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(ToscaPrimary.copy(alpha = 0.85f))
@@ -916,6 +924,37 @@ private fun TrendingTrackCard(
                 MiniEqualizer(
                     barColor = ObsidianBlack,
                     isPlaying = true
+                )
+            }
+        }
+
+        if (onMoreOptionsClick != null) {
+            val moreSource = remember { MutableInteractionSource() }
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .size(ActionButtonSizeXs)
+                    .pressedScale(targetScale = ScalePressedButton, interactionSource = moreSource)
+                    .clip(CircleShape)
+                    .background(GlassFillLight)
+                    .glassBorder(
+                        shape = CircleShape,
+                        strokeWidth = StrokeWidthBorder,
+                        startColor = GlassBorderBright.copy(alpha = 0.35f),
+                        endColor = GlassBorderSubtle
+                    )
+                    .clickable(
+                        interactionSource = moreSource,
+                        indication = null
+                    ) { onMoreOptionsClick(song) },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.MoreVert,
+                    contentDescription = null,
+                    tint = TextPrimary,
+                    modifier = Modifier.size(IconSizeSm)
                 )
             }
         }

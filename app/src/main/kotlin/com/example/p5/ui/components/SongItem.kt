@@ -14,7 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,7 +44,9 @@ import com.example.p5.ui.theme.DurationFast
 import com.example.p5.ui.theme.DurationNormal
 import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassBorderSubtle
+import com.example.p5.ui.theme.IconSizeSm
 import com.example.p5.ui.theme.ObsidianSurfaceVariant
+import com.example.p5.ui.theme.ScalePressedButton
 import com.example.p5.ui.theme.ScalePressedSubtle
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.StrokeWidthBorder
@@ -60,7 +66,8 @@ fun SongItem(
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    trailingContent: (@Composable () -> Unit)? = null
+    trailingContent: (@Composable () -> Unit)? = null,
+    onMoreOptionsClick: ((Song) -> Unit)? = null
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val cardShape = remember { RoundedCornerShape(CornerRadiusCard) }
@@ -182,12 +189,41 @@ fun SongItem(
         if (trailingContent != null) {
             trailingContent()
         } else {
-            Text(
-                text = song.durationFormatted,
-                color = TextMuted,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Normal
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (song.durationFormatted.isNotBlank()) {
+                    Text(
+                        text = song.durationFormatted,
+                        color = TextMuted,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                }
+
+                if (onMoreOptionsClick != null) {
+                    val moreSource = remember { MutableInteractionSource() }
+                    Box(
+                        modifier = Modifier
+                            .padding(start = 6.dp)
+                            .size(32.dp)
+                            .pressedScale(targetScale = ScalePressedButton, interactionSource = moreSource)
+                            .clip(CircleShape)
+                            .clickable(
+                                interactionSource = moreSource,
+                                indication = null
+                            ) { onMoreOptionsClick(song) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.MoreVert,
+                            contentDescription = null,
+                            tint = TextSecondary,
+                            modifier = Modifier.size(IconSizeSm)
+                        )
+                    }
+                }
+            }
         }
     }
 }
