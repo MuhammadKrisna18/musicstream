@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
-import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.ActionButtonSizeSm
@@ -83,7 +82,6 @@ import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
@@ -130,11 +128,6 @@ fun MiniPlayer(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 4.dp)
-                .ambientGlow(
-                    color = ToscaGlowSubtle,
-                    alpha = if (playerState.isPlaying) 0.6f else 0.2f,
-                    shape = islandShape
-                )
                 .clip(islandShape)
                 .background(ObsidianFloating)
                 .then(

@@ -86,7 +86,6 @@ import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.RepeatMode
 import com.example.p5.ui.components.glass.MiniEqualizer
-import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.ActionButtonSizeLg
@@ -136,7 +135,6 @@ import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaGlow
 import com.example.p5.ui.theme.ToscaPrimary
 
 enum class PlayerCenterView {
@@ -351,11 +349,6 @@ fun FullPlayerSheet(
                                             .fillMaxWidth(0.85f)
                                             .aspectRatio(1f)
                                             .scale(albumScale)
-                                            .ambientGlow(
-                                                color = ToscaGlow,
-                                                alpha = if (playerState.isPlaying) 0.55f else 0.2f,
-                                                shape = albumShape
-                                            )
                                             .clip(albumShape)
                                             .background(ObsidianCardHigh)
                                             .glassBorder(
@@ -807,11 +800,6 @@ fun FullPlayerSheet(
                     Box(
                         modifier = Modifier
                             .size(PlayButtonSizeFull)
-                            .ambientGlow(
-                                color = ToscaGlow,
-                                alpha = if (playerState.isPlaying) 0.8f else 0.3f,
-                                shape = CircleShape
-                            )
                             .pressedScale(targetScale = ScalePressedButton, interactionSource = playSource)
                             .clip(CircleShape)
                             .background(ToscaPrimary)

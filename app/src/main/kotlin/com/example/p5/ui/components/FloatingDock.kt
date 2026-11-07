@@ -36,7 +36,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
-import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.CornerRadiusDock
@@ -53,7 +52,6 @@ import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
@@ -73,11 +71,6 @@ fun FloatingDock(
     ) {
         Box(
             modifier = Modifier
-                .ambientGlow(
-                    color = ToscaGlowSubtle,
-                    alpha = 0.5f,
-                    shape = dockShape
-                )
                 .clip(dockShape)
                 .background(ObsidianFloating)
                 .glassBorder(

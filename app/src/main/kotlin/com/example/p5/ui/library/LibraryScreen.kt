@@ -51,7 +51,6 @@ import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
-import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.ActionButtonSizeMd
@@ -82,7 +81,6 @@ import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaPrimary
 import java.util.Locale
 
@@ -302,7 +300,6 @@ fun LibraryScreen(
                     Box(
                         modifier = Modifier
                             .size(76.dp)
-                            .ambientGlow(color = ToscaGlowSubtle, alpha = 0.5f, shape = CircleShape)
                             .clip(CircleShape)
                             .background(GlassFillLight)
                             .glassBorder(
@@ -370,7 +367,6 @@ fun LibraryScreen(
                     Box(
                         modifier = Modifier
                             .size(76.dp)
-                            .ambientGlow(color = ToscaGlowSubtle, alpha = 0.5f, shape = CircleShape)
                             .clip(CircleShape)
                             .background(GlassFillLight)
                             .glassBorder(

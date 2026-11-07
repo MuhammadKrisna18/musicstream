@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -43,7 +42,6 @@ import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.GlassFillSubtle
 import com.example.p5.ui.theme.ScalePressedGlass
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.ToscaGlow
 import com.example.p5.ui.theme.ToscaPrimary
 
 fun Modifier.glassBackground(
@@ -110,17 +108,6 @@ fun Modifier.glassCard(
         endColor = borderColorEnd,
         accentGlow = accentBorder
     )
-
-fun Modifier.ambientGlow(
-    color: Color = ToscaGlow,
-    alpha: Float = 0.35f,
-    shape: Shape = RoundedCornerShape(CornerRadiusDefault)
-): Modifier = this.drawBehind {
-    drawRoundRect(
-        color = color.copy(alpha = alpha),
-        size = size
-    )
-}
 
 @Composable
 fun Modifier.pressedScale(

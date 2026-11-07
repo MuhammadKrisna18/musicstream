@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.domain.model.UpdateInfo
-import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.CornerRadiusMd
@@ -64,7 +63,6 @@ import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaContainer
 import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaPrimary
 import java.io.File
 
@@ -86,11 +84,6 @@ fun UpdateDialog(
             if (!isDownloading) onDismiss()
         },
         modifier = Modifier
-            .ambientGlow(
-                color = ToscaGlowSubtle,
-                alpha = 0.5f,
-                shape = dialogShape
-            )
             .clip(dialogShape)
             .glassBorder(
                 shape = dialogShape,

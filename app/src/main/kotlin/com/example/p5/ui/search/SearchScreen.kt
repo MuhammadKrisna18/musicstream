@@ -87,7 +87,6 @@ import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.components.glass.MiniEqualizer
-import com.example.p5.ui.components.glass.ambientGlow
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.ArtworkCardHeight
@@ -122,8 +121,6 @@ import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
 import com.example.p5.ui.theme.ToscaDark
 import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaGlow
-import com.example.p5.ui.theme.ToscaGlowSubtle
 import com.example.p5.ui.theme.ToscaLight
 import com.example.p5.ui.theme.ToscaPrimary
 
@@ -724,11 +721,6 @@ private fun EditorialHeroCard(
             .fillMaxWidth()
             .height(HeroBannerHeight)
             .pressedScale(targetScale = ScalePressedSubtle, interactionSource = interactionSource)
-            .ambientGlow(
-                color = ToscaGlowSubtle,
-                alpha = 0.4f,
-                shape = cardShape
-            )
             .clip(cardShape)
             .background(ObsidianCardHigh)
             .glassBorder(
@@ -826,11 +818,6 @@ private fun EditorialHeroCard(
                 Box(
                     modifier = Modifier
                         .size(PlayButtonSizeHero)
-                        .ambientGlow(
-                            color = ToscaGlow,
-                            alpha = 0.7f,
-                            shape = CircleShape
-                        )
                         .clip(CircleShape)
                         .background(ToscaPrimary),
                     contentAlignment = Alignment.Center
