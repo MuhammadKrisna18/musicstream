@@ -71,6 +71,43 @@ class MusicPlayerManager(
         loadAndPlay(song)
     }
 
+    fun addToQueueNext(song: Song): Boolean {
+        if (currentQueue.isEmpty()) {
+            playSong(song)
+            return true
+        }
+
+        if (currentQueueIndex in currentQueue.indices && currentQueue[currentQueueIndex].id == song.id) {
+            return false
+        }
+
+        val existingIndex = currentQueue.indexOfFirst { it.id == song.id }
+        if (existingIndex != -1) {
+            currentQueue.removeAt(existingIndex)
+            if (existingIndex < currentQueueIndex) {
+                currentQueueIndex--
+            }
+        }
+
+        val insertIndex = (currentQueueIndex + 1).coerceIn(0, currentQueue.size)
+        currentQueue.add(insertIndex, song)
+
+        if (isShuffleEnabled) {
+            rebuildShuffleOrder()
+            val songIndexInQueue = insertIndex
+            shuffleOrder.remove(songIndexInQueue)
+            val currentShufflePos = shuffleOrder.indexOf(currentQueueIndex)
+            if (currentShufflePos != -1 && currentShufflePos < shuffleOrder.size) {
+                shuffleOrder.add(currentShufflePos + 1, songIndexInQueue)
+            } else {
+                shuffleOrder.add(songIndexInQueue)
+            }
+        }
+
+        syncQueueState()
+        return true
+    }
+
     fun playNext(isAutoPlay: Boolean = false) {
         if (currentQueue.isEmpty()) return
 
@@ -110,7 +147,6 @@ class MusicPlayerManager(
     fun playPrevious() {
         if (currentQueue.isEmpty()) return
 
-        // If played more than 3 seconds, replay current song
         if (playerState.value.currentPositionMs > 3000L) {
             audioPlayer.seekTo(0L)
             return

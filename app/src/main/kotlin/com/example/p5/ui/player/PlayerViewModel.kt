@@ -20,6 +20,10 @@ class PlayerViewModel(
         musicPlayerManager.playSong(song)
     }
 
+    fun addToQueueNext(song: Song): Boolean {
+        return musicPlayerManager.addToQueueNext(song)
+    }
+
     fun playNext() {
         musicPlayerManager.playNext()
     }
