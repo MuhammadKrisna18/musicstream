@@ -69,6 +69,13 @@ class LibraryViewModel(
         }
     }
 
+    fun toggleFavorite(song: Song) {
+        viewModelScope.launch {
+            val isFav = favoriteRepository.toggleFavorite(song)
+            messageFlow.value = if (isFav) "Ditambahkan ke lagu favorit" else "Dihapus dari lagu favorit"
+        }
+    }
+
     fun removeSavedSong(songId: String) {
         viewModelScope.launch {
             savedSongRepository.removeSavedSong(songId)

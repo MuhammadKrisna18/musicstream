@@ -22,6 +22,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Bookmark
+import androidx.compose.material.icons.rounded.BookmarkBorder
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.History
@@ -92,10 +94,12 @@ fun LibraryScreen(
     modifier: Modifier = Modifier,
     currentVersion: String = "2.1.0",
     onCheckForUpdate: () -> Unit = {},
-    onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) }
+    onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) },
+    onMoreOptionsClick: (Song) -> Unit = {}
 ) {
     val uiState by libraryViewModel.uiState.collectAsStateWithLifecycle()
     val favoriteSongs = uiState.favoriteSongs
+    val savedSongs = uiState.savedSongs
     val historySongs = uiState.historySongs
     val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -126,7 +130,11 @@ fun LibraryScreen(
                     letterSpacing = (-0.5).sp
                 )
                 Text(
-                    text = if (selectedTab == 0) stringResource(R.string.library_subtitle_favorites, favoriteSongs.size) else stringResource(R.string.library_subtitle_history, historySongs.size),
+                    text = when (selectedTab) {
+                        0 -> stringResource(R.string.library_subtitle_favorites, favoriteSongs.size)
+                        1 -> stringResource(R.string.library_subtitle_saved, savedSongs.size)
+                        else -> stringResource(R.string.library_subtitle_history, historySongs.size)
+                    },
                     color = TextSecondary,
                     fontSize = 12.sp
                 )
@@ -180,6 +188,7 @@ fun LibraryScreen(
         ) {
             val tabs = listOf(
                 stringResource(R.string.library_tab_favorites, favoriteSongs.size),
+                stringResource(R.string.library_tab_saved, savedSongs.size),
                 stringResource(R.string.library_tab_history, historySongs.size)
             )
             tabs.forEachIndexed { index, title ->
@@ -289,225 +298,243 @@ fun LibraryScreen(
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        if (selectedTab == 0) {
-            if (favoriteSongs.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 48.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
+        when (selectedTab) {
+            0 -> {
+                if (favoriteSongs.isEmpty()) {
+                    Column(
                         modifier = Modifier
-                            .size(76.dp)
-                            .clip(CircleShape)
-                            .background(GlassFillLight)
-                            .glassBorder(
-                                shape = CircleShape,
-                                strokeWidth = StrokeWidthBorder,
-                                startColor = GlassBorderBright.copy(alpha = 0.35f),
-                                endColor = GlassBorderSubtle
-                            ),
-                        contentAlignment = Alignment.Center
+                            .fillMaxSize()
+                            .padding(top = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.FavoriteBorder,
-                            contentDescription = null,
-                            tint = ToscaPrimary,
-                            modifier = Modifier.size(ActionButtonSizeSm)
-                        )
-                    }
+                        Box(
+                            modifier = Modifier
+                                .size(76.dp)
+                                .clip(CircleShape)
+                                .background(GlassFillLight)
+                                .glassBorder(
+                                    shape = CircleShape,
+                                    strokeWidth = StrokeWidthBorder,
+                                    startColor = GlassBorderBright.copy(alpha = 0.35f),
+                                    endColor = GlassBorderSubtle
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.FavoriteBorder,
+                                contentDescription = null,
+                                tint = ToscaPrimary,
+                                modifier = Modifier.size(ActionButtonSizeSm)
+                            )
+                        }
 
-                    Spacer(modifier = Modifier.height(SpacingLg))
+                        Spacer(modifier = Modifier.height(SpacingLg))
 
-                    Text(
-                        text = stringResource(R.string.library_empty_favorites_title),
-                        color = TextPrimary,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = stringResource(R.string.library_empty_favorites_desc),
-                        color = TextSecondary,
-                        fontSize = 13.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp)
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = BottomScrollPadding),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    itemsIndexed(
-                        items = favoriteSongs,
-                        key = { _, item -> item.id }
-                    ) { index, song ->
-                        val isSelected = playerState.currentSong?.id == song.id
-                        FavoriteSongItem(
-                            song = song,
-                            isSelected = isSelected,
-                            isPlaying = playerState.isPlaying,
-                            onClick = { onPlayQueue(favoriteSongs, index) },
-                            onRemoveFavorite = { libraryViewModel.removeFavorite(song.id) }
-                        )
-                    }
-                }
-            }
-        } else {
-            if (historySongs.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 48.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(76.dp)
-                            .clip(CircleShape)
-                            .background(GlassFillLight)
-                            .glassBorder(
-                                shape = CircleShape,
-                                strokeWidth = StrokeWidthBorder,
-                                startColor = GlassBorderBright.copy(alpha = 0.35f),
-                                endColor = GlassBorderSubtle
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.History,
-                            contentDescription = null,
-                            tint = ToscaPrimary,
-                            modifier = Modifier.size(ActionButtonSizeSm)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(SpacingLg))
-
-                    Text(
-                        text = stringResource(R.string.library_empty_history_title),
-                        color = TextPrimary,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Text(
-                        text = stringResource(R.string.library_empty_history_desc),
-                        color = TextSecondary,
-                        fontSize = 13.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp)
-                    )
-                }
-            } else {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = SpacingSm),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
                         Text(
-                            text = stringResource(R.string.library_history_last_listened),
+                            text = stringResource(R.string.library_empty_favorites_title),
+                            color = TextPrimary,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = stringResource(R.string.library_empty_favorites_desc),
                             color = TextSecondary,
                             fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-
-                        Text(
-                            text = stringResource(R.string.library_history_clear),
-                            color = ToscaPrimary,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(CornerRadiusXs))
-                                .clickable { libraryViewModel.clearHistory() }
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp)
                         )
                     }
-
+                } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = BottomScrollPadding),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         itemsIndexed(
-                            items = historySongs,
+                            items = favoriteSongs,
                             key = { _, item -> item.id }
                         ) { index, song ->
                             val isSelected = playerState.currentSong?.id == song.id
-                            HistorySongItem(
+                            SongItem(
                                 song = song,
+                                isPlaying = playerState.isPlaying,
                                 isSelected = isSelected,
-                                livesPlaying = playerState.isPlaying,
-                                onClick = { onPlayQueue(historySongs, index) }
+                                onClick = { onPlayQueue(favoriteSongs, index) },
+                                onMoreOptionsClick = onMoreOptionsClick
                             )
+                        }
+                    }
+                }
+            }
+
+            1 -> {
+                if (savedSongs.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(76.dp)
+                                .clip(CircleShape)
+                                .background(GlassFillLight)
+                                .glassBorder(
+                                    shape = CircleShape,
+                                    strokeWidth = StrokeWidthBorder,
+                                    startColor = GlassBorderBright.copy(alpha = 0.35f),
+                                    endColor = GlassBorderSubtle
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.BookmarkBorder,
+                                contentDescription = null,
+                                tint = ToscaPrimary,
+                                modifier = Modifier.size(ActionButtonSizeSm)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(SpacingLg))
+
+                        Text(
+                            text = stringResource(R.string.library_empty_saved_title),
+                            color = TextPrimary,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = stringResource(R.string.library_empty_saved_desc),
+                            color = TextSecondary,
+                            fontSize = 13.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp)
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(bottom = BottomScrollPadding),
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        itemsIndexed(
+                            items = savedSongs,
+                            key = { _, item -> item.id }
+                        ) { index, song ->
+                            val isSelected = playerState.currentSong?.id == song.id
+                            SongItem(
+                                song = song,
+                                isPlaying = playerState.isPlaying,
+                                isSelected = isSelected,
+                                onClick = { onPlayQueue(savedSongs, index) },
+                                onMoreOptionsClick = onMoreOptionsClick
+                            )
+                        }
+                    }
+                }
+            }
+
+            else -> {
+                if (historySongs.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 48.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(76.dp)
+                                .clip(CircleShape)
+                                .background(GlassFillLight)
+                                .glassBorder(
+                                    shape = CircleShape,
+                                    strokeWidth = StrokeWidthBorder,
+                                    startColor = GlassBorderBright.copy(alpha = 0.35f),
+                                    endColor = GlassBorderSubtle
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.History,
+                                contentDescription = null,
+                                tint = ToscaPrimary,
+                                modifier = Modifier.size(ActionButtonSizeSm)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(SpacingLg))
+
+                        Text(
+                            text = stringResource(R.string.library_empty_history_title),
+                            color = TextPrimary,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        Text(
+                            text = stringResource(R.string.library_empty_history_desc),
+                            color = TextSecondary,
+                            fontSize = 13.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp)
+                        )
+                    }
+                } else {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = SpacingSm),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.library_history_last_listened),
+                                color = TextSecondary,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+
+                            Text(
+                                text = stringResource(R.string.library_history_clear),
+                                color = ToscaPrimary,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(CornerRadiusXs))
+                                    .clickable { libraryViewModel.clearHistory() }
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = BottomScrollPadding),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            itemsIndexed(
+                                items = historySongs,
+                                key = { _, item -> item.id }
+                            ) { index, song ->
+                                val isSelected = playerState.currentSong?.id == song.id
+                                SongItem(
+                                    song = song,
+                                    isSelected = isSelected,
+                                    isPlaying = playerState.isPlaying,
+                                    onClick = { onPlayQueue(historySongs, index) },
+                                    onMoreOptionsClick = onMoreOptionsClick
+                                )
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-private fun FavoriteSongItem(
-    song: Song,
-    isSelected: Boolean,
-    isPlaying: Boolean,
-    onClick: () -> Unit,
-    onRemoveFavorite: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    SongItem(
-        song = song,
-        isPlaying = isPlaying,
-        isSelected = isSelected,
-        onClick = onClick,
-        modifier = modifier,
-        trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = song.durationFormatted,
-                    color = TextMuted,
-                    fontSize = 12.sp
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                IconButton(
-                    onClick = onRemoveFavorite,
-                    modifier = Modifier.size(ActionButtonSizeSm)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Favorite,
-                        contentDescription = stringResource(R.string.library_remove_favorite_desc),
-                        tint = ToscaPrimary,
-                        modifier = Modifier.size(IconSizeMd)
-                    )
-                }
-            }
-        }
-    )
-}
-
-@Composable
-private fun HistorySongItem(
-    song: Song,
-    isSelected: Boolean,
-    livesPlaying: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    SongItem(
-        song = song,
-        isPlaying = livesPlaying,
-        isSelected = isSelected,
-        onClick = onClick,
-        modifier = modifier
-    )
 }
 
 private fun formatCacheBytes(bytes: Long): String {

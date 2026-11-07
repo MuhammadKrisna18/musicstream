@@ -18,15 +18,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.p5.domain.model.Song
 import com.example.p5.ui.common.AppViewModelProvider
 import com.example.p5.ui.components.FloatingDock
 import com.example.p5.ui.components.FullPlayerSheet
 import com.example.p5.ui.components.MiniPlayer
+import com.example.p5.ui.components.SongActionBottomSheet
 import com.example.p5.ui.components.UpdateDialog
 import com.example.p5.ui.library.LibraryScreen
 import com.example.p5.ui.library.LibraryViewModel
@@ -35,6 +38,7 @@ import com.example.p5.ui.search.SearchScreen
 import com.example.p5.ui.search.SearchViewModel
 import com.example.p5.ui.theme.ObsidianBackground
 import com.example.p5.ui.update.UpdateViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
@@ -50,7 +54,9 @@ fun MainScreen(
 
     var selectedTab by remember { mutableIntStateOf(0) }
     var isFullPlayerVisible by remember { mutableStateOf(false) }
+    var selectedSongForMenu by remember { mutableStateOf<Song?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(playerState.errorMessage) {
         playerState.errorMessage?.let { error ->
@@ -96,6 +102,7 @@ fun MainScreen(
                             playerState = playerState,
                             onSongClick = { song -> playerViewModel.playSong(song) },
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
+                            onMoreOptionsClick = { song -> selectedSongForMenu = song },
                             modifier = Modifier.fillMaxSize()
                         )
                     }
@@ -105,6 +112,7 @@ fun MainScreen(
                             playerState = playerState,
                             onSongClick = { song -> playerViewModel.playSong(song) },
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
+                            onMoreOptionsClick = { song -> selectedSongForMenu = song },
                             currentVersion = updateViewModel.currentVersionName,
                             onCheckForUpdate = { updateViewModel.checkForUpdates(isManualCheck = true) },
                             modifier = Modifier.fillMaxSize()
@@ -167,6 +175,33 @@ fun MainScreen(
                     onDismiss = updateViewModel::dismissDialog,
                     onStartDownload = updateViewModel::startDownload,
                     onInstall = updateViewModel::installDownloadedApk
+                )
+            }
+
+            if (selectedSongForMenu != null) {
+                val isSongFavorite = libraryUiState.favoriteSongs.any { it.id == selectedSongForMenu?.id }
+                val isSongSaved = libraryUiState.savedSongs.any { it.id == selectedSongForMenu?.id }
+
+                SongActionBottomSheet(
+                    song = selectedSongForMenu,
+                    isSaved = isSongSaved,
+                    isFavorite = isSongFavorite,
+                    onDismiss = { selectedSongForMenu = null },
+                    onToggleSave = { song -> libraryViewModel.toggleSaveSong(song) },
+                    onToggleFavorite = { song ->
+                        libraryViewModel.toggleFavorite(song)
+                        if (playerState.currentSong?.id == song.id) {
+                            playerViewModel.toggleFavoriteCurrentSong()
+                        }
+                    },
+                    onAddToQueueNext = { song ->
+                        val added = playerViewModel.addToQueueNext(song)
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                if (added) "Ditambahkan ke antrean berikutnya" else "Lagu sedang diputar"
+                            )
+                        }
+                    }
                 )
             }
         }

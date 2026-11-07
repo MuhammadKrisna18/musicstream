@@ -24,19 +24,24 @@
 
     <string name="library_title">Koleksi Saya</string>
     <string name="library_subtitle_favorites">%1$d lagu disukai</string>
+    <string name="library_subtitle_saved">%1$d lagu tersimpan</string>
     <string name="library_subtitle_history">%1$d trek pernah diputar</string>
     <string name="library_check_update_desc">Cek Pembaruan</string>
     <string name="library_tab_favorites">Favorit (%1$d)</string>
+    <string name="library_tab_saved">Tersimpan (%1$d)</string>
     <string name="library_tab_history">Riwayat (%1$d)</string>
     <string name="library_cache_label">Cache Streaming: %1$s</string>
     <string name="library_cache_clear">Bersihkan</string>
     <string name="library_empty_favorites_title">Belum Ada Lagu Favorit</string>
     <string name="library_empty_favorites_desc">Ketuk ikon hati pada lagu yang sedang diputar untuk menyimpannya ke koleksi favorit Anda.</string>
+    <string name="library_empty_saved_title">Belum Ada Lagu Tersimpan</string>
+    <string name="library_empty_saved_desc">Gunakan menu titik tiga pada lagu untuk menyimpannya ke koleksi tersimpan Anda.</string>
     <string name="library_empty_history_title">Belum Ada Riwayat Pemutaran</string>
     <string name="library_empty_history_desc">Lagu yang kamu dengarkan akan otomatis tercatat dan muncul di sini.</string>
     <string name="library_history_last_listened">Terakhir Didengarkan</string>
     <string name="library_history_clear">Hapus Riwayat</string>
     <string name="library_remove_favorite_desc">Hapus dari Favorit</string>
+    <string name="library_remove_saved_desc">Hapus dari Tersimpan</string>
     <string name="library_add_favorite_desc">Tambah ke Favorit</string>
 
     <string name="player_header_now_playing">NOW PLAYING</string>
