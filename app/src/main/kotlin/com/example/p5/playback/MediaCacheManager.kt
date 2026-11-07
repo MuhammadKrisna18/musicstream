@@ -14,7 +14,7 @@ import java.io.File
 
 @OptIn(UnstableApi::class)
 object MediaCacheManager {
-    private const val MAX_CACHE_SIZE_BYTES = 300L * 1024L * 1024L // 300 MB
+    private const val MAX_CACHE_SIZE_BYTES = 300L * 1024L * 1024L
 
     @Volatile
     private var simpleCache: SimpleCache? = null

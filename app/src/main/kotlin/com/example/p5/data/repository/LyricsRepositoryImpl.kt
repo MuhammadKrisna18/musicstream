@@ -30,10 +30,8 @@ class LyricsRepositoryImpl(
             val trackName = cleaned.first
             val artistName = cleaned.second
 
-            // Try exact match first
             var lyricsData = fetchExactLyrics(song.id, trackName, artistName, song.durationSeconds)
 
-            // If not found, try search fallback
             if (lyricsData == null) {
                 val searchQuery = "$artistName $trackName".trim()
                 lyricsData = fetchSearchLyrics(song.id, searchQuery)
@@ -91,7 +89,6 @@ class LyricsRepositoryImpl(
             val array = JSONArray(body)
             if (array.length() == 0) return null
 
-            // Pick first item that has synced or plain lyrics
             for (i in 0 until array.length()) {
                 val item = array.getJSONObject(i)
                 val parsed = parseLyricsJson(songId, item)
@@ -170,7 +167,6 @@ class LyricsRepositoryImpl(
     }
 
     private fun parseCleanArtistAndTitle(rawArtist: String, rawTitle: String): Pair<String, String> {
-        // If title contains " - ", often it's "Artist - Title"
         var artist = rawArtist
         var title = rawTitle
 
@@ -182,7 +178,6 @@ class LyricsRepositoryImpl(
             }
         }
 
-        // Clean common noise in titles like (Official Music Video), [MV], (Lyrics), etc.
         title = title
             .replace(Regex("\\[.*?\\]|\\(.*?\\)"), "")
             .replace(Regex("(?i)official\\s*(video|audio|music video|lyric video)?"), "")

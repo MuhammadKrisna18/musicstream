@@ -32,7 +32,6 @@ class UpdateViewModel(
         get() = updateRepository.currentVersionName
 
     init {
-        // Automatically check for update on app startup (silent)
         checkForUpdates(isManualCheck = false)
     }
 
@@ -87,7 +86,6 @@ class UpdateViewModel(
                         downloadedApkFile = apkFile
                     )
                 }
-                // Automatically prompt user to install the downloaded APK
                 installDownloadedApk()
             } catch (e: Exception) {
                 _uiState.update {

@@ -75,7 +75,6 @@ class SearchHistoryRepositoryImpl(
             SQLiteDatabase.CONFLICT_REPLACE
         )
 
-        // Keep maximum 20 recent queries
         db.execSQL(
             """
             DELETE FROM ${MusicDatabaseHelper.TABLE_SEARCH_HISTORY}
