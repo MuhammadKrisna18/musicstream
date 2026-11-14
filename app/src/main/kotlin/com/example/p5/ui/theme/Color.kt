@@ -2,13 +2,13 @@ package com.example.p5.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val ObsidianBlack = Color(0xFF07080A)
-val ObsidianBackground = Color(0xFF090B0E)
-val ObsidianSurface = Color(0xFF0F1217)
-val ObsidianSurfaceVariant = Color(0xFF161A22)
-val ObsidianCard = Color(0xFF13171F)
-val ObsidianCardHigh = Color(0xFF1A1F2C)
-val ObsidianFloating = Color(0xEB0C0F14)
+val ObsidianBlack = Color(0xFF090611)
+val ObsidianBackground = Color(0xFF0D0A18)
+val ObsidianSurface = Color(0xFF140E24)
+val ObsidianSurfaceVariant = Color(0xFF1C1333)
+val ObsidianCard = Color(0xFF161028)
+val ObsidianCardHigh = Color(0xFF20163B)
+val ObsidianFloating = Color(0xEB130D24)
 
 val GlassFillSubtle = Color(0x0AFFFFFF)
 val GlassFillLight = Color(0x14FFFFFF)
@@ -20,33 +20,43 @@ val GlassBorderSubtle = Color(0x1FFFFFFF)
 val GlassBorderMedium = Color(0x33FFFFFF)
 val GlassBorderBright = Color(0x59FFFFFF)
 
-val GlassSurfaceDark = Color(0xCC0D1016)
+val GlassSurfaceDark = Color(0xCC110B22)
 
-val ToscaPrimary = Color(0xFF00E5BF)
-val ToscaAccent = Color(0xFF00F5D4)
-val ToscaLight = Color(0xFF70FFDF)
-val ToscaDark = Color(0xFF00A88B)
-val ToscaContainer = Color(0xFF042922)
+val VelvetPrimary = Color(0xFFB388FF)
+val VelvetAccent = Color(0xFFC084FC)
+val VelvetLight = Color(0xFFDDD6FE)
+val VelvetDark = Color(0xFF7C3AED)
+val VelvetContainer = Color(0xFF2E1065)
 
-val ToscaGlow = Color(0x3D00F5D4)
-val ToscaGlowSubtle = Color(0x1800F5D4)
-val ToscaGlassBorder = Color(0x6600F5D4)
+val VelvetGlow = Color(0x4DB388FF)
+val VelvetGlowSubtle = Color(0x1EB388FF)
+val VelvetGlassBorder = Color(0x66B388FF)
 
-val AuroraCyan = Color(0xFF00D4FF)
-val AuroraMint = Color(0xFF5FF281)
-val AuroraDeepIndigo = Color(0xFF181534)
+val ToscaPrimary = VelvetPrimary
+val ToscaAccent = VelvetAccent
+val ToscaLight = VelvetLight
+val ToscaDark = VelvetDark
+val ToscaContainer = VelvetContainer
 
-val TextPrimary = Color(0xFFF8FAFC)
-val TextSecondary = Color(0xFF94A3B8)
-val TextTertiary = Color(0xFF64748B)
-val TextMuted = Color(0xFF475569)
+val ToscaGlow = VelvetGlow
+val ToscaGlowSubtle = VelvetGlowSubtle
+val ToscaGlassBorder = VelvetGlassBorder
+
+val AuroraCyan = Color(0xFF818CF8)
+val AuroraMint = Color(0xFFC084FC)
+val AuroraDeepIndigo = Color(0xFF150A2A)
+
+val TextPrimary = Color(0xFFFAF5FF)
+val TextSecondary = Color(0xFFA78BFA)
+val TextTertiary = Color(0xFF7C6F9B)
+val TextMuted = Color(0xFF5B507A)
 val DividerColor = Color(0x1AFFFFFF)
 
 val BlackBackground = ObsidianBackground
 val DarkSurface = ObsidianSurface
 val DarkSurfaceVariant = ObsidianSurfaceVariant
 
-val OrangePrimary = ToscaPrimary
-val OrangeLight = ToscaLight
-val OrangeDark = ToscaDark
-val OrangeContainer = ToscaContainer
+val OrangePrimary = VelvetPrimary
+val OrangeLight = VelvetLight
+val OrangeDark = VelvetDark
+val OrangeContainer = VelvetContainer
