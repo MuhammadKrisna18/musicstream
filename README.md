@@ -1,6 +1,6 @@
 # 🎵 MusicStream - Streaming Musik Modern, Elegan & Bebas Hambatan
 
-MusicStream adalah aplikasi pemutar musik Android modern yang dirancang untuk memberikan pengalaman mendengarkan musik terbaik. Dengan tampilan antarmuka kaca gelap (*Fluid Glassmorphism*) yang futuristik dan memanjakan mata, MusicStream menghadirkan jutaan lagu dengan streaming yang cepat, ringan, dan tanpa ribet.
+MusicStream adalah aplikasi pemutar musik Android modern yang dirancang untuk memberikan pengalaman mendengarkan musik terbaik. Dengan tampilan antarmuka kaca gelap (*Fluid Glassmorphism*) bertema **Midnight Velvet** yang futuristik, memanjakan mata, dan dihiasi latar belakang ilustrasi karakter anime bernuansa malam berbintang, MusicStream menghadirkan jutaan lagu dengan streaming yang cepat, ringan, dan tanpa ribet.
 
 ---
 
@@ -12,34 +12,37 @@ Temukan dan dengarkan lagu favoritmu dari seluruh dunia. Mulai dari lagu pop hit
 ### ⚡ 2. Putar Cepat & Hemat Kuota
 Streaming musik langsung dimulai seketika tanpa perlu menunggu loading lama. Aplikasi secara cerdas menyimpan lagu yang pernah kamu dengarkan, sehingga memutar ulang lagu favorit menjadi jauh lebih hemat kuota internet.
 
-### 🎨 3. Desain Kaca Elegan (*Fluid Glassmorphism*)
-Nikmati antarmuka gelap (*dark mode*) yang memukau dengan sentuhan efek kaca es transparan dan aksen tosca neon. Nyaman di mata saat digunakan di tempat redup atau malam hari.
+### 🌌 3. Nuansa Midnight Velvet & Karakter Anime Estetik
+Nikmati tema antarmuka eksklusif **Midnight Velvet** (Dark Purple & Gothic Indigo) yang dipadukan dengan ilustrasi karakter anime cewe berkualitas tinggi berlatar malam berbintang dengan headphone bercahaya lembut. Desain *Fluid Glassmorphism* transparan membuat visual karakter anime terlihat anggun di seluruh halaman (Beranda, Koleksi, hingga Pemutar Penuh) dengan keterbacaan teks yang tetap tajam.
 
-### 🎤 4. Lirik Lagu Real-Time (Karaoke)
+### 📱 4. Ikon Aplikasi Baru Bertema Midnight Velvet
+Tampilan baru semakin lengkap dengan ikon aplikasi kustom (*Adaptive Icon* & *Legacy Density*) yang elegan, memadukan piringan hitam vinyl gelap, headphone violet neon, dan gelombang audio gothic indigo.
+
+### 🎤 5. Lirik Lagu Real-Time (Karaoke)
 Bernyanyi bersama musisi favoritmu! Lirik berjalan secara otomatis mengikuti alunan nada dan vokal lagu. Kamu juga bisa mengetuk baris lirik mana saja untuk melompat langsung ke bagian lagu tersebut.
 
-### 🌙 5. Pengatur Waktu Tidur (*Sleep Timer*)
+### 🌙 6. Pengatur Waktu Tidur (*Sleep Timer*)
 Suka tertidur sambil mendengarkan alunan musik tenang? Atur waktu tidurmu (15, 30, 45, atau 60 menit, atau berhenti tepat saat lagu berakhir). Aplikasi akan menghentikan pemutaran secara otomatis saat kamu sudah terlelap.
 
-### 🔘 6. Menu Praktis Titik Tiga (*Song Action Sheet*)
+### 🔘 7. Menu Praktis Titik Tiga (*Song Action Sheet*)
 Di setiap kartu dan daftar musik, tersedia tombol titik tiga elegan. Cukup sentuh sekali untuk mengakses berbagai opsi cepat:
 * 📥 **Simpan Lagu**: Simpan lagu ke koleksi tersimpan tanpa memakan memori unduhan file besar.
 * ❤️ **Masukin ke Favorit**: Tandai lagu yang kamu sukai atau hapus dari favorit dengan status dinamis.
 * ⏭️ **Masuk ke Antrean Berikutnya**: Sisipkan lagu tepat setelah lagu saat ini selesai diputar tanpa merusak antrean yang ada.
 
-### 🎼 7. Playlist Mandiri Favorit & Tersimpan
+### 🎼 8. Playlist Mandiri Favorit & Tersimpan
 Koleksi lagu favorit dan lagu tersimpanmu kini bertindak layaknya playlist mandiri! Saat kamu memutar lagu dari tab Favorit atau tab Tersimpan, pemutar akan secara eksklusif memutar dan mengacak daftar lagu di dalam halaman tersebut.
 
-### 🔀 8. Antrean Musik & Putar Otomatis (*Autoplay*)
+### 🔀 9. Antrean Musik & Putar Otomatis (*Autoplay*)
 Musik tidak akan pernah berhenti tiba-tiba. Setelah lagumu selesai, aplikasi akan memutar rekomendasi lagu berikutnya yang senada secara otomatis, lengkap dengan fitur acak (*shuffle*) dan ulang (*repeat*).
 
-### 📱 9. Pemutar Mini Melayang (*Floating Mini Player*)
+### 📱 10. Pemutar Mini Melayang (*Floating Mini Player*)
 Leluasa menjelajahi halaman pencarian atau koleksi sambil tetap memantau lagu yang sedang berputar melalui pulau pemutar mini melayang di bagian bawah layar.
 
-### 🌐 10. Dukungan Penuh Bahasa Indonesia & Inggris
+### 🌐 11. Dukungan Penuh Bahasa Indonesia & Inggris
 Aplikasi hadir dengan lokalisasi bahasa yang menyeluruh, menyesuaikan secara otomatis dengan pengaturan bahasa perangkatmu.
 
-### 🔄 11. Pembaruan Aplikasi Praktis (*In-App Update*)
+### 🔄 12. Pembaruan Aplikasi Praktis (*In-App Update*)
 Tidak perlu repot mencari update manual. Cukup buka tab Koleksi, periksa pembaruan, dan pasang versi terbaru langsung dari aplikasi dengan sekali klik.
 
 ---
