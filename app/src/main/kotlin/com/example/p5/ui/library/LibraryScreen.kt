@@ -111,7 +111,7 @@ fun LibraryScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(ObsidianBackground)
+            .background(Color.Transparent)
             .padding(horizontal = SpacingLg)
     ) {
         Spacer(modifier = Modifier.height(14.dp))

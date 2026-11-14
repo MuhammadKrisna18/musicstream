@@ -167,7 +167,7 @@ fun SearchScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(ObsidianBackground)
+            .background(Color.Transparent)
             .padding(horizontal = 16.dp)
     ) {
         Spacer(modifier = Modifier.height(14.dp))

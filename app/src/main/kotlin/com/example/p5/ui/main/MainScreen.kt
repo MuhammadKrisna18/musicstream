@@ -2,6 +2,7 @@ package com.example.p5.ui.main
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,8 +23,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.p5.R
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.common.AppViewModelProvider
 import com.example.p5.ui.components.FloatingDock
@@ -37,6 +44,7 @@ import com.example.p5.ui.player.PlayerViewModel
 import com.example.p5.ui.search.SearchScreen
 import com.example.p5.ui.search.SearchViewModel
 import com.example.p5.ui.theme.ObsidianBackground
+import com.example.p5.ui.theme.ObsidianBlack
 import com.example.p5.ui.update.UpdateViewModel
 import kotlinx.coroutines.launch
 
@@ -90,6 +98,31 @@ fun MainScreen(
                 .fillMaxSize()
                 .background(ObsidianBackground)
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.bg_anime_midnight),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.35f)
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                ObsidianBlack.copy(alpha = 0.72f),
+                                Color.Transparent,
+                                ObsidianBlack.copy(alpha = 0.88f)
+                            ),
+                            startY = 0f,
+                            endY = 1800f
+                        )
+                    )
+            )
+
             Crossfade(
                 targetState = selectedTab,
                 animationSpec = tween(durationMillis = 200),
