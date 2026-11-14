@@ -12,6 +12,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -75,6 +76,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -195,14 +197,22 @@ fun FullPlayerSheet(
         dragHandle = null
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = R.drawable.bg_anime_midnight),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                alpha = 0.35f,
+                modifier = Modifier.fillMaxSize()
+            )
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
-                                AuroraDeepIndigo.copy(alpha = 0.55f),
-                                ObsidianBlack,
+                                AuroraDeepIndigo.copy(alpha = 0.65f),
+                                ObsidianBlack.copy(alpha = 0.85f),
                                 ObsidianBlack
                             ),
                             startY = auroraOffset1,
