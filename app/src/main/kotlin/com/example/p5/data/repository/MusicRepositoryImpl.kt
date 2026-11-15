@@ -1,11 +1,13 @@
 package com.example.p5.data.repository
 
 import com.example.p5.data.remote.YouTubeNativeDataSource
+import com.example.p5.data.remote.playlist.PlaylistCurator
 import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
+import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.MusicRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,6 +16,7 @@ import kotlinx.coroutines.withContext
 
 class MusicRepositoryImpl(
     private val youTubeDataSource: YouTubeNativeDataSource,
+    private val playlistCurator: PlaylistCurator = PlaylistCurator(youTubeDataSource),
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : MusicRepository {
 
@@ -50,6 +53,24 @@ class MusicRepositoryImpl(
     override suspend fun getGenreFeed(category: Category): Result<List<HomeSection>> = withContext(ioDispatcher) {
         runCatching {
             youTubeDataSource.getGenreFeed(category)
+        }
+    }
+
+    override suspend fun getCuratedPlaylists(): Result<List<Playlist>> = withContext(ioDispatcher) {
+        runCatching {
+            playlistCurator.getCuratedPlaylists()
+        }
+    }
+
+    override suspend fun getPlaylistTracks(playlist: Playlist): Result<List<Song>> = withContext(ioDispatcher) {
+        runCatching {
+            playlistCurator.getPlaylistTracks(playlist)
+        }
+    }
+
+    override suspend fun searchPlaylists(query: String): Result<List<Playlist>> = withContext(ioDispatcher) {
+        runCatching {
+            playlistCurator.searchPlaylists(query)
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.p5.di
 import android.content.Context
 import com.example.p5.data.local.MusicDatabaseHelper
 import com.example.p5.data.remote.YouTubeNativeDataSource
+import com.example.p5.data.remote.playlist.PlaylistCurator
 import com.example.p5.data.repository.FavoriteRepositoryImpl
 import com.example.p5.data.repository.HistoryRepositoryImpl
 import com.example.p5.data.repository.LyricsRepositoryImpl
@@ -18,12 +19,15 @@ import com.example.p5.domain.repository.MusicRepository
 import com.example.p5.domain.repository.SavedSongRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
 import com.example.p5.domain.repository.UpdateRepository
+import com.example.p5.domain.usecase.GetCuratedPlaylistsUseCase
 import com.example.p5.domain.usecase.GetGenreFeedUseCase
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
+import com.example.p5.domain.usecase.GetPlaylistTracksUseCase
 import com.example.p5.domain.usecase.GetStreamAudioUseCase
 import com.example.p5.domain.usecase.GetTrendingMusicUseCase
 import com.example.p5.domain.usecase.SearchMusicUseCase
+import com.example.p5.domain.usecase.SearchPlaylistsUseCase
 import com.example.p5.playback.MediaSessionAudioPlayer
 import com.example.p5.playback.MusicPlayerManager
 import okhttp3.OkHttpClient
@@ -37,6 +41,9 @@ interface AppContainer {
     val getHomeCategoriesUseCase: GetHomeCategoriesUseCase
     val getHomeFeedUseCase: GetHomeFeedUseCase
     val getGenreFeedUseCase: GetGenreFeedUseCase
+    val getCuratedPlaylistsUseCase: GetCuratedPlaylistsUseCase
+    val getPlaylistTracksUseCase: GetPlaylistTracksUseCase
+    val searchPlaylistsUseCase: SearchPlaylistsUseCase
 
     val audioPlayer: AudioPlayer
     val musicPlayerManager: MusicPlayerManager
@@ -67,8 +74,12 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         YouTubeNativeDataSource(okHttpClient)
     }
 
+    private val playlistCurator: PlaylistCurator by lazy {
+        PlaylistCurator(youTubeDataSource)
+    }
+
     override val musicRepository: MusicRepository by lazy {
-        MusicRepositoryImpl(youTubeDataSource)
+        MusicRepositoryImpl(youTubeDataSource, playlistCurator)
     }
 
     override val searchMusicUseCase: SearchMusicUseCase by lazy {
@@ -93,6 +104,18 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val getGenreFeedUseCase: GetGenreFeedUseCase by lazy {
         GetGenreFeedUseCase(musicRepository)
+    }
+
+    override val getCuratedPlaylistsUseCase: GetCuratedPlaylistsUseCase by lazy {
+        GetCuratedPlaylistsUseCase(musicRepository)
+    }
+
+    override val getPlaylistTracksUseCase: GetPlaylistTracksUseCase by lazy {
+        GetPlaylistTracksUseCase(musicRepository)
+    }
+
+    override val searchPlaylistsUseCase: SearchPlaylistsUseCase by lazy {
+        SearchPlaylistsUseCase(musicRepository)
     }
 
     override val audioPlayer: AudioPlayer by lazy {

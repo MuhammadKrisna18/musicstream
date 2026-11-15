@@ -5,6 +5,7 @@ import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
+import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.Song
 
 interface MusicRepository {
@@ -14,4 +15,7 @@ interface MusicRepository {
     suspend fun getHomeCategories(): Result<HomeCategories>
     suspend fun getHomeFeed(refresh: Boolean = false): Result<HomeFeed>
     suspend fun getGenreFeed(category: Category): Result<List<HomeSection>>
+    suspend fun getCuratedPlaylists(): Result<List<Playlist>>
+    suspend fun getPlaylistTracks(playlist: Playlist): Result<List<Song>>
+    suspend fun searchPlaylists(query: String): Result<List<Playlist>>
 }
