@@ -5,15 +5,19 @@ import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
+import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.SearchSortOrder
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
+import com.example.p5.domain.usecase.GetCuratedPlaylistsUseCase
 import com.example.p5.domain.usecase.GetGenreFeedUseCase
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
+import com.example.p5.domain.usecase.GetPlaylistTracksUseCase
 import com.example.p5.domain.usecase.GetTrendingMusicUseCase
 import com.example.p5.domain.usecase.SearchMusicUseCase
+import com.example.p5.domain.usecase.SearchPlaylistsUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +36,10 @@ class SearchViewModel(
     private val getHomeFeedUseCase: GetHomeFeedUseCase,
     private val getGenreFeedUseCase: GetGenreFeedUseCase,
     private val searchHistoryRepository: SearchHistoryRepository,
-    private val historyRepository: HistoryRepository
+    private val historyRepository: HistoryRepository,
+    private val getCuratedPlaylistsUseCase: GetCuratedPlaylistsUseCase,
+    private val getPlaylistTracksUseCase: GetPlaylistTracksUseCase,
+    private val searchPlaylistsUseCase: SearchPlaylistsUseCase
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -103,8 +110,20 @@ class SearchViewModel(
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
+    private val _curatedPlaylists = MutableStateFlow<List<Playlist>>(emptyList())
+    val curatedPlaylists: StateFlow<List<Playlist>> = _curatedPlaylists.asStateFlow()
+
     private val _selectedSection = MutableStateFlow<HomeSection?>(null)
     val selectedSection: StateFlow<HomeSection?> = _selectedSection.asStateFlow()
+
+    private val _selectedPlaylist = MutableStateFlow<Playlist?>(null)
+    val selectedPlaylist: StateFlow<Playlist?> = _selectedPlaylist.asStateFlow()
+
+    private val _selectedPlaylistTracks = MutableStateFlow<List<Song>>(emptyList())
+    val selectedPlaylistTracks: StateFlow<List<Song>> = _selectedPlaylistTracks.asStateFlow()
+
+    private val _isPlaylistLoading = MutableStateFlow(false)
+    val isPlaylistLoading: StateFlow<Boolean> = _isPlaylistLoading.asStateFlow()
 
     private val _moodTags = MutableStateFlow<List<MoodTag>>(emptyList())
     val moodTags: StateFlow<List<MoodTag>> = _moodTags.asStateFlow()
@@ -118,10 +137,21 @@ class SearchViewModel(
     private var searchJob: Job? = null
     private var artistJob: Job? = null
     private var genreJob: Job? = null
+    private var playlistJob: Job? = null
 
     init {
         loadDynamicContent()
         observeTopArtists()
+        loadCuratedPlaylists()
+    }
+
+    private fun loadCuratedPlaylists() {
+        viewModelScope.launch {
+            getCuratedPlaylistsUseCase()
+                .onSuccess { playlists ->
+                    _curatedPlaylists.value = playlists
+                }
+        }
     }
 
     private fun observeTopArtists() {
@@ -173,6 +203,7 @@ class SearchViewModel(
 
     fun selectGenre(category: Category?) {
         _selectedSection.value = null
+        _selectedPlaylist.value = null
         if (_selectedGenre.value?.id == category?.id && category != null) {
             _selectedGenre.value = null
             _genreSections.value = emptyList()
@@ -216,6 +247,8 @@ class SearchViewModel(
                 loadArtistRecommendations(topArtist)
             }
 
+            loadCuratedPlaylists()
+
             getHomeFeedUseCase(refresh = true)
                 .onSuccess { feed ->
                     _rawHomeSections.value = feed.sections
@@ -257,6 +290,7 @@ class SearchViewModel(
 
     fun onQueryChanged(newQuery: String) {
         _selectedSection.value = null
+        _selectedPlaylist.value = null
         _query.value = newQuery
         searchJob?.cancel()
 
@@ -273,11 +307,44 @@ class SearchViewModel(
     }
 
     fun openSectionDetail(section: HomeSection) {
+        _selectedPlaylist.value = null
         _selectedSection.value = section
     }
 
     fun closeSectionDetail() {
         _selectedSection.value = null
+    }
+
+    fun openPlaylistDetail(playlist: Playlist) {
+        _selectedSection.value = null
+        _selectedPlaylist.value = playlist
+        playlistJob?.cancel()
+
+        if (playlist.tracks.isNotEmpty()) {
+            _selectedPlaylistTracks.value = playlist.tracks
+            _isPlaylistLoading.value = false
+        } else {
+            _selectedPlaylistTracks.value = emptyList()
+            _isPlaylistLoading.value = true
+            playlistJob = viewModelScope.launch {
+                getPlaylistTracksUseCase(playlist)
+                    .onSuccess { songs ->
+                        _selectedPlaylistTracks.value = songs
+                        _isPlaylistLoading.value = false
+                    }
+                    .onFailure {
+                        _selectedPlaylistTracks.value = emptyList()
+                        _isPlaylistLoading.value = false
+                    }
+            }
+        }
+    }
+
+    fun closePlaylistDetail() {
+        _selectedPlaylist.value = null
+        _selectedPlaylistTracks.value = emptyList()
+        _isPlaylistLoading.value = false
+        playlistJob?.cancel()
     }
 
     fun searchCategory(categoryQuery: String) {

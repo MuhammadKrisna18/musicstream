@@ -27,10 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.util.Locale
+import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
+import com.example.p5.domain.model.PlaylistType
 import com.example.p5.domain.model.SearchSortOrder
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
@@ -38,6 +41,8 @@ import com.example.p5.ui.search.components.CategoryGridSection
 import com.example.p5.ui.search.components.EditorialHeroCard
 import com.example.p5.ui.search.components.GenreFilterRow
 import com.example.p5.ui.search.components.HomeTrackSection
+import com.example.p5.ui.search.components.PlaylistDetailContent
+import com.example.p5.ui.search.components.PlaylistRowSection
 import com.example.p5.ui.search.components.SearchBarField
 import com.example.p5.ui.search.components.SearchEmptyState
 import com.example.p5.ui.search.components.SearchErrorState
@@ -67,6 +72,10 @@ fun SearchScreen(
     val categories by searchViewModel.categories.collectAsStateWithLifecycle()
     val selectedGenre by searchViewModel.selectedGenre.collectAsStateWithLifecycle()
     val selectedSection by searchViewModel.selectedSection.collectAsStateWithLifecycle()
+    val curatedPlaylists by searchViewModel.curatedPlaylists.collectAsStateWithLifecycle()
+    val selectedPlaylist by searchViewModel.selectedPlaylist.collectAsStateWithLifecycle()
+    val selectedPlaylistTracks by searchViewModel.selectedPlaylistTracks.collectAsStateWithLifecycle()
+    val isPlaylistLoading by searchViewModel.isPlaylistLoading.collectAsStateWithLifecycle()
     val isGenreLoading by searchViewModel.isGenreLoading.collectAsStateWithLifecycle()
     val searchSortOrder by searchViewModel.searchSortOrder.collectAsStateWithLifecycle()
     val isHomeLoading by searchViewModel.isHomeLoading.collectAsStateWithLifecycle()
@@ -74,12 +83,23 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
     val shimmerBrush = rememberShimmerBrush()
 
+    val genreAndMixPlaylists = remember(curatedPlaylists) {
+        curatedPlaylists.filter { it.type == PlaylistType.GENRE || it.type == PlaylistType.RANDOM }
+    }
+    val artistPlaylists = remember(curatedPlaylists) {
+        curatedPlaylists.filter { it.type == PlaylistType.ARTIST }
+    }
+
     val editorialFeaturedTrack = remember(homeSections) {
         homeSections.firstOrNull { it.tracks.isNotEmpty() }?.tracks?.firstOrNull()
     }
 
-    BackHandler(enabled = selectedSection != null) {
-        searchViewModel.closeSectionDetail()
+    BackHandler(enabled = selectedSection != null || selectedPlaylist != null) {
+        if (selectedPlaylist != null) {
+            searchViewModel.closePlaylistDetail()
+        } else {
+            searchViewModel.closeSectionDetail()
+        }
     }
 
     Column(
@@ -89,12 +109,22 @@ fun SearchScreen(
             .padding(horizontal = 16.dp)
     ) {
         AnimatedContent(
-            targetState = selectedSection,
+            targetState = Pair(selectedSection, selectedPlaylist),
             transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "section_detail_or_home",
+            label = "section_or_playlist_detail_or_home",
             modifier = Modifier.fillMaxSize()
-        ) { currentSection ->
-            if (currentSection != null) {
+        ) { (currentSection, currentPlaylist) ->
+            if (currentPlaylist != null) {
+                PlaylistDetailContent(
+                    playlist = currentPlaylist,
+                    tracks = selectedPlaylistTracks,
+                    isLoading = isPlaylistLoading,
+                    playerState = playerState,
+                    onBackClick = searchViewModel::closePlaylistDetail,
+                    onPlayQueue = onPlayQueue,
+                    onMoreOptionsClick = onMoreOptionsClick
+                )
+            } else if (currentSection != null) {
                 SectionDetailContent(
                     section = currentSection,
                     playerState = playerState,
@@ -128,165 +158,187 @@ fun SearchScreen(
                         label = "search_state_content",
                         modifier = Modifier.weight(1f)
                     ) { state ->
-            when (state) {
-                SearchUiState.Idle -> {
-                    PullToRefreshBox(
-                        isRefreshing = isRefreshing,
-                        onRefresh = searchViewModel::refreshHomeFeed,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = BottomScrollPadding),
-                            verticalArrangement = Arrangement.spacedBy(18.dp)
-                        ) {
-                            if (searchHistory.isNotEmpty()) {
-                                item {
-                                    SearchHistorySection(
-                                        searchHistory = searchHistory,
-                                        onSelectQuery = { selectedQuery ->
-                                            focusManager.clearFocus()
-                                            searchViewModel.selectHistoryQuery(selectedQuery)
-                                        },
-                                        onDeleteItem = searchViewModel::deleteSearchHistoryItem,
-                                        onClearAll = searchViewModel::clearSearchHistory
-                                    )
-                                }
-                            }
+                        when (state) {
+                            SearchUiState.Idle -> {
+                                PullToRefreshBox(
+                                    isRefreshing = isRefreshing,
+                                    onRefresh = searchViewModel::refreshHomeFeed,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    LazyColumn(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentPadding = PaddingValues(bottom = BottomScrollPadding),
+                                        verticalArrangement = Arrangement.spacedBy(18.dp)
+                                    ) {
+                                        if (searchHistory.isNotEmpty()) {
+                                            item {
+                                                SearchHistorySection(
+                                                    searchHistory = searchHistory,
+                                                    onSelectQuery = { selectedQuery ->
+                                                        focusManager.clearFocus()
+                                                        searchViewModel.selectHistoryQuery(selectedQuery)
+                                                    },
+                                                    onDeleteItem = searchViewModel::deleteSearchHistoryItem,
+                                                    onClearAll = searchViewModel::clearSearchHistory
+                                                )
+                                            }
+                                        }
 
-                            if (categories.isNotEmpty()) {
-                                item(key = "genre_filter_row") {
-                                    GenreFilterRow(
-                                        genres = categories,
-                                        selectedGenre = selectedGenre,
-                                        onSelectGenre = searchViewModel::selectGenre
-                                    )
-                                }
-                            }
+                                        if (categories.isNotEmpty()) {
+                                            item(key = "genre_filter_row") {
+                                                GenreFilterRow(
+                                                    genres = categories,
+                                                    selectedGenre = selectedGenre,
+                                                    onSelectGenre = searchViewModel::selectGenre
+                                                )
+                                            }
+                                        }
 
-                            if (selectedGenre == null) {
-                                if (editorialFeaturedTrack != null && query.isEmpty()) {
-                                    item(key = "editorial_hero") {
-                                        EditorialHeroCard(
-                                            song = editorialFeaturedTrack,
-                                            isPlaying = playerState.isPlaying,
-                                            isSelected = playerState.currentSong?.id == editorialFeaturedTrack.id,
-                                            onClick = { onSongClick(editorialFeaturedTrack) }
-                                        )
-                                    }
-                                }
-                            }
+                                        if (selectedGenre == null) {
+                                            if (editorialFeaturedTrack != null && query.isEmpty()) {
+                                                item(key = "editorial_hero") {
+                                                    EditorialHeroCard(
+                                                        song = editorialFeaturedTrack,
+                                                        isPlaying = playerState.isPlaying,
+                                                        isSelected = playerState.currentSong?.id == editorialFeaturedTrack.id,
+                                                        onClick = { onSongClick(editorialFeaturedTrack) }
+                                                    )
+                                                }
+                                            }
+                                        }
 
-                            if ((isHomeLoading && homeSections.isEmpty()) || isGenreLoading) {
-                                searchShimmerSkeleton(shimmerBrush)
-                            } else {
-                                homeSections.forEach { section ->
-                                    if (section.tracks.isNotEmpty()) {
-                                        item(key = section.id) {
-                                            HomeTrackSection(
-                                                section = section,
-                                                isPlaying = playerState.isPlaying,
-                                                currentSongId = playerState.currentSong?.id,
-                                                onPlayQueue = onPlayQueue,
-                                                onSeeAllClick = searchViewModel::openSectionDetail,
-                                                onMoreOptionsClick = onMoreOptionsClick
-                                            )
+                                        if ((isHomeLoading && homeSections.isEmpty()) || isGenreLoading) {
+                                            searchShimmerSkeleton(shimmerBrush)
+                                        } else {
+                                            if (selectedGenre == null && genreAndMixPlaylists.isNotEmpty()) {
+                                                item(key = "section_curated_playlists") {
+                                                    PlaylistRowSection(
+                                                        title = stringResource(R.string.section_playlists_title),
+                                                        subtitle = stringResource(R.string.section_playlists_subtitle),
+                                                        playlists = genreAndMixPlaylists,
+                                                        onPlaylistClick = searchViewModel::openPlaylistDetail
+                                                    )
+                                                }
+                                            }
+
+                                            homeSections.forEach { section ->
+                                                if (section.tracks.isNotEmpty()) {
+                                                    item(key = section.id) {
+                                                        HomeTrackSection(
+                                                            section = section,
+                                                            isPlaying = playerState.isPlaying,
+                                                            currentSongId = playerState.currentSong?.id,
+                                                            onPlayQueue = onPlayQueue,
+                                                            onSeeAllClick = searchViewModel::openSectionDetail,
+                                                            onMoreOptionsClick = onMoreOptionsClick
+                                                        )
+                                                    }
+                                                }
+                                            }
+
+                                            if (selectedGenre == null && artistPlaylists.isNotEmpty()) {
+                                                item(key = "section_artist_playlists") {
+                                                    PlaylistRowSection(
+                                                        title = stringResource(R.string.section_playlists_artist_title),
+                                                        subtitle = stringResource(R.string.section_playlists_artist_subtitle),
+                                                        playlists = artistPlaylists,
+                                                        onPlaylistClick = searchViewModel::openPlaylistDetail
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        if (selectedGenre != null && homeSections.isEmpty() && !isGenreLoading) {
+                                            item {
+                                                SearchEmptyState(
+                                                    query = selectedGenre?.title.orEmpty(),
+                                                    modifier = Modifier.padding(vertical = 32.dp)
+                                                )
+                                            }
+                                        }
+
+                                        if (selectedGenre == null && categories.isNotEmpty()) {
+                                            item {
+                                                CategoryGridSection(
+                                                    categories = categories,
+                                                    onCategoryClick = searchViewModel::selectGenre
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
 
-                            if (selectedGenre != null && homeSections.isEmpty() && !isGenreLoading) {
-                                item {
-                                    SearchEmptyState(
-                                        query = selectedGenre?.title.orEmpty(),
-                                        modifier = Modifier.padding(vertical = 32.dp)
+                            SearchUiState.Loading -> {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = ToscaPrimary,
+                                        strokeWidth = 3.dp,
+                                        modifier = Modifier.size(36.dp)
                                     )
                                 }
                             }
 
-                            if (selectedGenre == null && categories.isNotEmpty()) {
-                                item {
-                                    CategoryGridSection(
-                                        categories = categories,
-                                        onCategoryClick = searchViewModel::selectGenre
-                                    )
+                            is SearchUiState.Success -> {
+                                val sortedSongs = remember(state.songs, searchSortOrder) {
+                                    when (searchSortOrder) {
+                                        SearchSortOrder.RELEVANCE -> state.songs
+                                        SearchSortOrder.MOST_POPULAR -> state.songs.sortedByDescending { it.viewCount }
+                                        SearchSortOrder.DURATION -> state.songs.sortedByDescending { it.durationSeconds }
+                                        SearchSortOrder.TITLE_AZ -> state.songs.sortedBy { it.title.lowercase(Locale.ROOT) }
+                                    }
                                 }
+
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(bottom = BottomScrollPadding),
+                                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    item(key = "search_sort_bar") {
+                                        SearchSortBar(
+                                            selectedOrder = searchSortOrder,
+                                            onSelectOrder = searchViewModel::setSearchSortOrder,
+                                            modifier = Modifier.padding(bottom = 4.dp)
+                                        )
+                                    }
+
+                                    itemsIndexed(
+                                        items = sortedSongs,
+                                        key = { _, item -> item.id }
+                                    ) { index, song ->
+                                        val isSelected = playerState.currentSong?.id == song.id
+
+                                        SongItem(
+                                            song = song,
+                                            isPlaying = playerState.isPlaying,
+                                            isSelected = isSelected,
+                                            onClick = {
+                                                searchViewModel.onSongSelectedFromSearch(song)
+                                                onPlayQueue(sortedSongs, index)
+                                            },
+                                            onMoreOptionsClick = onMoreOptionsClick
+                                        )
+                                    }
+                                }
+                            }
+
+                            SearchUiState.Empty -> {
+                                SearchEmptyState(query = query)
+                            }
+
+                            is SearchUiState.Error -> {
+                                SearchErrorState(
+                                    message = state.message,
+                                    onRetry = searchViewModel::searchNow
+                                )
                             }
                         }
                     }
-                }
-
-                SearchUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = ToscaPrimary,
-                            strokeWidth = 3.dp,
-                            modifier = Modifier.size(36.dp)
-                        )
-                    }
-                }
-
-                is SearchUiState.Success -> {
-                    val sortedSongs = remember(state.songs, searchSortOrder) {
-                        when (searchSortOrder) {
-                            SearchSortOrder.RELEVANCE -> state.songs
-                            SearchSortOrder.MOST_POPULAR -> state.songs.sortedByDescending { it.viewCount }
-                            SearchSortOrder.DURATION -> state.songs.sortedByDescending { it.durationSeconds }
-                            SearchSortOrder.TITLE_AZ -> state.songs.sortedBy { it.title.lowercase(Locale.ROOT) }
-                        }
-                    }
-
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = BottomScrollPadding),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        item(key = "search_sort_bar") {
-                            SearchSortBar(
-                                selectedOrder = searchSortOrder,
-                                onSelectOrder = searchViewModel::setSearchSortOrder,
-                                modifier = Modifier.padding(bottom = 4.dp)
-                            )
-                        }
-
-                        itemsIndexed(
-                            items = sortedSongs,
-                            key = { _, item -> item.id }
-                        ) { index, song ->
-                            val isSelected = playerState.currentSong?.id == song.id
-
-                            SongItem(
-                                song = song,
-                                isPlaying = playerState.isPlaying,
-                                isSelected = isSelected,
-                                onClick = {
-                                    searchViewModel.onSongSelectedFromSearch(song)
-                                    onPlayQueue(sortedSongs, index)
-                                },
-                                onMoreOptionsClick = onMoreOptionsClick
-                            )
-                        }
-                    }
-                }
-
-                SearchUiState.Empty -> {
-                    SearchEmptyState(query = query)
-                }
-
-                is SearchUiState.Error -> {
-                    SearchErrorState(
-                        message = state.message,
-                        onRetry = searchViewModel::searchNow
-                    )
                 }
             }
-        }
-    }
-}
         }
     }
 }
