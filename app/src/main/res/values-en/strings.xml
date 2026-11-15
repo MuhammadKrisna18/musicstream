@@ -14,6 +14,8 @@
     <string name="search_remove_item_desc">Delete</string>
     <string name="editorial_spotlight_badge">EDITOR\'S CHOICE</string>
     <string name="action_play">Play</string>
+    <string name="action_play_all">Play All</string>
+    <string name="action_shuffle">Shuffle</string>
     <string name="action_pause">Pause</string>
     <string name="section_see_all">See all</string>
     <string name="categories_title">Browse Music Genres</string>

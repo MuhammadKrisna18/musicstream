@@ -14,6 +14,8 @@
     <string name="search_remove_item_desc">Hapus</string>
     <string name="editorial_spotlight_badge">PILIHAN REDAKSI</string>
     <string name="action_play">Putar</string>
+    <string name="action_play_all">Putar Semua</string>
+    <string name="action_shuffle">Acak</string>
     <string name="action_pause">Jeda</string>
     <string name="section_see_all">Lihat Semua</string>
     <string name="categories_title">Jelajahi Genre Musik</string>
