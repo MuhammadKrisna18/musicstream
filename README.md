@@ -36,34 +36,37 @@ Daftar lagu favorit dan lagu tersimpan bertindak sebagai playlist mandiri. Saat 
 ### 9. Filter Genre Dinamis di Beranda (Non-Hardcoded)
 Halaman Beranda kini dilengkapi deretan filter genre yang diambil langsung secara dinamis dari katalog server YouTube Music (seperti Pop, Rock, Indie, R&B, Jazz, Dangdut, dan EDM). Memilih genre akan memperbarui kurasi lagu di Beranda secara in-place tanpa perlu berpindah ke halaman pencarian.
 
-### 10. Pengurutan Hasil Pencarian Berdasarkan Popularitas
+### 10. Tampilan Detail Section Beranda (See All)
+Setiap bagian kurasi lagu di Beranda (seperti Top Charts Indonesia, Pilihan Cepat, atau Rilisan Terbaru) kini dilengkapi tombol See All yang membuka tampilan daftar vertikal penuh. Pengguna dapat langsung menikmati tombol Putar Semua dan Acak, navigasi kembali (BackHandler) yang mulus, serta daftar lagu lengkap tanpa memicu pencarian teks yang tidak diinginkan.
+
+### 11. Pengurutan Hasil Pencarian Berdasarkan Popularitas
 Hasil pencarian kini dapat diurutkan secara fleksibel:
 * Relevansi: Berdasarkan algoritma pencarian terbaik.
 * Terpopuler: Mengurutkan lagu berdasarkan jumlah penonton dan pemutaran terbanyak (view count) lengkap dengan indikator tayangan.
 * Durasi: Mengurutkan lagu dari yang berdurasi paling panjang.
 * Alfabetis: Mengurutkan judul lagu secara alfabetis dari A ke Z.
 
-### 11. Pengurutan dan Quick Filter Artis di Perpustakaan
+### 12. Pengurutan dan Quick Filter Artis di Perpustakaan
 Tab Koleksi dan Simpan kini dapat dikelola dengan mudah:
 * Urutkan berdasarkan Terbaru Ditambahkan, Judul (A-Z), Artis (A-Z), atau Durasi.
 * Quick Filter Artis: Chip filter artis yang diekstrak secara otomatis dari lagu-lagu yang tersimpan di dalam koleksi.
 
-### 12. Antrean Musik dan Putar Otomatis (Autoplay)
+### 13. Antrean Musik dan Putar Otomatis (Autoplay)
 Musik berputar tanpa henti. Setelah lagu selesai, aplikasi memutar rekomendasi lagu berikutnya yang senada secara otomatis, lengkap dengan mode acak (shuffle) dan ulang (repeat).
 
-### 13. Pemutar Mini Melayang (Floating Mini Player)
+### 14. Pemutar Mini Melayang (Floating Mini Player)
 Jelajahi halaman pencarian atau koleksi sambil tetap mengontrol lagu yang sedang diputar melalui bar kontrol mini melayang di bagian bawah layar.
 
-### 14. Pembersihan Cache Mandiri
+### 15. Pembersihan Cache Mandiri
 Kelola ruang penyimpanan perangkat secara transparan dengan bar pemantau ukuran cache dan tombol pembersih cache streaming sekali sentuh.
 
-### 15. Dukungan Bahasa Indonesia dan Inggris
+### 16. Dukungan Bahasa Indonesia dan Inggris
 Aplikasi mendukung lokalisasi antarmuka dwibahasa secara menyeluruh, menyesuaikan secara otomatis dengan bahasa sistem perangkat.
 
-### 16. Pembaruan Aplikasi Otomatis (In-App Update)
+### 17. Pembaruan Aplikasi Otomatis (In-App Update)
 Pembaruan aplikasi dapat diperiksa dan dipasang langsung melalui tombol periksa pembaruan di tab Koleksi tanpa perlu mencari berkas instalasi secara manual.
 
-### 17. Arsitektur Modular dan Performa 120 FPS
+### 18. Arsitektur Modular dan Performa 120 FPS
 Dibangun dengan prinsip Clean Architecture dan Jetpack Compose modular. Isolasi rekomposisi pada penggeser durasi pemutar memastikan animasi berjalan stabil pada 120 FPS tanpa stutter (zero dropped frames).
 
 ---
