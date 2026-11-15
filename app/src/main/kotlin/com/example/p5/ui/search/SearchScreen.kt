@@ -64,6 +64,7 @@ fun SearchScreen(
     val homeSections by searchViewModel.homeSections.collectAsStateWithLifecycle()
     val categories by searchViewModel.categories.collectAsStateWithLifecycle()
     val selectedGenre by searchViewModel.selectedGenre.collectAsStateWithLifecycle()
+    val selectedSection by searchViewModel.selectedSection.collectAsStateWithLifecycle()
     val isGenreLoading by searchViewModel.isGenreLoading.collectAsStateWithLifecycle()
     val searchSortOrder by searchViewModel.searchSortOrder.collectAsStateWithLifecycle()
     val isHomeLoading by searchViewModel.isHomeLoading.collectAsStateWithLifecycle()
@@ -165,7 +166,7 @@ fun SearchScreen(
                                                 isPlaying = playerState.isPlaying,
                                                 currentSongId = playerState.currentSong?.id,
                                                 onPlayQueue = onPlayQueue,
-                                                onSeeAllClick = searchViewModel::searchCategory,
+                                                onSeeAllClick = searchViewModel::openSectionDetail,
                                                 onMoreOptionsClick = onMoreOptionsClick
                                             )
                                         }

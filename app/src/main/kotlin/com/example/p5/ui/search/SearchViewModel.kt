@@ -103,6 +103,9 @@ class SearchViewModel(
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
+    private val _selectedSection = MutableStateFlow<HomeSection?>(null)
+    val selectedSection: StateFlow<HomeSection?> = _selectedSection.asStateFlow()
+
     private val _moodTags = MutableStateFlow<List<MoodTag>>(emptyList())
     val moodTags: StateFlow<List<MoodTag>> = _moodTags.asStateFlow()
 
@@ -169,6 +172,7 @@ class SearchViewModel(
     }
 
     fun selectGenre(category: Category?) {
+        _selectedSection.value = null
         if (_selectedGenre.value?.id == category?.id && category != null) {
             _selectedGenre.value = null
             _genreSections.value = emptyList()
@@ -252,6 +256,7 @@ class SearchViewModel(
     }
 
     fun onQueryChanged(newQuery: String) {
+        _selectedSection.value = null
         _query.value = newQuery
         searchJob?.cancel()
 
@@ -265,6 +270,14 @@ class SearchViewModel(
             delay(500)
             executeSearch(trimmed)
         }
+    }
+
+    fun openSectionDetail(section: HomeSection) {
+        _selectedSection.value = section
+    }
+
+    fun closeSectionDetail() {
+        _selectedSection.value = null
     }
 
     fun searchCategory(categoryQuery: String) {

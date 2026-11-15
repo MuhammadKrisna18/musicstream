@@ -67,7 +67,7 @@ fun HomeTrackSection(
     isPlaying: Boolean,
     currentSongId: String?,
     onPlayQueue: (List<Song>, Int) -> Unit,
-    onSeeAllClick: (String) -> Unit,
+    onSeeAllClick: (HomeSection) -> Unit,
     onMoreOptionsClick: (Song) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -99,13 +99,13 @@ fun HomeTrackSection(
                 }
             }
 
-            if (!section.query.isNullOrBlank()) {
+            if (section.tracks.isNotEmpty()) {
                 Text(
                     text = stringResource(R.string.section_see_all),
                     color = ToscaPrimary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable { onSeeAllClick(section.query) }
+                    modifier = Modifier.clickable { onSeeAllClick(section) }
                 )
             }
         }
