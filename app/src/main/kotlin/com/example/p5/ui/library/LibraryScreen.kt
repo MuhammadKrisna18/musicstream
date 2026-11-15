@@ -40,7 +40,7 @@ fun LibraryScreen(
     playerState: PlayerState,
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
-    currentVersion: String = "2.3.0",
+    currentVersion: String = "2.4.0",
     onCheckForUpdate: () -> Unit = {},
     onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) },
     onMoreOptionsClick: (Song) -> Unit = {}

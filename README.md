@@ -45,6 +45,9 @@ Aplikasi hadir dengan lokalisasi bahasa yang menyeluruh, menyesuaikan secara oto
 ### 🔄 12. Pembaruan Aplikasi Praktis (*In-App Update*)
 Tidak perlu repot mencari update manual. Cukup buka tab Koleksi, periksa pembaruan, dan pasang versi terbaru langsung dari aplikasi dengan sekali klik.
 
+### 🚀 13. Performa Ekstra Ringan & Animasi Halus (Modular Architecture)
+Dibangun dengan arsitektur Jetpack Compose yang sepenuhnya modular dan isolasi recomposition cerdas. Antarmuka berjalan sangat mulus dan responsif hingga 120 FPS tanpa stutter (*zero dropped frames*).
+
 ---
 
 ## 📲 Cara Memasang Aplikasi
