@@ -18,6 +18,7 @@ object AppViewModelProvider {
                 musicApplication().container.getTrendingMusicUseCase,
                 musicApplication().container.getHomeCategoriesUseCase,
                 musicApplication().container.getHomeFeedUseCase,
+                musicApplication().container.getGenreFeedUseCase,
                 musicApplication().container.searchHistoryRepository,
                 musicApplication().container.historyRepository
             )

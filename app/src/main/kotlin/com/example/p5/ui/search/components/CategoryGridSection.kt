@@ -54,7 +54,7 @@ import com.example.p5.ui.theme.ToscaPrimary
 @Composable
 fun CategoryGridSection(
     categories: List<Category>,
-    onCategoryClick: (String) -> Unit,
+    onCategoryClick: (Category) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (categories.isEmpty()) return
@@ -79,13 +79,13 @@ fun CategoryGridSection(
             ) {
                 GenreCategoryCard(
                     category = pair[0],
-                    onClick = { onCategoryClick(pair[0].query) },
+                    onClick = { onCategoryClick(pair[0]) },
                     modifier = Modifier.weight(1f)
                 )
                 if (pair.size > 1) {
                     GenreCategoryCard(
                         category = pair[1],
-                        onClick = { onCategoryClick(pair[1].query) },
+                        onClick = { onCategoryClick(pair[1]) },
                         modifier = Modifier.weight(1f)
                     )
                 } else {

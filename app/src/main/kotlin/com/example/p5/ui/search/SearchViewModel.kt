@@ -8,6 +8,7 @@ import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
+import com.example.p5.domain.usecase.GetGenreFeedUseCase
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
 import com.example.p5.domain.usecase.GetTrendingMusicUseCase
@@ -28,6 +29,7 @@ class SearchViewModel(
     private val getTrendingMusicUseCase: GetTrendingMusicUseCase,
     private val getHomeCategoriesUseCase: GetHomeCategoriesUseCase,
     private val getHomeFeedUseCase: GetHomeFeedUseCase,
+    private val getGenreFeedUseCase: GetGenreFeedUseCase,
     private val searchHistoryRepository: SearchHistoryRepository,
     private val historyRepository: HistoryRepository
 ) : ViewModel() {
@@ -47,31 +49,43 @@ class SearchViewModel(
 
     private val _rawHomeSections = MutableStateFlow<List<HomeSection>>(emptyList())
     private val _artistRecommendationSection = MutableStateFlow<HomeSection?>(null)
+    private val _selectedGenre = MutableStateFlow<Category?>(null)
+    val selectedGenre: StateFlow<Category?> = _selectedGenre.asStateFlow()
+
+    private val _genreSections = MutableStateFlow<List<HomeSection>>(emptyList())
+    private val _isGenreLoading = MutableStateFlow(false)
+    val isGenreLoading: StateFlow<Boolean> = _isGenreLoading.asStateFlow()
 
     val homeSections: StateFlow<List<HomeSection>> = combine(
         historyRepository.getTopPlayedSongs(10),
         _artistRecommendationSection,
-        _rawHomeSections
-    ) { topPlayed, artistSec, rawSecs ->
-        val personalized = mutableListOf<HomeSection>()
+        _rawHomeSections,
+        _selectedGenre,
+        _genreSections
+    ) { topPlayed, artistSec, rawSecs, selectedGenre, genreSecs ->
+        if (selectedGenre != null) {
+            genreSecs
+        } else {
+            val personalized = mutableListOf<HomeSection>()
 
-        if (topPlayed.isNotEmpty()) {
-            personalized.add(
-                HomeSection(
-                    id = "personalized_on_repeat",
-                    title = "Sering Kamu Putar",
-                    subtitle = "Lagu yang paling sering kamu dengarkan belakangan ini",
-                    query = "",
-                    tracks = topPlayed
+            if (topPlayed.isNotEmpty()) {
+                personalized.add(
+                    HomeSection(
+                        id = "personalized_on_repeat",
+                        title = "Sering Kamu Putar",
+                        subtitle = "Lagu yang paling sering kamu dengarkan belakangan ini",
+                        query = "",
+                        tracks = topPlayed
+                    )
                 )
-            )
-        }
+            }
 
-        if (artistSec != null && artistSec.tracks.isNotEmpty()) {
-            personalized.add(artistSec)
-        }
+            if (artistSec != null && artistSec.tracks.isNotEmpty()) {
+                personalized.add(artistSec)
+            }
 
-        personalized + rawSecs
+            personalized + rawSecs
+        }
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -92,6 +106,7 @@ class SearchViewModel(
 
     private var searchJob: Job? = null
     private var artistJob: Job? = null
+    private var genreJob: Job? = null
 
     init {
         loadDynamicContent()
@@ -145,9 +160,45 @@ class SearchViewModel(
         }
     }
 
+    fun selectGenre(category: Category?) {
+        if (_selectedGenre.value?.id == category?.id && category != null) {
+            _selectedGenre.value = null
+            _genreSections.value = emptyList()
+            return
+        }
+        _selectedGenre.value = category
+        genreJob?.cancel()
+        if (category == null) {
+            _genreSections.value = emptyList()
+            _isGenreLoading.value = false
+            return
+        }
+
+        genreJob = viewModelScope.launch {
+            _isGenreLoading.value = true
+            getGenreFeedUseCase(category)
+                .onSuccess { sections ->
+                    _genreSections.value = sections
+                    _isGenreLoading.value = false
+                }
+                .onFailure {
+                    _genreSections.value = emptyList()
+                    _isGenreLoading.value = false
+                }
+        }
+    }
+
     fun refreshHomeFeed() {
         viewModelScope.launch {
             _isRefreshing.value = true
+            val currentGenre = _selectedGenre.value
+            if (currentGenre != null) {
+                getGenreFeedUseCase(currentGenre)
+                    .onSuccess { sections ->
+                        _genreSections.value = sections
+                    }
+            }
+
             val topArtist = historyRepository.getTopArtists(1).firstOrNull()?.firstOrNull()
             if (!topArtist.isNullOrBlank()) {
                 loadArtistRecommendations(topArtist)

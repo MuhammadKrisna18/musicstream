@@ -33,6 +33,7 @@ import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.search.components.CategoryGridSection
 import com.example.p5.ui.search.components.EditorialHeroCard
+import com.example.p5.ui.search.components.GenreFilterRow
 import com.example.p5.ui.search.components.HomeTrackSection
 import com.example.p5.ui.search.components.MoodTagsRow
 import com.example.p5.ui.search.components.SearchBarField
@@ -61,6 +62,8 @@ fun SearchScreen(
     val homeSections by searchViewModel.homeSections.collectAsStateWithLifecycle()
     val categories by searchViewModel.categories.collectAsStateWithLifecycle()
     val moodTags by searchViewModel.moodTags.collectAsStateWithLifecycle()
+    val selectedGenre by searchViewModel.selectedGenre.collectAsStateWithLifecycle()
+    val isGenreLoading by searchViewModel.isGenreLoading.collectAsStateWithLifecycle()
     val isHomeLoading by searchViewModel.isHomeLoading.collectAsStateWithLifecycle()
     val isRefreshing by searchViewModel.isRefreshing.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
@@ -126,27 +129,39 @@ fun SearchScreen(
                                 }
                             }
 
-                            if (editorialFeaturedTrack != null && query.isEmpty()) {
-                                item(key = "editorial_hero") {
-                                    EditorialHeroCard(
-                                        song = editorialFeaturedTrack,
-                                        isPlaying = playerState.isPlaying,
-                                        isSelected = playerState.currentSong?.id == editorialFeaturedTrack.id,
-                                        onClick = { onSongClick(editorialFeaturedTrack) }
+                            if (categories.isNotEmpty()) {
+                                item(key = "genre_filter_row") {
+                                    GenreFilterRow(
+                                        genres = categories,
+                                        selectedGenre = selectedGenre,
+                                        onSelectGenre = searchViewModel::selectGenre
                                     )
                                 }
                             }
 
-                            if (moodTags.isNotEmpty()) {
-                                item {
-                                    MoodTagsRow(
-                                        moodTags = moodTags,
-                                        onSelectMoodTag = searchViewModel::searchCategory
-                                    )
+                            if (selectedGenre == null) {
+                                if (editorialFeaturedTrack != null && query.isEmpty()) {
+                                    item(key = "editorial_hero") {
+                                        EditorialHeroCard(
+                                            song = editorialFeaturedTrack,
+                                            isPlaying = playerState.isPlaying,
+                                            isSelected = playerState.currentSong?.id == editorialFeaturedTrack.id,
+                                            onClick = { onSongClick(editorialFeaturedTrack) }
+                                        )
+                                    }
+                                }
+
+                                if (moodTags.isNotEmpty()) {
+                                    item {
+                                        MoodTagsRow(
+                                            moodTags = moodTags,
+                                            onSelectMoodTag = searchViewModel::searchCategory
+                                        )
+                                    }
                                 }
                             }
 
-                            if (isHomeLoading && homeSections.isEmpty()) {
+                            if ((isHomeLoading && homeSections.isEmpty()) || isGenreLoading) {
                                 searchShimmerSkeleton(shimmerBrush)
                             } else {
                                 homeSections.forEach { section ->
@@ -165,11 +180,20 @@ fun SearchScreen(
                                 }
                             }
 
-                            if (categories.isNotEmpty()) {
+                            if (selectedGenre != null && homeSections.isEmpty() && !isGenreLoading) {
+                                item {
+                                    SearchEmptyState(
+                                        query = selectedGenre?.title.orEmpty(),
+                                        modifier = Modifier.padding(vertical = 32.dp)
+                                    )
+                                }
+                            }
+
+                            if (selectedGenre == null && categories.isNotEmpty()) {
                                 item {
                                     CategoryGridSection(
                                         categories = categories,
-                                        onCategoryClick = searchViewModel::searchCategory
+                                        onCategoryClick = searchViewModel::selectGenre
                                     )
                                 }
                             }
