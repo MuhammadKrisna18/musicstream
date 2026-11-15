@@ -96,22 +96,40 @@ class YouTubeNativeDataSource(
     }
 
     suspend fun getAudioStream(videoId: String): AudioStream = withContext(ioDispatcher) {
-        val payload = sessionManager.buildPlayerPayload(videoId)
+        val primaryPayload = sessionManager.buildPlayerPayload(videoId)
 
-        val request = Request.Builder()
+        val primaryRequest = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)
-            .post(payload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "com.google.android.apps.youtube.music/6.40.52 (Linux; U; Android 14)")
-            .addHeader("X-YouTube-Client-Name", "ANDROID")
-            .addHeader("X-YouTube-Client-Version", "19.29.35")
+            .post(primaryPayload.toString().toRequestBody(jsonMediaType))
+            .addHeader("User-Agent", "com.google.android.youtube/20.10.38 (Linux; U; Android 11) gzip")
+            .addHeader("X-YouTube-Client-Name", "3")
+            .addHeader("X-YouTube-Client-Version", "20.10.38")
             .build()
 
-        val response = okHttpClient.newCall(request).execute()
-        if (!response.isSuccessful) {
-            throw IOException("Player request failed: ${response.code}")
+        try {
+            val response = okHttpClient.newCall(primaryRequest).execute()
+            if (response.isSuccessful) {
+                val jsonString = response.body?.string()
+                if (!jsonString.isNullOrEmpty()) {
+                    return@withContext parser.parsePlayerResponse(videoId, jsonString)
+                }
+            }
+        } catch (_: Exception) {
         }
 
-        val jsonString = response.body?.string() ?: throw IOException("Empty player response")
+        val fallbackPayload = sessionManager.buildVrPlayerPayload(videoId)
+        val fallbackRequest = Request.Builder()
+            .url(MusicConfig.YOUTUBE_PLAYER_URL)
+            .post(fallbackPayload.toString().toRequestBody(jsonMediaType))
+            .addHeader("User-Agent", "Mozilla/5.0 (Linux; Android 10; Quest 2) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/15.0.0.4.44.247754366 SamsungBrowser/4.0 Chrome/91.0.4472.114 Mobile VR Safari/537.36")
+            .build()
+
+        val fallbackResponse = okHttpClient.newCall(fallbackRequest).execute()
+        if (!fallbackResponse.isSuccessful) {
+            throw IOException("Player request failed: ${fallbackResponse.code}")
+        }
+
+        val jsonString = fallbackResponse.body?.string() ?: throw IOException("Empty player response")
         parser.parsePlayerResponse(videoId, jsonString)
     }
 

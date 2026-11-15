@@ -71,15 +71,40 @@ class InnerTubeSessionManager(
             put("context", JSONObject().apply {
                 put("client", JSONObject().apply {
                     put("clientName", "ANDROID")
-                    put("clientVersion", "19.29.35")
-                    put("androidSdkVersion", 34)
-                    put("hl", "en")
-                    put("gl", "US")
+                    put("clientVersion", "20.10.38")
+                    put("androidSdkVersion", 30)
+                    put("osName", "Android")
+                    put("osVersion", "11")
+                    put("hl", "id")
+                    put("gl", "ID")
                 })
                 put("playback", JSONObject().apply {
                     put("audioConfig", JSONObject().apply {
                         put("audioQuality", "AUDIO_QUALITY_HIGH")
                     })
+                })
+            })
+            put("videoId", videoId)
+            put("contentCheckOk", true)
+            put("racyCheckOk", true)
+            put("playbackContext", JSONObject().apply {
+                put("contentPlaybackContext", JSONObject().apply {
+                    put("signatureTimestamp", cachedSts)
+                })
+            })
+        }
+    }
+
+    fun buildVrPlayerPayload(videoId: String): JSONObject {
+        refreshSessionDataIfNeeded()
+        return JSONObject().apply {
+            put("context", JSONObject().apply {
+                put("client", JSONObject().apply {
+                    put("clientName", "ANDROID_VR")
+                    put("clientVersion", "1.61.48")
+                    put("deviceModel", "Quest 2")
+                    put("hl", "id")
+                    put("gl", "ID")
                 })
             })
             put("videoId", videoId)
