@@ -11,5 +11,6 @@ data class HomeSection(
 data class HomeFeed(
     val sections: List<HomeSection>,
     val moodTags: List<MoodTag>,
-    val categories: List<Category>
+    val categories: List<Category>,
+    val playlists: List<Playlist> = emptyList()
 )

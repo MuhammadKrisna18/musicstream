@@ -59,4 +59,14 @@ object InnerTubeFormatter {
         )
         return excludedKeywords.any { lower.contains(it) }
     }
+
+    fun isExcludedCompilation(title: String): Boolean {
+        val lower = title.lowercase(Locale.ROOT)
+        return lower.contains("full album") ||
+            lower.contains("kompilasi") ||
+            lower.contains("1 jam") ||
+            lower.contains("kumpulan lagu") ||
+            lower.contains("nonstop") ||
+            lower.contains("top hits spotify")
+    }
 }

@@ -5,6 +5,8 @@ import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
+import com.example.p5.domain.model.Playlist
+import com.example.p5.domain.model.PlaylistType
 import com.example.p5.domain.model.Song
 import org.json.JSONArray
 import org.json.JSONObject
@@ -13,12 +15,18 @@ import java.util.Locale
 data class ParsedBrowse(
     val sections: List<HomeSection>,
     val moodTags: List<MoodTag>,
-    val categories: List<Category>
+    val categories: List<Category>,
+    val playlists: List<Playlist> = emptyList()
+)
+
+data class SearchPayload(
+    val songs: List<Song>,
+    val playlists: List<Playlist>
 )
 
 class InnerTubeParser {
 
-    fun parseSearchResults(jsonString: String, limit: Int): List<Song> {
+    fun parseSearchPayload(jsonString: String, limit: Int): SearchPayload {
         val root = JSONObject(jsonString)
         val contents = root.optJSONObject("contents")
             ?.optJSONObject("twoColumnSearchResultsRenderer")
@@ -27,6 +35,7 @@ class InnerTubeParser {
             ?.optJSONArray("contents") ?: JSONArray()
 
         val songs = mutableListOf<Song>()
+        val playlists = mutableListOf<Playlist>()
 
         for (i in 0 until contents.length()) {
             val section = contents.optJSONObject(i) ?: continue
@@ -34,9 +43,55 @@ class InnerTubeParser {
             val items = itemSection.optJSONArray("contents") ?: continue
 
             for (j in 0 until items.length()) {
-                if (songs.size >= limit) break
                 val item = items.optJSONObject(j) ?: continue
+
+                val pr = item.optJSONObject("playlistRenderer")
+                if (pr != null && playlists.size < 5) {
+                    val playlistId = pr.optString("playlistId")
+                    if (playlistId.isNotBlank()) {
+                        val title = pr.optJSONObject("title")?.optString("simpleText")
+                            ?: pr.optJSONObject("title")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")
+                            ?: ""
+                        if (title.isNotBlank()) {
+                            val owner = pr.optJSONObject("shortBylineText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")
+                                ?: pr.optJSONObject("longBylineText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")
+                                ?: "YouTube Music"
+                            val videoCount = pr.optString("videoCount")
+                                ?: pr.optJSONObject("videoCountText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")
+                                ?: ""
+                            val subtitle = if (videoCount.isNotBlank()) "$owner • $videoCount" else owner
+
+                            val thumbs = pr.optJSONObject("thumbnails")?.optJSONArray("thumbnails")
+                                ?: pr.optJSONObject("thumbnail")?.optJSONArray("thumbnails")
+                                ?: pr.optJSONArray("thumbnails")
+                            val thumbUrl = if (thumbs != null && thumbs.length() > 0) {
+                                thumbs.optJSONObject(thumbs.length() - 1)?.optString("url") ?: ""
+                            } else ""
+
+                            val type = when {
+                                title.contains("mix", ignoreCase = true) || title.contains("radio", ignoreCase = true) -> PlaylistType.RANDOM
+                                title.contains("pop", ignoreCase = true) || title.contains("rock", ignoreCase = true) ||
+                                    title.contains("indie", ignoreCase = true) || title.contains("jazz", ignoreCase = true) ||
+                                    title.contains("dangdut", ignoreCase = true) || title.contains("koplo", ignoreCase = true) -> PlaylistType.GENRE
+                                else -> PlaylistType.ARTIST
+                            }
+
+                            playlists.add(
+                                Playlist(
+                                    id = playlistId,
+                                    title = title,
+                                    subtitle = subtitle,
+                                    thumbnailUrl = thumbUrl,
+                                    type = type,
+                                    query = title
+                                )
+                            )
+                        }
+                    }
+                }
+
                 val vr = item.optJSONObject("videoRenderer") ?: continue
+                if (songs.size >= limit) continue
 
                 val videoId = vr.optString("videoId")
                 if (videoId.isEmpty()) continue
@@ -94,7 +149,11 @@ class InnerTubeParser {
             }
         }
 
-        return songs
+        return SearchPayload(songs, playlists)
+    }
+
+    fun parseSearchResults(jsonString: String, limit: Int): List<Song> {
+        return parseSearchPayload(jsonString, limit).songs
     }
 
     fun parseBrowseResponse(jsonString: String, prefixId: String): ParsedBrowse {
@@ -102,6 +161,7 @@ class InnerTubeParser {
         val sections = mutableListOf<HomeSection>()
         val parsedMoodTags = mutableListOf<MoodTag>()
         val parsedCategories = mutableListOf<Category>()
+        val parsedPlaylists = mutableListOf<Playlist>()
 
         val contentsRoot = root.optJSONObject("contents")
 
@@ -133,7 +193,7 @@ class InnerTubeParser {
                     )
                 }
             }
-            return ParsedBrowse(sections, parsedMoodTags, parsedCategories)
+            return ParsedBrowse(sections, parsedMoodTags, parsedCategories, parsedPlaylists)
         }
 
         val tabs = contentsRoot
@@ -289,7 +349,42 @@ class InnerTubeParser {
 
                 val twoRow = item.optJSONObject("musicTwoRowItemRenderer")
                 if (twoRow != null) {
-                    parseSongFromTwoRow(twoRow)?.let { tracks.add(it) }
+                    val navEndpoint = twoRow.optJSONObject("navigationEndpoint")
+                    val browseEndpoint = navEndpoint?.optJSONObject("browseEndpoint")
+                    val browseId = browseEndpoint?.optString("browseId") ?: ""
+
+                    if (browseId.startsWith("VL") || browseId.startsWith("PL") || browseId.startsWith("RDEM")) {
+                        val pTitle = twoRow.optJSONObject("title")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+                        val pSubtitle = twoRow.optJSONObject("subtitle")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: "YouTube Music"
+                        val pThumbs = twoRow.optJSONObject("thumbnailRenderer")
+                            ?.optJSONObject("musicThumbnailRenderer")
+                            ?.optJSONObject("thumbnail")
+                            ?.optJSONArray("thumbnails")
+                        val pThumbUrl = if (pThumbs != null && pThumbs.length() > 0) {
+                            pThumbs.optJSONObject(pThumbs.length() - 1)?.optString("url") ?: ""
+                        } else ""
+
+                        if (pTitle.isNotBlank()) {
+                            parsedPlaylists.add(
+                                Playlist(
+                                    id = browseId,
+                                    title = pTitle,
+                                    subtitle = pSubtitle,
+                                    thumbnailUrl = pThumbUrl,
+                                    type = when {
+                                        pTitle.contains("mix", ignoreCase = true) || pTitle.contains("radio", ignoreCase = true) -> PlaylistType.RANDOM
+                                        pTitle.contains("pop", ignoreCase = true) || pTitle.contains("rock", ignoreCase = true) ||
+                                            pTitle.contains("indie", ignoreCase = true) || pTitle.contains("jazz", ignoreCase = true) ||
+                                            pTitle.contains("dangdut", ignoreCase = true) || pTitle.contains("koplo", ignoreCase = true) -> PlaylistType.GENRE
+                                        else -> PlaylistType.ARTIST
+                                    },
+                                    query = pTitle
+                                )
+                            )
+                        }
+                    } else {
+                        parseSongFromTwoRow(twoRow)?.let { tracks.add(it) }
+                    }
                     continue
                 }
             }
@@ -307,7 +402,55 @@ class InnerTubeParser {
             }
         }
 
-        return ParsedBrowse(sections, parsedMoodTags, parsedCategories)
+        return ParsedBrowse(sections, parsedMoodTags, parsedCategories, parsedPlaylists)
+    }
+
+    fun parsePlaylistTracks(jsonString: String): List<Song> {
+        val root = JSONObject(jsonString)
+        val songs = mutableListOf<Song>()
+        val contentsRoot = root.optJSONObject("contents")
+
+        val twoCol = contentsRoot?.optJSONObject("twoColumnBrowseResultsRenderer")
+        val secContents = twoCol?.optJSONObject("secondaryContents")
+            ?.optJSONObject("sectionListRenderer")
+            ?.optJSONArray("contents")
+
+        if (secContents != null) {
+            for (i in 0 until secContents.length()) {
+                val playlistShelf = secContents.optJSONObject(i)?.optJSONObject("musicPlaylistShelfRenderer") ?: continue
+                val items = playlistShelf.optJSONArray("contents") ?: continue
+                for (j in 0 until items.length()) {
+                    val item = items.optJSONObject(j)?.optJSONObject("musicResponsiveListItemRenderer") ?: continue
+                    parseSongFromResponsive(item)?.let { songs.add(it) }
+                }
+            }
+        }
+
+        if (songs.isEmpty()) {
+            val singleCol = contentsRoot?.optJSONObject("singleColumnBrowseResultsRenderer")
+            val tabs = singleCol?.optJSONArray("tabs") ?: JSONArray()
+            if (tabs.length() > 0) {
+                val tabContents = tabs.optJSONObject(0)
+                    ?.optJSONObject("tabRenderer")
+                    ?.optJSONObject("content")
+                    ?.optJSONObject("sectionListRenderer")
+                    ?.optJSONArray("contents") ?: JSONArray()
+                for (i in 0 until tabContents.length()) {
+                    val playlistShelf = tabContents.optJSONObject(i)?.optJSONObject("musicPlaylistShelfRenderer") ?: continue
+                    val items = playlistShelf.optJSONArray("contents") ?: continue
+                    for (j in 0 until items.length()) {
+                        val item = items.optJSONObject(j)?.optJSONObject("musicResponsiveListItemRenderer") ?: continue
+                        parseSongFromResponsive(item)?.let { songs.add(it) }
+                    }
+                }
+            }
+        }
+
+        val cleanSongs = songs.filter { song ->
+            song.durationSeconds in 90..480 && !InnerTubeFormatter.isExcludedCompilation(song.title)
+        }
+
+        return if (cleanSongs.isNotEmpty()) cleanSongs else songs
     }
 
     fun parseSongFromResponsive(responsive: JSONObject): Song? {

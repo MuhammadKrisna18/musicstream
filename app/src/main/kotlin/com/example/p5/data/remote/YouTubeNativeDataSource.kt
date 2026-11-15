@@ -10,6 +10,7 @@ import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
+import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.Song
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -55,6 +56,43 @@ class YouTubeNativeDataSource(
 
         val jsonString = response.body?.string() ?: throw IOException("Empty search response")
         parser.parseSearchResults(jsonString, limit)
+    }
+
+    suspend fun searchWithPlaylists(query: String, limit: Int = 20): Pair<List<Song>, List<Playlist>> = withContext(ioDispatcher) {
+        val payload = sessionManager.buildSearchPayload(query)
+
+        val request = Request.Builder()
+            .url(MusicConfig.YOUTUBE_SEARCH_URL)
+            .post(payload.toString().toRequestBody(jsonMediaType))
+            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
+            .addHeader("Origin", MusicConfig.YOUTUBE_BASE_ORIGIN)
+            .addHeader("X-YouTube-Client-Name", "1")
+            .addHeader("X-YouTube-Client-Version", "2.20240726.00.00")
+            .build()
+
+        val response = okHttpClient.newCall(request).execute()
+        if (!response.isSuccessful) {
+            throw IOException("Search request failed: ${response.code}")
+        }
+
+        val jsonString = response.body?.string() ?: throw IOException("Empty search response")
+        val searchPayload = parser.parseSearchPayload(jsonString, limit)
+        Pair(searchPayload.songs, searchPayload.playlists)
+    }
+
+    suspend fun searchPlaylists(query: String, limit: Int = 5): List<Playlist> {
+        return searchWithPlaylists(query, limit).second
+    }
+
+    suspend fun getPlaylistTracks(playlistId: String): List<Song> = withContext(ioDispatcher) {
+        val targetBrowseId = if (playlistId.startsWith("VL")) playlistId else "VL$playlistId"
+        try {
+            val jsonString = fetchBrowse(targetBrowseId)
+            val songs = parser.parsePlaylistTracks(jsonString)
+            if (songs.isNotEmpty()) return@withContext songs
+        } catch (_: Exception) {
+        }
+        emptyList()
     }
 
     suspend fun getAudioStream(videoId: String): AudioStream = withContext(ioDispatcher) {
@@ -110,22 +148,26 @@ class YouTubeNativeDataSource(
         val chartJson = chartDeferred.await()
 
         val sections = mutableListOf<HomeSection>()
+        val dynamicPlaylists = mutableListOf<Playlist>()
         var dynamicMoodTags: List<MoodTag> = emptyList()
         var dynamicCategories: List<Category> = emptyList()
 
         if (!chartJson.isNullOrEmpty()) {
             val parsedChart = parser.parseBrowseResponse(chartJson, prefixId = "chart")
             sections.addAll(parsedChart.sections)
+            dynamicPlaylists.addAll(parsedChart.playlists)
         }
 
         if (!homeJson.isNullOrEmpty()) {
             val parsedHome = parser.parseBrowseResponse(homeJson, prefixId = "home")
             sections.addAll(parsedHome.sections)
+            dynamicPlaylists.addAll(parsedHome.playlists)
         }
 
         if (!exploreJson.isNullOrEmpty()) {
             val parsedExplore = parser.parseBrowseResponse(exploreJson, prefixId = "explore")
             sections.addAll(parsedExplore.sections)
+            dynamicPlaylists.addAll(parsedExplore.playlists)
             if (parsedExplore.moodTags.isNotEmpty()) {
                 dynamicMoodTags = parsedExplore.moodTags
             }
@@ -137,6 +179,7 @@ class YouTubeNativeDataSource(
 
         if (!moodsGenresJson.isNullOrEmpty()) {
             val parsedMoods = parser.parseBrowseResponse(moodsGenresJson, prefixId = "moods_genres")
+            dynamicPlaylists.addAll(parsedMoods.playlists)
             if (parsedMoods.moodTags.isNotEmpty()) {
                 dynamicMoodTags = parsedMoods.moodTags
             }
@@ -166,7 +209,8 @@ class YouTubeNativeDataSource(
         HomeFeed(
             sections = finalSections,
             moodTags = if (randomize) baseMoodTags.shuffled() else baseMoodTags,
-            categories = if (randomize) baseCategories.shuffled() else baseCategories
+            categories = if (randomize) baseCategories.shuffled() else baseCategories,
+            playlists = dynamicPlaylists.distinctBy { it.id }.take(10)
         )
     }
 
@@ -193,7 +237,7 @@ class YouTubeNativeDataSource(
 
     suspend fun getGenreFeed(category: Category): List<HomeSection> = withContext(ioDispatcher) {
         val cached = genreFeedCache[category.id]
-        if (cached != null && cached.isNotEmpty()) {
+        if (!cached.isNullOrEmpty()) {
             return@withContext cached
         }
 
