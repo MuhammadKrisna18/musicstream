@@ -28,7 +28,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import java.util.Locale
 import com.example.p5.domain.model.PlayerState
+import com.example.p5.domain.model.SearchSortOrder
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.search.components.CategoryGridSection
@@ -40,6 +42,7 @@ import com.example.p5.ui.search.components.SearchBarField
 import com.example.p5.ui.search.components.SearchEmptyState
 import com.example.p5.ui.search.components.SearchErrorState
 import com.example.p5.ui.search.components.SearchHistorySection
+import com.example.p5.ui.search.components.SearchSortBar
 import com.example.p5.ui.search.components.SearchTopHeader
 import com.example.p5.ui.search.components.rememberShimmerBrush
 import com.example.p5.ui.search.components.searchShimmerSkeleton
@@ -64,6 +67,7 @@ fun SearchScreen(
     val moodTags by searchViewModel.moodTags.collectAsStateWithLifecycle()
     val selectedGenre by searchViewModel.selectedGenre.collectAsStateWithLifecycle()
     val isGenreLoading by searchViewModel.isGenreLoading.collectAsStateWithLifecycle()
+    val searchSortOrder by searchViewModel.searchSortOrder.collectAsStateWithLifecycle()
     val isHomeLoading by searchViewModel.isHomeLoading.collectAsStateWithLifecycle()
     val isRefreshing by searchViewModel.isRefreshing.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
@@ -215,13 +219,30 @@ fun SearchScreen(
                 }
 
                 is SearchUiState.Success -> {
+                    val sortedSongs = remember(state.songs, searchSortOrder) {
+                        when (searchSortOrder) {
+                            SearchSortOrder.RELEVANCE -> state.songs
+                            SearchSortOrder.MOST_POPULAR -> state.songs.sortedByDescending { it.viewCount }
+                            SearchSortOrder.DURATION -> state.songs.sortedByDescending { it.durationSeconds }
+                            SearchSortOrder.TITLE_AZ -> state.songs.sortedBy { it.title.lowercase(Locale.ROOT) }
+                        }
+                    }
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(bottom = BottomScrollPadding),
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
+                        item(key = "search_sort_bar") {
+                            SearchSortBar(
+                                selectedOrder = searchSortOrder,
+                                onSelectOrder = searchViewModel::setSearchSortOrder,
+                                modifier = Modifier.padding(bottom = 4.dp)
+                            )
+                        }
+
                         itemsIndexed(
-                            items = state.songs,
+                            items = sortedSongs,
                             key = { _, item -> item.id }
                         ) { index, song ->
                             val isSelected = playerState.currentSong?.id == song.id
@@ -232,7 +253,7 @@ fun SearchScreen(
                                 isSelected = isSelected,
                                 onClick = {
                                     searchViewModel.onSongSelectedFromSearch(song)
-                                    onPlayQueue(state.songs, index)
+                                    onPlayQueue(sortedSongs, index)
                                 },
                                 onMoreOptionsClick = onMoreOptionsClick
                             )

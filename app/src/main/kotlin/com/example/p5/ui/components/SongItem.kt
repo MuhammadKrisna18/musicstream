@@ -174,8 +174,22 @@ fun SongItem(
                 overflow = TextOverflow.Ellipsis
             )
 
+            val subtitleText = remember(song.artist, song.viewCount) {
+                if (song.viewCount > 0) {
+                    val formatted = when {
+                        song.viewCount >= 1_000_000_000 -> String.format(java.util.Locale.ROOT, "%.1fM", song.viewCount / 1_000_000_000.0)
+                        song.viewCount >= 1_000_000 -> String.format(java.util.Locale.ROOT, "%.1fM", song.viewCount / 1_000_000.0)
+                        song.viewCount >= 1_000 -> String.format(java.util.Locale.ROOT, "%.1fK", song.viewCount / 1_000.0)
+                        else -> "${song.viewCount}"
+                    }
+                    "${song.artist} • $formatted views"
+                } else {
+                    song.artist
+                }
+            }
+
             Text(
-                text = song.artist,
+                text = subtitleText,
                 color = TextSecondary,
                 fontSize = 13.sp,
                 maxLines = 1,

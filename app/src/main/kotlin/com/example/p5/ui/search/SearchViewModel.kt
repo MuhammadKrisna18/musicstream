@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
+import com.example.p5.domain.model.SearchSortOrder
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
@@ -36,6 +37,13 @@ class SearchViewModel(
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
+
+    private val _searchSortOrder = MutableStateFlow(SearchSortOrder.RELEVANCE)
+    val searchSortOrder: StateFlow<SearchSortOrder> = _searchSortOrder.asStateFlow()
+
+    fun setSearchSortOrder(order: SearchSortOrder) {
+        _searchSortOrder.value = order
+    }
 
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()

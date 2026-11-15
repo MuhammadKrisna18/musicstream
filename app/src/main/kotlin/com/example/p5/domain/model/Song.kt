@@ -7,5 +7,6 @@ data class Song(
     val durationSeconds: Int,
     val durationFormatted: String,
     val thumbnailUrl: String,
-    val webUrl: String
+    val webUrl: String,
+    val viewCount: Long = 0L
 )

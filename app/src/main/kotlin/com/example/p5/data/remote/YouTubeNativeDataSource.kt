@@ -513,6 +513,7 @@ class YouTubeNativeDataSource(
 
         var artist = "YouTube Music"
         var durationFormatted = "3:30"
+        var viewCount = 0L
 
         if (flexColumns.length() > 1) {
             val col1 = flexColumns.optJSONObject(1)?.optJSONObject("musicResponsiveListItemFlexColumnRenderer")
@@ -531,6 +532,13 @@ class YouTubeNativeDataSource(
                 for (t in texts) {
                     if (t.matches(Regex("^\\d{1,2}:\\d{2}$"))) {
                         durationFormatted = t
+                    } else if (t.contains("x ditonton", ignoreCase = true) || t.contains("views", ignoreCase = true) || t.contains("x diputar", ignoreCase = true)) {
+                        val digits = t.replace("[^0-9]".toRegex(), "").toLongOrNull()
+                        if (digits != null) {
+                            viewCount = if (t.contains("jt", ignoreCase = true) || t.contains("m", ignoreCase = true)) digits * 1_000_000L
+                            else if (t.contains("rb", ignoreCase = true) || t.contains("k", ignoreCase = true)) digits * 1_000L
+                            else digits
+                        }
                     }
                 }
             }
@@ -569,7 +577,8 @@ class YouTubeNativeDataSource(
             durationSeconds = durationSec,
             durationFormatted = durationFormatted,
             thumbnailUrl = thumbnailUrl,
-            webUrl = MusicConfig.WATCH_URL_TEMPLATE.format(videoId)
+            webUrl = MusicConfig.WATCH_URL_TEMPLATE.format(videoId),
+            viewCount = viewCount
         )
     }
 
@@ -777,6 +786,11 @@ class YouTubeNativeDataSource(
                     MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
                 }
 
+                val viewCountText = vr.optJSONObject("viewCountText")?.optString("simpleText")
+                    ?: vr.optJSONObject("viewCountText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")
+                    ?: ""
+                val viewCount = viewCountText.replace("[^0-9]".toRegex(), "").toLongOrNull() ?: 0L
+
                 songs.add(
                     Song(
                         id = videoId,
@@ -785,7 +799,8 @@ class YouTubeNativeDataSource(
                         durationSeconds = durationSec,
                         durationFormatted = durationFormatted,
                         thumbnailUrl = thumbnailUrl,
-                        webUrl = MusicConfig.WATCH_URL_TEMPLATE.format(videoId)
+                        webUrl = MusicConfig.WATCH_URL_TEMPLATE.format(videoId),
+                        viewCount = viewCount
                     )
                 )
             }
