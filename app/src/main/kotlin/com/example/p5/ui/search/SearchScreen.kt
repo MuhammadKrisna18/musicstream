@@ -1,5 +1,6 @@
 package com.example.p5.ui.search
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -43,6 +44,7 @@ import com.example.p5.ui.search.components.SearchErrorState
 import com.example.p5.ui.search.components.SearchHistorySection
 import com.example.p5.ui.search.components.SearchSortBar
 import com.example.p5.ui.search.components.SearchTopHeader
+import com.example.p5.ui.search.components.SectionDetailContent
 import com.example.p5.ui.search.components.rememberShimmerBrush
 import com.example.p5.ui.search.components.searchShimmerSkeleton
 import com.example.p5.ui.theme.BottomScrollPadding
@@ -76,36 +78,56 @@ fun SearchScreen(
         homeSections.firstOrNull { it.tracks.isNotEmpty() }?.tracks?.firstOrNull()
     }
 
+    BackHandler(enabled = selectedSection != null) {
+        searchViewModel.closeSectionDetail()
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Transparent)
             .padding(horizontal = 16.dp)
     ) {
-        Spacer(modifier = Modifier.height(14.dp))
-
-        SearchTopHeader(
-            isRefreshing = isRefreshing,
-            isPlaying = playerState.isPlaying,
-            onRefresh = searchViewModel::refreshHomeFeed
-        )
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        SearchBarField(
-            query = query,
-            onQueryChanged = searchViewModel::onQueryChanged,
-            onSearch = searchViewModel::searchNow
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
         AnimatedContent(
-            targetState = uiState,
+            targetState = selectedSection,
             transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "search_state_content",
-            modifier = Modifier.weight(1f)
-        ) { state ->
+            label = "section_detail_or_home",
+            modifier = Modifier.fillMaxSize()
+        ) { currentSection ->
+            if (currentSection != null) {
+                SectionDetailContent(
+                    section = currentSection,
+                    playerState = playerState,
+                    onBackClick = searchViewModel::closeSectionDetail,
+                    onPlayQueue = onPlayQueue,
+                    onMoreOptionsClick = onMoreOptionsClick
+                )
+            } else {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    SearchTopHeader(
+                        isRefreshing = isRefreshing,
+                        isPlaying = playerState.isPlaying,
+                        onRefresh = searchViewModel::refreshHomeFeed
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    SearchBarField(
+                        query = query,
+                        onQueryChanged = searchViewModel::onQueryChanged,
+                        onSearch = searchViewModel::searchNow
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    AnimatedContent(
+                        targetState = uiState,
+                        transitionSpec = { fadeIn() togetherWith fadeOut() },
+                        label = "search_state_content",
+                        modifier = Modifier.weight(1f)
+                    ) { state ->
             when (state) {
                 SearchUiState.Idle -> {
                     PullToRefreshBox(
@@ -262,6 +284,9 @@ fun SearchScreen(
                     )
                 }
             }
+        }
+    }
+}
         }
     }
 }

@@ -72,9 +72,7 @@ fun SectionDetailContent(
     val backInteraction = remember { MutableInteractionSource() }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
+        modifier = modifier.fillMaxSize()
     ) {
         Row(
             modifier = Modifier
