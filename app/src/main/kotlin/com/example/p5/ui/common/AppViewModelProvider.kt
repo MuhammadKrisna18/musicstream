@@ -23,7 +23,8 @@ object AppViewModelProvider {
                 musicApplication().container.historyRepository,
                 musicApplication().container.getCuratedPlaylistsUseCase,
                 musicApplication().container.getPlaylistTracksUseCase,
-                musicApplication().container.searchPlaylistsUseCase
+                musicApplication().container.searchPlaylistsUseCase,
+                musicApplication().container.searchSongsAndPlaylistsUseCase
             )
         }
         initializer {

@@ -33,7 +33,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.util.Locale
 import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
-import com.example.p5.domain.model.PlaylistType
 import com.example.p5.domain.model.SearchSortOrder
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
@@ -82,13 +81,6 @@ fun SearchScreen(
     val isRefreshing by searchViewModel.isRefreshing.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
     val shimmerBrush = rememberShimmerBrush()
-
-    val genreAndMixPlaylists = remember(curatedPlaylists) {
-        curatedPlaylists.filter { it.type == PlaylistType.GENRE || it.type == PlaylistType.RANDOM }
-    }
-    val artistPlaylists = remember(curatedPlaylists) {
-        curatedPlaylists.filter { it.type == PlaylistType.ARTIST }
-    }
 
     val editorialFeaturedTrack = remember(homeSections) {
         homeSections.firstOrNull { it.tracks.isNotEmpty() }?.tracks?.firstOrNull()
@@ -210,12 +202,12 @@ fun SearchScreen(
                                         if ((isHomeLoading && homeSections.isEmpty()) || isGenreLoading) {
                                             searchShimmerSkeleton(shimmerBrush)
                                         } else {
-                                            if (selectedGenre == null && genreAndMixPlaylists.isNotEmpty()) {
+                                            if (selectedGenre == null && curatedPlaylists.isNotEmpty()) {
                                                 item(key = "section_curated_playlists") {
                                                     PlaylistRowSection(
                                                         title = stringResource(R.string.section_playlists_title),
                                                         subtitle = stringResource(R.string.section_playlists_subtitle),
-                                                        playlists = genreAndMixPlaylists,
+                                                        playlists = curatedPlaylists,
                                                         onPlaylistClick = searchViewModel::openPlaylistDetail
                                                     )
                                                 }
@@ -233,17 +225,6 @@ fun SearchScreen(
                                                             onMoreOptionsClick = onMoreOptionsClick
                                                         )
                                                     }
-                                                }
-                                            }
-
-                                            if (selectedGenre == null && artistPlaylists.isNotEmpty()) {
-                                                item(key = "section_artist_playlists") {
-                                                    PlaylistRowSection(
-                                                        title = stringResource(R.string.section_playlists_artist_title),
-                                                        subtitle = stringResource(R.string.section_playlists_artist_subtitle),
-                                                        playlists = artistPlaylists,
-                                                        onPlaylistClick = searchViewModel::openPlaylistDetail
-                                                    )
                                                 }
                                             }
                                         }

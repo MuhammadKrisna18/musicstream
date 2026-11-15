@@ -18,6 +18,7 @@ import com.example.p5.domain.usecase.GetPlaylistTracksUseCase
 import com.example.p5.domain.usecase.GetTrendingMusicUseCase
 import com.example.p5.domain.usecase.SearchMusicUseCase
 import com.example.p5.domain.usecase.SearchPlaylistsUseCase
+import com.example.p5.domain.usecase.SearchSongsAndPlaylistsUseCase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +40,8 @@ class SearchViewModel(
     private val historyRepository: HistoryRepository,
     private val getCuratedPlaylistsUseCase: GetCuratedPlaylistsUseCase,
     private val getPlaylistTracksUseCase: GetPlaylistTracksUseCase,
-    private val searchPlaylistsUseCase: SearchPlaylistsUseCase
+    private val searchPlaylistsUseCase: SearchPlaylistsUseCase,
+    private val searchSongsAndPlaylistsUseCase: SearchSongsAndPlaylistsUseCase
 ) : ViewModel() {
 
     private val _query = MutableStateFlow("")
@@ -193,6 +195,9 @@ class SearchViewModel(
                     _rawHomeSections.value = feed.sections
                     _categories.value = feed.categories
                     _moodTags.value = feed.moodTags
+                    if (feed.playlists.isNotEmpty()) {
+                        _curatedPlaylists.value = feed.playlists
+                    }
                     _isHomeLoading.value = false
                 }
                 .onFailure {
@@ -254,6 +259,9 @@ class SearchViewModel(
                     _rawHomeSections.value = feed.sections
                     _categories.value = feed.categories
                     _moodTags.value = feed.moodTags
+                    if (feed.playlists.isNotEmpty()) {
+                        _curatedPlaylists.value = feed.playlists
+                    }
                     _isRefreshing.value = false
                 }
                 .onFailure {
@@ -407,30 +415,21 @@ class SearchViewModel(
 
     private suspend fun executeSearch(query: String) {
         _uiState.value = SearchUiState.Loading
-        val playlistsResult = searchPlaylistsUseCase(query).getOrDefault(emptyList())
-
-        searchMusicUseCase(query)
-            .onSuccess { songs ->
-                _uiState.value = if (songs.isEmpty() && playlistsResult.isEmpty()) {
+        searchSongsAndPlaylistsUseCase(query)
+            .onSuccess { result ->
+                _uiState.value = if (result.songs.isEmpty() && result.playlists.isEmpty()) {
                     SearchUiState.Empty
                 } else {
                     SearchUiState.Success(
-                        songs = songs,
-                        playlists = playlistsResult
+                        songs = result.songs,
+                        playlists = result.playlists
                     )
                 }
             }
             .onFailure { throwable ->
-                if (playlistsResult.isNotEmpty()) {
-                    _uiState.value = SearchUiState.Success(
-                        songs = emptyList(),
-                        playlists = playlistsResult
-                    )
-                } else {
-                    _uiState.value = SearchUiState.Error(
-                        throwable.localizedMessage ?: "Failed to perform search"
-                    )
-                }
+                _uiState.value = SearchUiState.Error(
+                    throwable.localizedMessage ?: "Failed to perform search"
+                )
             }
     }
 }
