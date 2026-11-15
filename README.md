@@ -71,6 +71,35 @@ Dibangun dengan prinsip Clean Architecture dan Jetpack Compose modular. Isolasi 
 
 ---
 
+## Integrasi Layanan API dan Status Operasional
+
+MusicStream beroperasi menggunakan integrasi beberapa layanan antarmuka pemrograman aplikasi (API) pihak ketiga tanpa memerlukan kunci API berbayar (API key-free architecture). Berikut adalah rincian API yang digunakan beserta fungsi dan status operasionalnya:
+
+### 1. YouTube InnerTube API (Private Native Endpoints)
+* **Kategori**: Katalog Musik, Streaming Audio, dan Metadata.
+* **Status**: Aktif dan Beroperasi Penuh.
+* **Rincian Endpoint**:
+  * **Search Endpoint** (`POST https://www.youtube.com/youtubei/v1/search`): Digunakan untuk melakukan pencarian lagu, artis, dan album melalui konteks klien WEB_REMIX secara instan dan bebas pembatasan kuota API resmi.
+  * **Player Endpoint** (`POST https://www.youtube.com/youtubei/v1/player`): Digunakan untuk mengekstrak tautan stream audio langsung (direct audio stream m4a/webm) dengan bitrate optimal dan validasi signature timestamp (STS) melalui konteks klien ANDROID.
+  * **Browse Endpoint** (`POST https://music.youtube.com/youtubei/v1/browse`): Digunakan untuk memuat kurasi Beranda, feed tangga lagu resmi Indonesia, serta daftar kategori genre dinamis.
+  * **Session Origin** (`GET https://www.youtube.com`): Digunakan oleh modul InnerTubeSessionManager untuk menyinkronkan token sesi visitor data dan signature timestamp secara berkala setiap jam.
+  * **Image CDN** (`GET https://i.ytimg.com/vi/{videoId}/hqdefault.jpg`): CDN gambar YouTube berkecepatan tinggi untuk menyajikan cover thumbnail lagu secara efisien dengan caching lokal.
+
+### 2. LRCLIB API (Open Synchronized Lyrics)
+* **Kategori**: Lirik Lagu Real-Time dan Karaoke Interaktif.
+* **Status**: Aktif dan Beroperasi Penuh.
+* **Rincian Endpoint**:
+  * **Exact Match** (`GET https://lrclib.net/api/get`): Mengambil lirik lagu terverifikasi dengan stempel waktu per baris (format LRC sinkron) berdasarkan judul lagu, nama artis, dan durasi audio.
+  * **Search Fallback** (`GET https://lrclib.net/api/search`): Sebagai jalur cadangan pencarian lirik berbasis query teks bebas jika pencarian eksak tidak membuahkan hasil.
+
+### 3. GitHub Releases REST API
+* **Kategori**: Pembaruan Aplikasi Otomatis (In-App Update).
+* **Status**: Aktif dan Beroperasi Penuh.
+* **Rincian Endpoint**:
+  * **Latest Release** (`GET https://api.github.com/repos/MuhammadKrisna18/musicstream/releases/latest`): Memeriksa versi rilis terbaru pada repositori GitHub, menampilkan catatan perubahan rilis, serta mengunduh dan memasang berkas app-release.apk secara otomatis langsung dari dalam aplikasi.
+
+---
+
 ## Petunjuk Pemasangan
 
 1. Unduh berkas instalasi terbaru app-release.apk dari menu Releases di repositori GitHub ini.
