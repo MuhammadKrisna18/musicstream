@@ -2,8 +2,10 @@ package com.example.p5.data.repository
 
 import com.example.p5.data.remote.YouTubeNativeDataSource
 import com.example.p5.domain.model.AudioStream
+import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
+import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.MusicRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -42,6 +44,12 @@ class MusicRepositoryImpl(
     override suspend fun getHomeFeed(refresh: Boolean): Result<HomeFeed> = withContext(ioDispatcher) {
         runCatching {
             youTubeDataSource.getHomeFeed(refresh)
+        }
+    }
+
+    override suspend fun getGenreFeed(category: Category): Result<List<HomeSection>> = withContext(ioDispatcher) {
+        runCatching {
+            youTubeDataSource.getGenreFeed(category)
         }
     }
 }

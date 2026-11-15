@@ -21,6 +21,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
@@ -44,6 +45,8 @@ class YouTubeNativeDataSource(
 
     @Volatile
     private var cachedHomeFeed: HomeFeed? = null
+
+    private val genreFeedCache = ConcurrentHashMap<String, List<HomeSection>>()
 
     suspend fun search(query: String, limit: Int = 20): List<Song> = withContext(ioDispatcher) {
         val payload = JSONObject().apply {
@@ -124,6 +127,9 @@ class YouTubeNativeDataSource(
     }
 
     suspend fun getHomeFeed(refresh: Boolean = false): HomeFeed = withContext(ioDispatcher) {
+        if (refresh) {
+            genreFeedCache.clear()
+        }
         if (!refresh && cachedHomeFeed != null) {
             return@withContext cachedHomeFeed!!
         }
@@ -151,10 +157,12 @@ class YouTubeNativeDataSource(
 
         val homeDeferred = async { runCatching { fetchBrowse("FEmusic_home") }.getOrNull() }
         val exploreDeferred = async { runCatching { fetchBrowse("FEmusic_explore") }.getOrNull() }
+        val moodsGenresDeferred = async { runCatching { fetchBrowse("FEmusic_moods_and_genres") }.getOrNull() }
         val chartDeferred = async { runCatching { fetchBrowse(selectedChartId) }.getOrNull() }
 
         val homeJson = homeDeferred.await()
         val exploreJson = exploreDeferred.await()
+        val moodsGenresJson = moodsGenresDeferred.await()
         val chartJson = chartDeferred.await()
 
         val sections = mutableListOf<HomeSection>()
@@ -182,6 +190,16 @@ class YouTubeNativeDataSource(
             }
         }
 
+        if (!moodsGenresJson.isNullOrEmpty()) {
+            val parsedMoods = parseBrowseResponse(moodsGenresJson, prefixId = "moods_genres")
+            if (parsedMoods.moodTags.isNotEmpty()) {
+                dynamicMoodTags = parsedMoods.moodTags
+            }
+            if (parsedMoods.categories.isNotEmpty()) {
+                dynamicCategories = parsedMoods.categories
+            }
+        }
+
         val filteredSections = sections.filter { it.tracks.isNotEmpty() }
         val finalSections = if (randomize && filteredSections.size > 1) {
             val first = filteredSections.first().let { sec ->
@@ -205,7 +223,7 @@ class YouTubeNativeDataSource(
         )
     }
 
-    private fun fetchBrowse(browseId: String): String {
+    private fun fetchBrowse(browseId: String, params: String? = null): String {
         val payload = JSONObject().apply {
             put("context", JSONObject().apply {
                 put("client", JSONObject().apply {
@@ -216,6 +234,9 @@ class YouTubeNativeDataSource(
                 })
             })
             put("browseId", browseId)
+            if (!params.isNullOrBlank()) {
+                put("params", params)
+            }
         }
 
         val request = Request.Builder()
@@ -232,6 +253,46 @@ class YouTubeNativeDataSource(
             throw IOException("Browse API error: ${response.code}")
         }
         return response.body?.string() ?: throw IOException("Empty browse response")
+    }
+
+    suspend fun getGenreFeed(category: Category): List<HomeSection> = withContext(ioDispatcher) {
+        val cached = genreFeedCache[category.id]
+        if (cached != null && cached.isNotEmpty()) {
+            return@withContext cached
+        }
+
+        if (category.browseId.isNotBlank() && category.params.isNotBlank()) {
+            try {
+                val json = fetchBrowse(category.browseId, category.params)
+                val parsed = parseBrowseResponse(json, prefixId = "genre_${category.id}")
+                if (parsed.sections.isNotEmpty()) {
+                    genreFeedCache[category.id] = parsed.sections
+                    return@withContext parsed.sections
+                }
+            } catch (_: Exception) {
+            }
+        }
+
+        val fallbackQuery = category.query.ifBlank { "Lagu ${category.title}" }
+        val songs = search(fallbackQuery, limit = 20)
+        val fallbackSections = if (songs.isNotEmpty()) {
+            listOf(
+                HomeSection(
+                    id = "genre_section_${category.id}",
+                    title = category.title,
+                    subtitle = "Pilihan lagu ${category.title}",
+                    query = fallbackQuery,
+                    tracks = songs
+                )
+            )
+        } else {
+            emptyList()
+        }
+
+        if (fallbackSections.isNotEmpty()) {
+            genreFeedCache[category.id] = fallbackSections
+        }
+        fallbackSections
     }
 
     private data class ParsedBrowse(
@@ -295,6 +356,62 @@ class YouTubeNativeDataSource(
 
         for (i in 0 until contents.length()) {
             val sectionObj = contents.optJSONObject(i) ?: continue
+
+            val grid = sectionObj.optJSONObject("gridRenderer")
+            if (grid != null) {
+                val gridHeader = grid.optJSONObject("header")?.optJSONObject("gridHeaderRenderer")
+                val gridTitle = gridHeader?.optJSONObject("title")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+                val isMood = gridTitle.contains("mood", ignoreCase = true) || gridTitle.contains("suasana", ignoreCase = true)
+                val items = grid.optJSONArray("items") ?: JSONArray()
+                for (j in 0 until items.length()) {
+                    val item = items.optJSONObject(j) ?: continue
+                    val navButton = item.optJSONObject("musicNavigationButtonRenderer") ?: continue
+                    val btnText = navButton.optJSONObject("buttonText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+                    if (btnText.isBlank()) continue
+
+                    val stripeColor = navButton.optJSONObject("solid")?.optLong("leftStripeColor", 0L) ?: 0L
+                    val colorHex = if (stripeColor != 0L) {
+                        String.format(Locale.ROOT, "#%06X", 0xFFFFFF and stripeColor.toInt())
+                    } else {
+                        "#00E5BF"
+                    }
+
+                    val browseEndpoint = navButton.optJSONObject("clickCommand")?.optJSONObject("browseEndpoint")
+                    val browseId = browseEndpoint?.optString("browseId") ?: ""
+                    val params = browseEndpoint?.optString("params") ?: ""
+
+                    val itemId = if (isMood) "mood_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
+                    else "genre_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
+                    val icon = mapMoodToIcon(btnText)
+
+                    if (isMood) {
+                        parsedMoodTags.add(
+                            MoodTag(
+                                id = itemId,
+                                label = btnText,
+                                query = "Lagu $btnText",
+                                browseId = browseId,
+                                params = params
+                            )
+                        )
+                    } else {
+                        parsedCategories.add(
+                            Category(
+                                id = itemId,
+                                title = btnText,
+                                query = "Lagu $btnText",
+                                icon = icon,
+                                startColor = colorHex,
+                                endColor = "#1A1A1E",
+                                browseId = browseId,
+                                params = params
+                            )
+                        )
+                    }
+                }
+                continue
+            }
+
             val carousel = sectionObj.optJSONObject("musicCarouselShelfRenderer") ?: continue
             val header = carousel.optJSONObject("header")?.optJSONObject("musicCarouselShelfBasicHeaderRenderer")
 
@@ -321,12 +438,24 @@ class YouTubeNativeDataSource(
                         "#00E5BF"
                     }
 
+                    val browseEndpoint = navButton.optJSONObject("clickCommand")?.optJSONObject("browseEndpoint")
+                    val browseId = browseEndpoint?.optString("browseId") ?: ""
+                    val params = browseEndpoint?.optString("params") ?: ""
+
                     if (btnText.isNotBlank()) {
                         val moodId = "mood_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
-                        if (parsedMoodTags.size < 12) {
-                            parsedMoodTags.add(MoodTag(id = moodId, label = btnText, query = "Lagu $btnText"))
+                        if (parsedMoodTags.size < 20) {
+                            parsedMoodTags.add(
+                                MoodTag(
+                                    id = moodId,
+                                    label = btnText,
+                                    query = "Lagu $btnText",
+                                    browseId = browseId,
+                                    params = params
+                                )
+                            )
                         }
-                        if (parsedCategories.size < 12) {
+                        if (parsedCategories.size < 30) {
                             val icon = mapMoodToIcon(btnText)
                             parsedCategories.add(
                                 Category(
@@ -335,7 +464,9 @@ class YouTubeNativeDataSource(
                                     query = "Lagu $btnText",
                                     icon = icon,
                                     startColor = colorHex,
-                                    endColor = "#1A1A1E"
+                                    endColor = "#1A1A1E",
+                                    browseId = browseId,
+                                    params = params
                                 )
                             )
                         }

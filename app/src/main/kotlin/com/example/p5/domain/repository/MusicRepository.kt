@@ -1,8 +1,10 @@
 package com.example.p5.domain.repository
 
 import com.example.p5.domain.model.AudioStream
+import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
+import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.Song
 
 interface MusicRepository {
@@ -11,4 +13,5 @@ interface MusicRepository {
     suspend fun getTrending(limit: Int = 15): Result<List<Song>>
     suspend fun getHomeCategories(): Result<HomeCategories>
     suspend fun getHomeFeed(refresh: Boolean = false): Result<HomeFeed>
+    suspend fun getGenreFeed(category: Category): Result<List<HomeSection>>
 }

@@ -18,6 +18,7 @@ import com.example.p5.domain.repository.MusicRepository
 import com.example.p5.domain.repository.SavedSongRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
 import com.example.p5.domain.repository.UpdateRepository
+import com.example.p5.domain.usecase.GetGenreFeedUseCase
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
 import com.example.p5.domain.usecase.GetStreamAudioUseCase
@@ -35,6 +36,7 @@ interface AppContainer {
     val getTrendingMusicUseCase: GetTrendingMusicUseCase
     val getHomeCategoriesUseCase: GetHomeCategoriesUseCase
     val getHomeFeedUseCase: GetHomeFeedUseCase
+    val getGenreFeedUseCase: GetGenreFeedUseCase
 
     val audioPlayer: AudioPlayer
     val musicPlayerManager: MusicPlayerManager
@@ -87,6 +89,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val getHomeFeedUseCase: GetHomeFeedUseCase by lazy {
         GetHomeFeedUseCase(musicRepository)
+    }
+
+    override val getGenreFeedUseCase: GetGenreFeedUseCase by lazy {
+        GetGenreFeedUseCase(musicRepository)
     }
 
     override val audioPlayer: AudioPlayer by lazy {
