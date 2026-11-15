@@ -185,8 +185,9 @@ class YouTubeNativeDataSource(
             if (parsedExplore.moodTags.isNotEmpty()) {
                 dynamicMoodTags = parsedExplore.moodTags
             }
-            if (parsedExplore.categories.isNotEmpty()) {
-                dynamicCategories = parsedExplore.categories
+            val cleanCategories = parsedExplore.categories.filter { !isExcludedMoodOrActivity(it.title) }
+            if (cleanCategories.isNotEmpty()) {
+                dynamicCategories = cleanCategories
             }
         }
 
@@ -195,8 +196,9 @@ class YouTubeNativeDataSource(
             if (parsedMoods.moodTags.isNotEmpty()) {
                 dynamicMoodTags = parsedMoods.moodTags
             }
-            if (parsedMoods.categories.isNotEmpty()) {
-                dynamicCategories = parsedMoods.categories
+            val cleanCategories = parsedMoods.categories.filter { !isExcludedMoodOrActivity(it.title) }
+            if (cleanCategories.isNotEmpty()) {
+                dynamicCategories = cleanCategories
             }
         }
 
@@ -214,7 +216,8 @@ class YouTubeNativeDataSource(
         }
 
         val baseMoodTags = if (dynamicMoodTags.isNotEmpty()) dynamicMoodTags else MusicConfig.staticMoodTags
-        val baseCategories = if (dynamicCategories.isNotEmpty()) dynamicCategories else MusicConfig.staticCategories
+        val pureCategories = dynamicCategories.filter { !isExcludedMoodOrActivity(it.title) }
+        val baseCategories = if (pureCategories.isNotEmpty()) pureCategories else MusicConfig.staticCategories
 
         HomeFeed(
             sections = finalSections,
@@ -361,7 +364,11 @@ class YouTubeNativeDataSource(
             if (grid != null) {
                 val gridHeader = grid.optJSONObject("header")?.optJSONObject("gridHeaderRenderer")
                 val gridTitle = gridHeader?.optJSONObject("title")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
-                val isMood = gridTitle.contains("mood", ignoreCase = true) || gridTitle.contains("suasana", ignoreCase = true)
+                val isMood = gridTitle.contains("mood", ignoreCase = true) ||
+                    gridTitle.contains("suasana", ignoreCase = true) ||
+                    gridTitle.contains("momen", ignoreCase = true) ||
+                    gridTitle.contains("aktivitas", ignoreCase = true) ||
+                    isExcludedMoodOrActivity(gridTitle)
                 val items = grid.optJSONArray("items") ?: JSONArray()
                 for (j in 0 until items.length()) {
                     val item = items.optJSONObject(j) ?: continue
@@ -380,11 +387,12 @@ class YouTubeNativeDataSource(
                     val browseId = browseEndpoint?.optString("browseId") ?: ""
                     val params = browseEndpoint?.optString("params") ?: ""
 
-                    val itemId = if (isMood) "mood_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
+                    val isItemMood = isMood || isExcludedMoodOrActivity(btnText)
+                    val itemId = if (isItemMood) "mood_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
                     else "genre_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
                     val icon = mapMoodToIcon(btnText)
 
-                    if (isMood) {
+                    if (isItemMood) {
                         parsedMoodTags.add(
                             MoodTag(
                                 id = itemId,
@@ -443,6 +451,11 @@ class YouTubeNativeDataSource(
                     val params = browseEndpoint?.optString("params") ?: ""
 
                     if (btnText.isNotBlank()) {
+                        val isItemMood = isExcludedMoodOrActivity(btnText) ||
+                            title.contains("mood", ignoreCase = true) ||
+                            title.contains("suasana", ignoreCase = true) ||
+                            title.contains("momen", ignoreCase = true) ||
+                            title.contains("aktivitas", ignoreCase = true)
                         val moodId = "mood_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
                         if (parsedMoodTags.size < 20) {
                             parsedMoodTags.add(
@@ -455,11 +468,12 @@ class YouTubeNativeDataSource(
                                 )
                             )
                         }
-                        if (parsedCategories.size < 30) {
+                        if (!isItemMood && parsedCategories.size < 30) {
+                            val genreId = "genre_${btnText.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_")}"
                             val icon = mapMoodToIcon(btnText)
                             parsedCategories.add(
                                 Category(
-                                    id = moodId,
+                                    id = genreId,
                                     title = btnText,
                                     query = "Lagu $btnText",
                                     icon = icon,
@@ -637,6 +651,18 @@ class YouTubeNativeDataSource(
             lower.contains("album") || lower.contains("single") -> "Rilisan musik terbaru musisi favorit"
             else -> "Koleksi hits musik pilihan"
         }
+    }
+
+    private fun isExcludedMoodOrActivity(text: String): Boolean {
+        val lower = text.lowercase(Locale.ROOT)
+        val excludedKeywords = listOf(
+            "semangat", "santai", "fokus", "olah raga", "olahraga", "workout", "pesta", "party",
+            "romantis", "tidur", "sleep", "gaming", "game", "bepergian", "commute", "travel",
+            "merasa senang", "feel good", "sedih", "sad", "chill", "lofi", "energi", "energy",
+            "belajar", "study", "makan malam", "dinner", "keluarga", "family", "liburan", "holiday",
+            "relaks", "relax", "meditasi", "meditation", "motivasi", "motivation", "pagi", "malam"
+        )
+        return excludedKeywords.any { lower.contains(it) }
     }
 
     private fun mapMoodToIcon(title: String): String {

@@ -25,24 +25,24 @@ object MusicConfig {
     )
 
     val staticMoodTags: List<MoodTag> = listOf(
-        MoodTag("top_hits", "🔥 Top Hits", "Lagu Trending"),
-        MoodTag("santai", "☕ Santai", "Lagu Santai"),
-        MoodTag("olah_raga", "⚡ Olah Raga", "Lagu Workout"),
-        MoodTag("rock", "🎸 Rock", "Lagu Rock"),
-        MoodTag("akustik", "🌙 Akustik", "Lagu Akustik"),
-        MoodTag("pesta", "🎉 Pesta", "Lagu Pesta"),
-        MoodTag("fokus", "🎧 Fokus", "Lagu Fokus")
+        MoodTag("top_hits", "Top Hits", "Lagu Trending"),
+        MoodTag("santai", "Santai", "Lagu Santai"),
+        MoodTag("olah_raga", "Olah Raga", "Lagu Workout"),
+        MoodTag("rock", "Rock", "Lagu Rock"),
+        MoodTag("akustik", "Akustik", "Lagu Akustik"),
+        MoodTag("pesta", "Pesta", "Lagu Pesta"),
+        MoodTag("fokus", "Fokus", "Lagu Fokus")
     )
 
     val staticCategories: List<Category> = listOf(
-        Category("top_hits", "Top Hits", "Lagu Trending", "whatshot", "#00E5BF", "#004D40"),
-        Category("santai", "Santai & Rileks", "Lagu Santai", "nightlife", "#00BFA5", "#121519"),
-        Category("olah_raga", "Olah Raga & Energi", "Lagu Workout", "bolt", "#1DE9B6", "#004D40"),
-        Category("pop_vibes", "Populer Indonesia", "Lagu Pop Indonesia", "music_note", "#00B0FF", "#0D47A1"),
-        Category("indie_wave", "Indie & Senja", "Lagu Indie Indonesia", "headphones", "#7C4DFF", "#1A237E"),
-        Category("rock_metal", "Rock & Metal", "Lagu Rock", "electric_bolt", "#00E5BF", "#263238"),
-        Category("fokus_kerja", "Fokus & Belajar", "Lagu Fokus Lofi", "headphones", "#64FFDA", "#263238"),
-        Category("romantis", "Romantis & Cinta", "Lagu Romantis", "favorite", "#26A69A", "#004D40")
+        Category("pop_vibes", "Pop Indonesia", "Lagu Pop Indonesia", "music_note", "#00B0FF", "#0D47A1"),
+        Category("rock_metal", "Rock", "Lagu Rock", "electric_bolt", "#00E5BF", "#263238"),
+        Category("indie_wave", "Indie", "Lagu Indie Indonesia", "headphones", "#7C4DFF", "#1A237E"),
+        Category("jazz_blues", "Jazz", "Lagu Jazz", "nightlife", "#A4C5FF", "#121519"),
+        Category("dangdut", "Dangdut", "Lagu Dangdut", "whatshot", "#7B3EDB", "#004D40"),
+        Category("rnb_soul", "R&B & Soul", "Lagu R&B", "nightlife", "#B47BFF", "#1A1A1E"),
+        Category("hiphop", "Hip-Hop", "Lagu Hip Hop", "bolt", "#E24B00", "#263238"),
+        Category("akustik", "Akustik", "Lagu Akustik", "nightlife", "#00A513", "#004D40"),
+        Category("metal", "Metal", "Lagu Metal", "electric_bolt", "#8C8C8C", "#263238")
     )
 }
-

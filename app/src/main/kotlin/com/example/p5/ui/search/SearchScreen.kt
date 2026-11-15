@@ -37,7 +37,6 @@ import com.example.p5.ui.search.components.CategoryGridSection
 import com.example.p5.ui.search.components.EditorialHeroCard
 import com.example.p5.ui.search.components.GenreFilterRow
 import com.example.p5.ui.search.components.HomeTrackSection
-import com.example.p5.ui.search.components.MoodTagsRow
 import com.example.p5.ui.search.components.SearchBarField
 import com.example.p5.ui.search.components.SearchEmptyState
 import com.example.p5.ui.search.components.SearchErrorState
@@ -64,7 +63,6 @@ fun SearchScreen(
     val searchHistory by searchViewModel.searchHistory.collectAsStateWithLifecycle()
     val homeSections by searchViewModel.homeSections.collectAsStateWithLifecycle()
     val categories by searchViewModel.categories.collectAsStateWithLifecycle()
-    val moodTags by searchViewModel.moodTags.collectAsStateWithLifecycle()
     val selectedGenre by searchViewModel.selectedGenre.collectAsStateWithLifecycle()
     val isGenreLoading by searchViewModel.isGenreLoading.collectAsStateWithLifecycle()
     val searchSortOrder by searchViewModel.searchSortOrder.collectAsStateWithLifecycle()
@@ -151,15 +149,6 @@ fun SearchScreen(
                                             isPlaying = playerState.isPlaying,
                                             isSelected = playerState.currentSong?.id == editorialFeaturedTrack.id,
                                             onClick = { onSongClick(editorialFeaturedTrack) }
-                                        )
-                                    }
-                                }
-
-                                if (moodTags.isNotEmpty()) {
-                                    item {
-                                        MoodTagsRow(
-                                            moodTags = moodTags,
-                                            onSelectMoodTag = searchViewModel::searchCategory
                                         )
                                     }
                                 }

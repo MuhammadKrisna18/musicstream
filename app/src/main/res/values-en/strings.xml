@@ -16,7 +16,7 @@
     <string name="action_play">Play</string>
     <string name="action_pause">Pause</string>
     <string name="section_see_all">See all</string>
-    <string name="categories_title">Exclusive Mood &amp; Genres</string>
+    <string name="categories_title">Browse Music Genres</string>
     <string name="search_empty_message">No songs found for \"%1$s\"</string>
     <string name="action_retry">Retry</string>
 
