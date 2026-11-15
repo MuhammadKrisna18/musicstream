@@ -69,12 +69,12 @@ Pembaruan aplikasi dapat diperiksa dan dipasang langsung melalui tombol periksa 
 ### 18. Arsitektur Modular dan Performa 120 FPS
 Dibangun dengan prinsip Clean Architecture dan Jetpack Compose modular. Isolasi rekomposisi pada penggeser durasi pemutar memastikan animasi berjalan stabil pada 120 FPS tanpa stutter (zero dropped frames).
 
-### 19. Fitur Playlist Multi-Lagu (Genre, Artis, dan Random Mix)
-Menghadirkan entitas playlist tematik yang merangkum deretan lagu single resmi ke dalam satu antrean utuh (bukan berkas kompilasi video 1 jam), sehingga pengguna tetap menikmati lirik real-time per lagu dan kebebasan memilih lagu favorit di dalam playlist:
-* Berdasarkan Genre: Pop Indonesia, Indie Senja Pilihan, Rock Indonesia Terbaik, Koplo & Dangdut Hits, hingga Jazz & Soul Cafe.
-* Berdasarkan Artis: Deretan playlist "This is [Artis]" terkurasi (seperti This is Tulus, This is Sheila on 7, This is Denny Caknan, This is Dewa 19, This is Yovie & Nuno, This is Raisa) serta pembuatan playlist artis dinamis secara otomatis saat mencari musisi lain.
-* Berdasarkan Random / Mix: Daily Mix Indonesia, Acoustic Chill Mix, dan Semangat Pagi Mix untuk menemani aktivitas harian.
-* Layar Detail Playlist & Hasil Pencarian: Dilengkapi tombol Putar Semua dan Acak, antrean lagu ExoPlayer instan, serta integrasi baris playlist terkait di halaman Beranda dan di bagian atas hasil pencarian.
+### 19. Eksplorasi Playlist Dinamis dari YouTube API (Zero-Hardcode)
+Menghadirkan integrasi playlist dinamis murni langsung dari YouTube Music InnerTube API tanpa data hardcode:
+* Lagu Single Tetap Utama: Lagu single tetap menjadi warga kelas satu di seluruh tampilan Beranda maupun hasil pencarian.
+* Integrasi Hasil Pencarian Alami: Saat mencari judul lagu atau nama musisi, aplikasi mengekstrak lagu single (`videoRenderer`) dan playlist asli (`playlistRenderer`) dalam satu roundtrip API. Jika YouTube mengembalikan playlist, kartu playlist ditampilkan ringkas di atas hasil lagu; jika tidak ada, hasil pencarian 100% menampilkan deretan lagu single murni.
+* Baris Playlist Tunggal di Beranda: Menyajikan satu baris horizontal playlist pilihan terkurasi yang ditarik secara dinamis dari katalog server YouTube Music Explore/Browse.
+* Layar Detail Playlist & Antrean Lagu: Dilengkapi tombol Putar Semua dan Acak, pemuatan daftar lagu individual secara asinkron dari endpoint browse YouTube (`VL[playlistId]`), dukungan lirik real-time per lagu (format LRC sinkron), dan pemutaran berkelanjutan tanpa jeda.
 
 ---
 
