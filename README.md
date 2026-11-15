@@ -69,6 +69,13 @@ Pembaruan aplikasi dapat diperiksa dan dipasang langsung melalui tombol periksa 
 ### 18. Arsitektur Modular dan Performa 120 FPS
 Dibangun dengan prinsip Clean Architecture dan Jetpack Compose modular. Isolasi rekomposisi pada penggeser durasi pemutar memastikan animasi berjalan stabil pada 120 FPS tanpa stutter (zero dropped frames).
 
+### 19. Fitur Playlist Multi-Lagu (Genre, Artis, dan Random Mix)
+Menghadirkan entitas playlist tematik yang merangkum deretan lagu single resmi ke dalam satu antrean utuh (bukan berkas kompilasi video 1 jam), sehingga pengguna tetap menikmati lirik real-time per lagu dan kebebasan memilih lagu favorit di dalam playlist:
+* Berdasarkan Genre: Pop Indonesia, Indie Senja Pilihan, Rock Indonesia Terbaik, Koplo & Dangdut Hits, hingga Jazz & Soul Cafe.
+* Berdasarkan Artis: Deretan playlist "This is [Artis]" terkurasi (seperti This is Tulus, This is Sheila on 7, This is Denny Caknan, This is Dewa 19, This is Yovie & Nuno, This is Raisa) serta pembuatan playlist artis dinamis secara otomatis saat mencari musisi lain.
+* Berdasarkan Random / Mix: Daily Mix Indonesia, Acoustic Chill Mix, dan Semangat Pagi Mix untuk menemani aktivitas harian.
+* Layar Detail Playlist & Hasil Pencarian: Dilengkapi tombol Putar Semua dan Acak, antrean lagu ExoPlayer instan, serta integrasi baris playlist terkait di halaman Beranda dan di bagian atas hasil pencarian.
+
 ---
 
 ## Integrasi Layanan API dan Status Operasional
