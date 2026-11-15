@@ -56,4 +56,10 @@ class PlaylistCuratorTest {
         val results = curator.searchPlaylists("   ")
         assertTrue(results.isEmpty())
     }
+
+    @Test
+    fun searchPlaylists_lyricsOrChordQuery_doesNotGenerateDynamicPlaylist() {
+        val results = curator.searchPlaylists("hati hati di jalan lirik")
+        assertTrue(results.isEmpty())
+    }
 }

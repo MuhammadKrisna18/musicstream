@@ -297,30 +297,44 @@ fun SearchScreen(
                                     contentPadding = PaddingValues(bottom = BottomScrollPadding),
                                     verticalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
-                                    item(key = "search_sort_bar") {
-                                        SearchSortBar(
-                                            selectedOrder = searchSortOrder,
-                                            onSelectOrder = searchViewModel::setSearchSortOrder,
-                                            modifier = Modifier.padding(bottom = 4.dp)
-                                        )
+                                    if (state.playlists.isNotEmpty()) {
+                                        item(key = "search_playlists_row") {
+                                            PlaylistRowSection(
+                                                title = stringResource(R.string.search_playlists_title),
+                                                subtitle = stringResource(R.string.search_playlists_subtitle),
+                                                playlists = state.playlists,
+                                                onPlaylistClick = searchViewModel::onPlaylistSelectedFromSearch,
+                                                modifier = Modifier.padding(bottom = 8.dp)
+                                            )
+                                        }
                                     }
 
-                                    itemsIndexed(
-                                        items = sortedSongs,
-                                        key = { _, item -> item.id }
-                                    ) { index, song ->
-                                        val isSelected = playerState.currentSong?.id == song.id
+                                    if (sortedSongs.isNotEmpty()) {
+                                        item(key = "search_sort_bar") {
+                                            SearchSortBar(
+                                                selectedOrder = searchSortOrder,
+                                                onSelectOrder = searchViewModel::setSearchSortOrder,
+                                                modifier = Modifier.padding(bottom = 4.dp)
+                                            )
+                                        }
 
-                                        SongItem(
-                                            song = song,
-                                            isPlaying = playerState.isPlaying,
-                                            isSelected = isSelected,
-                                            onClick = {
-                                                searchViewModel.onSongSelectedFromSearch(song)
-                                                onPlayQueue(sortedSongs, index)
-                                            },
-                                            onMoreOptionsClick = onMoreOptionsClick
-                                        )
+                                        itemsIndexed(
+                                            items = sortedSongs,
+                                            key = { _, item -> item.id }
+                                        ) { index, song ->
+                                            val isSelected = playerState.currentSong?.id == song.id
+
+                                            SongItem(
+                                                song = song,
+                                                isPlaying = playerState.isPlaying,
+                                                isSelected = isSelected,
+                                                onClick = {
+                                                    searchViewModel.onSongSelectedFromSearch(song)
+                                                    onPlayQueue(sortedSongs, index)
+                                                },
+                                                onMoreOptionsClick = onMoreOptionsClick
+                                            )
+                                        }
                                     }
                                 }
                             }

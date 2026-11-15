@@ -86,5 +86,7 @@
     <string name="section_playlists_artist_title">Popular Artist Playlists</string>
     <string name="section_playlists_artist_subtitle">Best hits from your favorite musicians</string>
     <string name="search_tab_playlists">Playlists</string>
+    <string name="search_playlists_title">Related Playlists</string>
+    <string name="search_playlists_subtitle">Curated collections matching your search</string>
 </resources>
 

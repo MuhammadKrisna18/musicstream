@@ -91,4 +91,6 @@
     <string name="section_playlists_artist_title">Playlist Artis Populer</string>
     <string name="section_playlists_artist_subtitle">Lagu hits terbaik dari musisi favorit</string>
     <string name="search_tab_playlists">Playlist</string>
+    <string name="search_playlists_title">Playlist Terkait</string>
+    <string name="search_playlists_subtitle">Koleksi lagu pilihan sesuai pencarianmu</string>
 </resources>

@@ -166,7 +166,15 @@ class PlaylistCurator(
             return matched
         }
 
-        if (trimmed.length >= 3) {
+        val isNotArtistQuery = lowerQuery.contains("lirik") ||
+            lowerQuery.contains("lyrics") ||
+            lowerQuery.contains("chord") ||
+            lowerQuery.contains("karaoke") ||
+            lowerQuery.contains("cover") ||
+            lowerQuery.contains("remix") ||
+            lowerQuery.contains("instrumental")
+
+        if (trimmed.length >= 3 && !isNotArtistQuery) {
             val capitalized = trimmed.split(" ").joinToString(" ") { word ->
                 word.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString() }
             }

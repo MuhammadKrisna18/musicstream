@@ -383,6 +383,16 @@ class SearchViewModel(
         }
     }
 
+    fun onPlaylistSelectedFromSearch(playlist: Playlist) {
+        val trimmed = _query.value.trim()
+        if (trimmed.length >= 2) {
+            viewModelScope.launch {
+                searchHistoryRepository.addSearchQuery(trimmed)
+            }
+        }
+        openPlaylistDetail(playlist)
+    }
+
     fun deleteSearchHistoryItem(query: String) {
         viewModelScope.launch {
             searchHistoryRepository.deleteSearchQuery(query)
@@ -397,18 +407,30 @@ class SearchViewModel(
 
     private suspend fun executeSearch(query: String) {
         _uiState.value = SearchUiState.Loading
+        val playlistsResult = searchPlaylistsUseCase(query).getOrDefault(emptyList())
+
         searchMusicUseCase(query)
             .onSuccess { songs ->
-                _uiState.value = if (songs.isEmpty()) {
+                _uiState.value = if (songs.isEmpty() && playlistsResult.isEmpty()) {
                     SearchUiState.Empty
                 } else {
-                    SearchUiState.Success(songs)
+                    SearchUiState.Success(
+                        songs = songs,
+                        playlists = playlistsResult
+                    )
                 }
             }
             .onFailure { throwable ->
-                _uiState.value = SearchUiState.Error(
-                    throwable.localizedMessage ?: "Failed to perform search"
-                )
+                if (playlistsResult.isNotEmpty()) {
+                    _uiState.value = SearchUiState.Success(
+                        songs = emptyList(),
+                        playlists = playlistsResult
+                    )
+                } else {
+                    _uiState.value = SearchUiState.Error(
+                        throwable.localizedMessage ?: "Failed to perform search"
+                    )
+                }
             }
     }
 }
