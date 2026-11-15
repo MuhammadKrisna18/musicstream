@@ -78,5 +78,13 @@
     <string name="update_action_downloading">Downloading...</string>
     <string name="update_action_download">Download Update</string>
     <string name="update_action_later">Later</string>
+    <string name="playlist_badge_genre">GENRE</string>
+    <string name="playlist_badge_artist">ARTIST</string>
+    <string name="playlist_badge_random">MIX</string>
+    <string name="section_playlists_title">Featured Playlists</string>
+    <string name="section_playlists_subtitle">Curated single song collections for your day</string>
+    <string name="section_playlists_artist_title">Popular Artist Playlists</string>
+    <string name="section_playlists_artist_subtitle">Best hits from your favorite musicians</string>
+    <string name="search_tab_playlists">Playlists</string>
 </resources>
 

@@ -83,4 +83,12 @@
     <string name="update_action_downloading">Mengunduh...</string>
     <string name="update_action_download">Unduh Update</string>
     <string name="update_action_later">Nanti</string>
+    <string name="playlist_badge_genre">GENRE</string>
+    <string name="playlist_badge_artist">ARTIS</string>
+    <string name="playlist_badge_random">MIX</string>
+    <string name="section_playlists_title">Playlist Pilihan</string>
+    <string name="section_playlists_subtitle">Koleksi lagu single terkurasi untuk menemani harimu</string>
+    <string name="section_playlists_artist_title">Playlist Artis Populer</string>
+    <string name="section_playlists_artist_subtitle">Lagu hits terbaik dari musisi favorit</string>
+    <string name="search_tab_playlists">Playlist</string>
 </resources>
