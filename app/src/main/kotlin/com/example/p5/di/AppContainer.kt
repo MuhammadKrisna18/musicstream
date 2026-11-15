@@ -28,6 +28,7 @@ import com.example.p5.domain.usecase.GetStreamAudioUseCase
 import com.example.p5.domain.usecase.GetTrendingMusicUseCase
 import com.example.p5.domain.usecase.SearchMusicUseCase
 import com.example.p5.domain.usecase.SearchPlaylistsUseCase
+import com.example.p5.domain.usecase.SearchSongsAndPlaylistsUseCase
 import com.example.p5.playback.MediaSessionAudioPlayer
 import com.example.p5.playback.MusicPlayerManager
 import okhttp3.OkHttpClient
@@ -44,6 +45,7 @@ interface AppContainer {
     val getCuratedPlaylistsUseCase: GetCuratedPlaylistsUseCase
     val getPlaylistTracksUseCase: GetPlaylistTracksUseCase
     val searchPlaylistsUseCase: SearchPlaylistsUseCase
+    val searchSongsAndPlaylistsUseCase: SearchSongsAndPlaylistsUseCase
 
     val audioPlayer: AudioPlayer
     val musicPlayerManager: MusicPlayerManager
@@ -116,6 +118,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val searchPlaylistsUseCase: SearchPlaylistsUseCase by lazy {
         SearchPlaylistsUseCase(musicRepository)
+    }
+
+    override val searchSongsAndPlaylistsUseCase: SearchSongsAndPlaylistsUseCase by lazy {
+        SearchSongsAndPlaylistsUseCase(musicRepository)
     }
 
     override val audioPlayer: AudioPlayer by lazy {

@@ -8,6 +8,7 @@ import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.Playlist
+import com.example.p5.domain.model.SearchResult
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.MusicRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,6 +24,13 @@ class MusicRepositoryImpl(
     override suspend fun searchSongs(query: String, limit: Int): Result<List<Song>> = withContext(ioDispatcher) {
         runCatching {
             youTubeDataSource.search(query, limit)
+        }
+    }
+
+    override suspend fun searchSongsAndPlaylists(query: String, limit: Int): Result<SearchResult> = withContext(ioDispatcher) {
+        runCatching {
+            val (songs, playlists) = youTubeDataSource.searchWithPlaylists(query, limit)
+            SearchResult(songs, playlists)
         }
     }
 
