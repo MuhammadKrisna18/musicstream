@@ -3,6 +3,7 @@ package com.example.p5.ui.library
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.p5.domain.model.LibrarySortOrder
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.FavoriteRepository
 import com.example.p5.domain.repository.HistoryRepository
@@ -12,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -24,6 +26,22 @@ class LibraryViewModel(
 
     private val messageFlow = MutableStateFlow<String?>(null)
     private val cacheSizeBytesFlow = MutableStateFlow(0L)
+    private val _sortOrder = MutableStateFlow(LibrarySortOrder.LATEST_ADDED)
+    val sortOrder: StateFlow<LibrarySortOrder> = _sortOrder.asStateFlow()
+    private val _selectedArtist = MutableStateFlow<String?>(null)
+    val selectedArtist: StateFlow<String?> = _selectedArtist.asStateFlow()
+
+    fun setSortOrder(order: LibrarySortOrder) {
+        _sortOrder.value = order
+    }
+
+    fun selectArtist(artist: String?) {
+        if (_selectedArtist.value == artist) {
+            _selectedArtist.value = null
+        } else {
+            _selectedArtist.value = artist
+        }
+    }
 
     val uiState: StateFlow<LibraryUiState> = combine(
         favoriteRepository.getAllFavoriteSongs(),

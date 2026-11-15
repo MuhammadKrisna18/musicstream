@@ -23,16 +23,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.p5.R
+import com.example.p5.domain.model.LibrarySortOrder
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.library.components.LibraryCacheBar
 import com.example.p5.ui.library.components.LibraryEmptyState
+import com.example.p5.ui.library.components.LibraryFilterBar
 import com.example.p5.ui.library.components.LibraryHistoryHeader
 import com.example.p5.ui.library.components.LibrarySongList
 import com.example.p5.ui.library.components.LibraryTabBar
 import com.example.p5.ui.library.components.LibraryTopHeader
 import com.example.p5.ui.theme.SpacingLg
 import com.example.p5.ui.theme.SpacingMd
+import java.util.Locale
 
 @Composable
 fun LibraryScreen(
@@ -49,11 +52,49 @@ fun LibraryScreen(
     val favoriteSongs = uiState.favoriteSongs
     val savedSongs = uiState.savedSongs
     val historySongs = uiState.historySongs
+    val sortOrder by libraryViewModel.sortOrder.collectAsStateWithLifecycle()
+    val selectedArtist by libraryViewModel.selectedArtist.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         libraryViewModel.refreshCacheSize(context)
+    }
+
+    val favoriteArtists = remember(favoriteSongs) {
+        favoriteSongs.map { it.artist }.distinct().filter { it.isNotBlank() }.sorted()
+    }
+
+    val displayFavoriteSongs = remember(favoriteSongs, sortOrder, selectedArtist) {
+        val filtered = if (selectedArtist.isNullOrBlank()) {
+            favoriteSongs
+        } else {
+            favoriteSongs.filter { it.artist.equals(selectedArtist, ignoreCase = true) }
+        }
+        when (sortOrder) {
+            LibrarySortOrder.LATEST_ADDED -> filtered
+            LibrarySortOrder.TITLE_AZ -> filtered.sortedBy { it.title.lowercase(Locale.ROOT) }
+            LibrarySortOrder.ARTIST_AZ -> filtered.sortedBy { it.artist.lowercase(Locale.ROOT) }
+            LibrarySortOrder.DURATION -> filtered.sortedByDescending { it.durationSeconds }
+        }
+    }
+
+    val savedArtists = remember(savedSongs) {
+        savedSongs.map { it.artist }.distinct().filter { it.isNotBlank() }.sorted()
+    }
+
+    val displaySavedSongs = remember(savedSongs, sortOrder, selectedArtist) {
+        val filtered = if (selectedArtist.isNullOrBlank()) {
+            savedSongs
+        } else {
+            savedSongs.filter { it.artist.equals(selectedArtist, ignoreCase = true) }
+        }
+        when (sortOrder) {
+            LibrarySortOrder.LATEST_ADDED -> filtered
+            LibrarySortOrder.TITLE_AZ -> filtered.sortedBy { it.title.lowercase(Locale.ROOT) }
+            LibrarySortOrder.ARTIST_AZ -> filtered.sortedBy { it.artist.lowercase(Locale.ROOT) }
+            LibrarySortOrder.DURATION -> filtered.sortedByDescending { it.durationSeconds }
+        }
     }
 
     Column(
@@ -79,7 +120,10 @@ fun LibraryScreen(
             favoriteCount = favoriteSongs.size,
             savedCount = savedSongs.size,
             historyCount = historySongs.size,
-            onTabSelected = { selectedTab = it }
+            onTabSelected = {
+                selectedTab = it
+                libraryViewModel.selectArtist(null)
+            }
         )
 
         Spacer(modifier = Modifier.height(SpacingMd))
@@ -101,11 +145,21 @@ fun LibraryScreen(
                     )
                 } else {
                     LibrarySongList(
-                        songs = favoriteSongs,
+                        songs = displayFavoriteSongs,
                         currentSongId = playerState.currentSong?.id,
                         isPlaying = playerState.isPlaying,
                         onPlayQueue = onPlayQueue,
-                        onMoreOptionsClick = onMoreOptionsClick
+                        onMoreOptionsClick = onMoreOptionsClick,
+                        headerContent = {
+                            LibraryFilterBar(
+                                sortOrder = sortOrder,
+                                onSortOrderSelected = libraryViewModel::setSortOrder,
+                                artists = favoriteArtists,
+                                selectedArtist = selectedArtist,
+                                onArtistSelected = libraryViewModel::selectArtist,
+                                modifier = Modifier.padding(bottom = 10.dp)
+                            )
+                        }
                     )
                 }
             }
@@ -119,11 +173,21 @@ fun LibraryScreen(
                     )
                 } else {
                     LibrarySongList(
-                        songs = savedSongs,
+                        songs = displaySavedSongs,
                         currentSongId = playerState.currentSong?.id,
                         isPlaying = playerState.isPlaying,
                         onPlayQueue = onPlayQueue,
-                        onMoreOptionsClick = onMoreOptionsClick
+                        onMoreOptionsClick = onMoreOptionsClick,
+                        headerContent = {
+                            LibraryFilterBar(
+                                sortOrder = sortOrder,
+                                onSortOrderSelected = libraryViewModel::setSortOrder,
+                                artists = savedArtists,
+                                selectedArtist = selectedArtist,
+                                onArtistSelected = libraryViewModel::selectArtist,
+                                modifier = Modifier.padding(bottom = 10.dp)
+                            )
+                        }
                     )
                 }
             }
