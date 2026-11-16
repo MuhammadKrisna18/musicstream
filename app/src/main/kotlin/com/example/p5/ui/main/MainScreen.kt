@@ -194,6 +194,8 @@ fun MainScreen(
                     onToggleShuffle = playerViewModel::toggleShuffle,
                     onToggleRepeatMode = playerViewModel::toggleRepeatMode,
                     onPlayQueueIndex = playerViewModel::playQueueIndex,
+                    onMoveQueueItem = playerViewModel::moveQueueItem,
+                    onRemoveQueueItem = playerViewModel::removeQueueItem,
                     onSetSleepTimerMinutes = playerViewModel::setSleepTimerMinutes,
                     onSetSleepTimerEndOfTrack = playerViewModel::setSleepTimerEndOfTrack,
                     onCancelSleepTimer = playerViewModel::cancelSleepTimer,

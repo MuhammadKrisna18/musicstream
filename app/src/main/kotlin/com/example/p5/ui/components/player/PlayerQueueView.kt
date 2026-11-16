@@ -15,7 +15,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DragHandle
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -23,12 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.example.p5.R
 import com.example.p5.domain.model.Song
@@ -51,7 +57,6 @@ import com.example.p5.ui.theme.StrokeWidthStandard
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
 import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
@@ -60,10 +65,17 @@ fun PlayerQueueView(
     currentQueueIndex: Int,
     isPlaying: Boolean,
     onPlayQueueIndex: (Int) -> Unit,
+    onMoveQueueItem: (fromIndex: Int, toIndex: Int) -> Unit,
+    onRemoveQueueItem: (Int) -> Unit = {},
     accentColor: Color = ToscaPrimary,
     modifier: Modifier = Modifier
 ) {
     val queueShape = remember { RoundedCornerShape(CornerRadiusPill) }
+    val listState = rememberLazyListState()
+    val reorderState = rememberQueueReorderState(
+        lazyListState = listState,
+        onMove = onMoveQueueItem
+    )
 
     Column(
         modifier = modifier
@@ -99,22 +111,50 @@ fun PlayerQueueView(
             }
         } else {
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                itemsIndexed(queue) { index, song ->
+                itemsIndexed(
+                    items = queue,
+                    key = { _, song -> song.id }
+                ) { index, song ->
                     val isCurrent = index == currentQueueIndex
+                    val isDragging = reorderState.draggedIndex == index
                     val rowShape = remember { RoundedCornerShape(CornerRadiusMd) }
                     val rowSource = remember { MutableInteractionSource() }
 
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .zIndex(if (isDragging) 2f else 0f)
+                            .graphicsLayer {
+                                translationY = if (isDragging) reorderState.draggedOffset else 0f
+                                if (isDragging) {
+                                    scaleX = 1.03f
+                                    scaleY = 1.03f
+                                    shadowElevation = 10f
+                                }
+                            }
+                            .animateItem()
                             .pressedScale(targetScale = ScalePressedGlass, interactionSource = rowSource)
                             .clip(rowShape)
-                            .background(if (isCurrent) accentColor.copy(alpha = 0.14f) else GlassFillSubtle)
+                            .background(
+                                when {
+                                    isDragging -> accentColor.copy(alpha = 0.22f)
+                                    isCurrent -> accentColor.copy(alpha = 0.14f)
+                                    else -> GlassFillSubtle
+                                }
+                            )
                             .then(
-                                if (isCurrent) {
+                                if (isDragging) {
+                                    Modifier.glassBorder(
+                                        shape = rowShape,
+                                        strokeWidth = StrokeWidthBorder,
+                                        startColor = accentColor,
+                                        endColor = accentColor.copy(alpha = 0.5f)
+                                    )
+                                } else if (isCurrent) {
                                     Modifier.glassBorder(
                                         shape = rowShape,
                                         strokeWidth = StrokeWidthBorder,
@@ -191,6 +231,22 @@ fun PlayerQueueView(
                             color = TextMuted,
                             fontSize = 11.sp
                         )
+
+                        Spacer(modifier = Modifier.width(4.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .size(32.dp)
+                                .dragReorderHandle(index = index, state = reorderState),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.DragHandle,
+                                contentDescription = stringResource(R.string.player_queue_reorder_desc),
+                                tint = if (isDragging || isCurrent) accentColor else TextMuted,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
             }

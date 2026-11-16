@@ -52,6 +52,8 @@
     <string name="player_dismiss_desc">Tutup</string>
     <string name="player_queue_title">Lagu Berikutnya (%1$d)</string>
     <string name="player_queue_empty">Tidak ada antrean putar</string>
+    <string name="player_queue_reorder_desc">Ubah urutan lagu</string>
+    <string name="player_queue_remove_desc">Hapus dari antrean</string>
     <string name="player_lyrics_loading">Sinkronisasi lirik...</string>
     <string name="player_lyrics_not_found_title">Lirik Belum Tersedia</string>
     <string name="player_lyrics_not_found_desc">Lirik untuk lagu ini belum ditemukan di arsip</string>

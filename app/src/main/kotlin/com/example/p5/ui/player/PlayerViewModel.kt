@@ -44,6 +44,14 @@ class PlayerViewModel(
         musicPlayerManager.playQueueIndex(index)
     }
 
+    fun moveQueueItem(fromIndex: Int, toIndex: Int) {
+        musicPlayerManager.moveQueueItem(fromIndex, toIndex)
+    }
+
+    fun removeQueueItem(index: Int): Boolean {
+        return musicPlayerManager.removeQueueItem(index)
+    }
+
     fun togglePlayPause() {
         musicPlayerManager.togglePlayPause()
     }

@@ -65,6 +65,8 @@ fun FullPlayerSheet(
     onToggleShuffle: () -> Unit,
     onToggleRepeatMode: () -> Unit,
     onPlayQueueIndex: (Int) -> Unit,
+    onMoveQueueItem: (Int, Int) -> Unit = { _, _ -> },
+    onRemoveQueueItem: (Int) -> Unit = {},
     onSetSleepTimerMinutes: (Int) -> Unit,
     onSetSleepTimerEndOfTrack: () -> Unit,
     onCancelSleepTimer: () -> Unit,
@@ -198,6 +200,8 @@ fun FullPlayerSheet(
                                     currentQueueIndex = playerState.currentQueueIndex,
                                     isPlaying = playerState.isPlaying,
                                     onPlayQueueIndex = onPlayQueueIndex,
+                                    onMoveQueueItem = onMoveQueueItem,
+                                    onRemoveQueueItem = onRemoveQueueItem,
                                     accentColor = palette.accent
                                 )
                             }

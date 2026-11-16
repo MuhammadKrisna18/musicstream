@@ -188,6 +188,48 @@ class MusicPlayerManager(
         }
     }
 
+    fun moveQueueItem(fromIndex: Int, toIndex: Int) {
+        if (fromIndex !in currentQueue.indices || toIndex !in currentQueue.indices || fromIndex == toIndex) return
+
+        val item = currentQueue.removeAt(fromIndex)
+        currentQueue.add(toIndex, item)
+
+        currentQueueIndex = when {
+            currentQueueIndex == fromIndex -> toIndex
+            fromIndex < currentQueueIndex && toIndex >= currentQueueIndex -> currentQueueIndex - 1
+            fromIndex > currentQueueIndex && toIndex <= currentQueueIndex -> currentQueueIndex + 1
+            else -> currentQueueIndex
+        }
+
+        if (isShuffleEnabled) {
+            rebuildShuffleOrder()
+        }
+
+        syncQueueState()
+    }
+
+    fun removeQueueItem(index: Int): Boolean {
+        if (index !in currentQueue.indices) return false
+        if (currentQueue.size <= 1) return false
+
+        val isRemovingCurrent = index == currentQueueIndex
+        currentQueue.removeAt(index)
+
+        if (index < currentQueueIndex) {
+            currentQueueIndex--
+        } else if (isRemovingCurrent) {
+            currentQueueIndex = currentQueueIndex.coerceIn(0, currentQueue.lastIndex)
+            loadAndPlay(currentQueue[currentQueueIndex])
+        }
+
+        if (isShuffleEnabled) {
+            rebuildShuffleOrder()
+        }
+
+        syncQueueState()
+        return true
+    }
+
     fun toggleShuffle() {
         isShuffleEnabled = !isShuffleEnabled
         if (isShuffleEnabled) {
