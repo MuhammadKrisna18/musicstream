@@ -5,8 +5,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import androidx.media3.common.MimeTypes
-import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
@@ -101,18 +99,6 @@ class MediaSessionAudioPlayer(
                     Player.STATE_IDLE -> _playerState.update { it.copy(isBuffering = false) }
                 }
             }
-
-            override fun onPlayerError(error: PlaybackException) {
-                val cause = error.cause
-                val message = cause?.localizedMessage ?: error.localizedMessage ?: "Playback error: ${error.errorCodeName}"
-                _playerState.update {
-                    it.copy(
-                        isBuffering = false,
-                        isPlaying = false,
-                        errorMessage = message
-                    )
-                }
-            }
         })
     }
 
@@ -191,16 +177,9 @@ class MediaSessionAudioPlayer(
             .setArtworkUri(if (song.thumbnailUrl.isNotEmpty()) Uri.parse(song.thumbnailUrl) else null)
             .build()
 
-        val mimeType = if (stream.format == "webm") {
-            MimeTypes.AUDIO_WEBM
-        } else {
-            MimeTypes.AUDIO_MP4
-        }
-
         val mediaItem = MediaItem.Builder()
             .setMediaId(song.id)
             .setUri(Uri.parse(stream.streamUrl))
-            .setMimeType(mimeType)
             .setMediaMetadata(mediaMetadata)
             .build()
 

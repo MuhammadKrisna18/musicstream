@@ -96,19 +96,18 @@ class YouTubeNativeDataSource(
     }
 
     suspend fun getAudioStream(videoId: String): AudioStream = withContext(ioDispatcher) {
-        val primaryPayload = sessionManager.buildPlayerPayload(videoId)
+        val payload = sessionManager.buildPlayerPayload(videoId)
 
-        val primaryRequest = Request.Builder()
+        val request = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)
-            .post(primaryPayload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "com.google.ios.youtube/20.10.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
-            .addHeader("X-YouTube-Client-Name", "5")
-            .addHeader("X-YouTube-Client-Version", "20.10.1")
-            .addHeader("Origin", "https://www.youtube.com")
+            .post(payload.toString().toRequestBody(jsonMediaType))
+            .addHeader("User-Agent", "com.google.android.apps.youtube.music/6.40.52 (Linux; U; Android 14)")
+            .addHeader("X-YouTube-Client-Name", "ANDROID")
+            .addHeader("X-YouTube-Client-Version", "20.05.34")
             .build()
 
         try {
-            val response = okHttpClient.newCall(primaryRequest).execute()
+            val response = okHttpClient.newCall(request).execute()
             if (response.isSuccessful) {
                 val jsonString = response.body?.string()
                 if (!jsonString.isNullOrEmpty()) {
@@ -122,39 +121,17 @@ class YouTubeNativeDataSource(
         val secondaryRequest = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)
             .post(secondaryPayload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "com.google.ios.youtube/20.15.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
-            .addHeader("X-YouTube-Client-Name", "5")
-            .addHeader("X-YouTube-Client-Version", "20.15.1")
-            .addHeader("Origin", "https://www.youtube.com")
-            .build()
-
-        try {
-            val response = okHttpClient.newCall(secondaryRequest).execute()
-            if (response.isSuccessful) {
-                val jsonString = response.body?.string()
-                if (!jsonString.isNullOrEmpty()) {
-                    return@withContext parser.parsePlayerResponse(videoId, jsonString)
-                }
-            }
-        } catch (_: Exception) {
-        }
-
-        val fallbackPayload = sessionManager.buildFallbackPlayerPayload(videoId)
-        val fallbackRequest = Request.Builder()
-            .url(MusicConfig.YOUTUBE_PLAYER_URL)
-            .post(fallbackPayload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "com.google.android.youtube/20.10.38 (Linux; U; Android 11) gzip")
-            .addHeader("X-YouTube-Client-Name", "3")
+            .addHeader("User-Agent", "com.google.android.apps.youtube.music/6.40.52 (Linux; U; Android 14)")
+            .addHeader("X-YouTube-Client-Name", "ANDROID")
             .addHeader("X-YouTube-Client-Version", "20.10.38")
-            .addHeader("Origin", "https://www.youtube.com")
             .build()
 
-        val fallbackResponse = okHttpClient.newCall(fallbackRequest).execute()
-        if (!fallbackResponse.isSuccessful) {
-            throw IOException("Player request failed: ${fallbackResponse.code}")
+        val secondaryResponse = okHttpClient.newCall(secondaryRequest).execute()
+        if (!secondaryResponse.isSuccessful) {
+            throw IOException("Player request failed: ${secondaryResponse.code}")
         }
 
-        val jsonString = fallbackResponse.body?.string() ?: throw IOException("Empty player response")
+        val jsonString = secondaryResponse.body?.string() ?: throw IOException("Empty player response")
         parser.parsePlayerResponse(videoId, jsonString)
     }
 

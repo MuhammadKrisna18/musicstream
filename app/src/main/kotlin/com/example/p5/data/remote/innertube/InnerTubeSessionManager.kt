@@ -70,20 +70,26 @@ class InnerTubeSessionManager(
         return JSONObject().apply {
             put("context", JSONObject().apply {
                 put("client", JSONObject().apply {
-                    put("clientName", "IOS")
-                    put("clientVersion", "20.10.1")
-                    put("deviceMake", "Apple")
-                    put("deviceModel", "iPhone16,2")
-                    put("userAgent", "com.google.ios.youtube/20.10.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
-                    put("osName", "iPhone")
-                    put("osVersion", "18.3.2.22D82")
-                    put("hl", "id")
-                    put("gl", "ID")
+                    put("clientName", "ANDROID")
+                    put("clientVersion", "20.05.34")
+                    put("androidSdkVersion", 34)
+                    put("hl", "en")
+                    put("gl", "US")
+                })
+                put("playback", JSONObject().apply {
+                    put("audioConfig", JSONObject().apply {
+                        put("audioQuality", "AUDIO_QUALITY_HIGH")
+                    })
                 })
             })
             put("videoId", videoId)
             put("contentCheckOk", true)
             put("racyCheckOk", true)
+            put("playbackContext", JSONObject().apply {
+                put("contentPlaybackContext", JSONObject().apply {
+                    put("signatureTimestamp", cachedSts)
+                })
+            })
         }
     }
 
@@ -92,40 +98,26 @@ class InnerTubeSessionManager(
         return JSONObject().apply {
             put("context", JSONObject().apply {
                 put("client", JSONObject().apply {
-                    put("clientName", "IOS")
-                    put("clientVersion", "20.15.1")
-                    put("deviceMake", "Apple")
-                    put("deviceModel", "iPhone16,2")
-                    put("userAgent", "com.google.ios.youtube/20.15.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
-                    put("osName", "iPhone")
-                    put("osVersion", "18.3.2.22D82")
-                    put("hl", "id")
-                    put("gl", "ID")
-                })
-            })
-            put("videoId", videoId)
-            put("contentCheckOk", true)
-            put("racyCheckOk", true)
-        }
-    }
-
-    fun buildFallbackPlayerPayload(videoId: String): JSONObject {
-        refreshSessionDataIfNeeded()
-        return JSONObject().apply {
-            put("context", JSONObject().apply {
-                put("client", JSONObject().apply {
                     put("clientName", "ANDROID")
                     put("clientVersion", "20.10.38")
-                    put("androidSdkVersion", 30)
-                    put("osName", "Android")
-                    put("osVersion", "11")
-                    put("hl", "id")
-                    put("gl", "ID")
+                    put("androidSdkVersion", 34)
+                    put("hl", "en")
+                    put("gl", "US")
+                })
+                put("playback", JSONObject().apply {
+                    put("audioConfig", JSONObject().apply {
+                        put("audioQuality", "AUDIO_QUALITY_HIGH")
+                    })
                 })
             })
             put("videoId", videoId)
             put("contentCheckOk", true)
             put("racyCheckOk", true)
+            put("playbackContext", JSONObject().apply {
+                put("contentPlaybackContext", JSONObject().apply {
+                    put("signatureTimestamp", cachedSts)
+                })
+            })
         }
     }
 
