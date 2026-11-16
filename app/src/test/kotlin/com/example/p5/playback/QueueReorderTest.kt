@@ -1,5 +1,6 @@
 package com.example.p5.playback
 
+import com.example.p5.domain.model.ArtistProfile
 import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
@@ -51,6 +52,8 @@ class QueueReorderTest {
             override suspend fun getCuratedPlaylists() = Result.success(emptyList<Playlist>())
             override suspend fun getPlaylistTracks(playlist: Playlist) = Result.success(emptyList<Song>())
             override suspend fun searchPlaylists(query: String) = Result.success(emptyList<Playlist>())
+            override suspend fun getArtistProfile(channelId: String) = Result.success(ArtistProfile(id = channelId, name = "Dummy Artist", avatarUrl = ""))
+            override suspend fun getArtistAllSongs(playlistId: String) = Result.success(emptyList<Song>())
         }
         val dummyGetStream = GetStreamAudioUseCase(dummyRepo)
         val dummyLyrics = object : LyricsRepository {

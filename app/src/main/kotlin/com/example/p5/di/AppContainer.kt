@@ -19,6 +19,8 @@ import com.example.p5.domain.repository.MusicRepository
 import com.example.p5.domain.repository.SavedSongRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
 import com.example.p5.domain.repository.UpdateRepository
+import com.example.p5.domain.usecase.GetArtistAllSongsUseCase
+import com.example.p5.domain.usecase.GetArtistProfileUseCase
 import com.example.p5.domain.usecase.GetCuratedPlaylistsUseCase
 import com.example.p5.domain.usecase.GetGenreFeedUseCase
 import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
@@ -46,6 +48,8 @@ interface AppContainer {
     val getPlaylistTracksUseCase: GetPlaylistTracksUseCase
     val searchPlaylistsUseCase: SearchPlaylistsUseCase
     val searchSongsAndPlaylistsUseCase: SearchSongsAndPlaylistsUseCase
+    val getArtistProfileUseCase: GetArtistProfileUseCase
+    val getArtistAllSongsUseCase: GetArtistAllSongsUseCase
 
     val audioPlayer: AudioPlayer
     val musicPlayerManager: MusicPlayerManager
@@ -122,6 +126,14 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val searchSongsAndPlaylistsUseCase: SearchSongsAndPlaylistsUseCase by lazy {
         SearchSongsAndPlaylistsUseCase(musicRepository)
+    }
+
+    override val getArtistProfileUseCase: GetArtistProfileUseCase by lazy {
+        GetArtistProfileUseCase(musicRepository)
+    }
+
+    override val getArtistAllSongsUseCase: GetArtistAllSongsUseCase by lazy {
+        GetArtistAllSongsUseCase(musicRepository)
     }
 
     override val audioPlayer: AudioPlayer by lazy {

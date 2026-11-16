@@ -2,6 +2,7 @@ package com.example.p5.data.repository
 
 import com.example.p5.data.remote.YouTubeNativeDataSource
 import com.example.p5.data.remote.playlist.PlaylistCurator
+import com.example.p5.domain.model.ArtistProfile
 import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
@@ -79,6 +80,18 @@ class MusicRepositoryImpl(
     override suspend fun searchPlaylists(query: String): Result<List<Playlist>> = withContext(ioDispatcher) {
         runCatching {
             playlistCurator.searchPlaylists(query)
+        }
+    }
+
+    override suspend fun getArtistProfile(channelId: String): Result<ArtistProfile> = withContext(ioDispatcher) {
+        runCatching {
+            youTubeDataSource.getArtistProfile(channelId)
+        }
+    }
+
+    override suspend fun getArtistAllSongs(playlistId: String): Result<List<Song>> = withContext(ioDispatcher) {
+        runCatching {
+            youTubeDataSource.getArtistAllSongs(playlistId)
         }
     }
 }

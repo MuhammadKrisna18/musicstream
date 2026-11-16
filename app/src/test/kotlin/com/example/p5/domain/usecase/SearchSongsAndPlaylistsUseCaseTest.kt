@@ -1,5 +1,6 @@
 package com.example.p5.domain.usecase
 
+import com.example.p5.domain.model.ArtistProfile
 import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
@@ -76,6 +77,12 @@ class SearchSongsAndPlaylistsUseCaseTest {
             Result.success(emptyList())
 
         override suspend fun searchPlaylists(query: String): Result<List<Playlist>> =
+            Result.success(emptyList())
+
+        override suspend fun getArtistProfile(channelId: String): Result<ArtistProfile> =
+            Result.success(ArtistProfile(id = channelId, name = "Test Artist", avatarUrl = ""))
+
+        override suspend fun getArtistAllSongs(playlistId: String): Result<List<Song>> =
             Result.success(emptyList())
     }
 

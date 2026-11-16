@@ -1,5 +1,6 @@
 package com.example.p5.domain.repository
 
+import com.example.p5.domain.model.ArtistProfile
 import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
@@ -20,4 +21,6 @@ interface MusicRepository {
     suspend fun getCuratedPlaylists(): Result<List<Playlist>>
     suspend fun getPlaylistTracks(playlist: Playlist): Result<List<Song>>
     suspend fun searchPlaylists(query: String): Result<List<Playlist>>
+    suspend fun getArtistProfile(channelId: String): Result<ArtistProfile>
+    suspend fun getArtistAllSongs(playlistId: String): Result<List<Song>>
 }
