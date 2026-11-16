@@ -100,10 +100,13 @@ class YouTubeNativeDataSource(
 
         val request = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)
+            .addHeader("Content-Type", "application/json")
+            .addHeader("X-YouTube-Client-Name", "101")
+            .addHeader("X-YouTube-Client-Version", "1.02")
+            .addHeader("Origin", MusicConfig.YOUTUBE_BASE_ORIGIN)
+            .addHeader("X-Goog-Visitor-Id", sessionManager.getVisitorData())
+            .addHeader("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 15_7_3) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15")
             .post(payload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "com.google.android.apps.youtube.music/6.40.52 (Linux; U; Android 14)")
-            .addHeader("X-YouTube-Client-Name", "ANDROID")
-            .addHeader("X-YouTube-Client-Version", "20.05.34")
             .build()
 
         try {
@@ -120,10 +123,12 @@ class YouTubeNativeDataSource(
         val secondaryPayload = sessionManager.buildSecondaryPlayerPayload(videoId)
         val secondaryRequest = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)
+            .addHeader("Content-Type", "application/json")
+            .addHeader("X-YouTube-Client-Name", "5")
+            .addHeader("X-YouTube-Client-Version", "20.10.1")
+            .addHeader("Origin", MusicConfig.YOUTUBE_BASE_ORIGIN)
+            .addHeader("User-Agent", "com.google.ios.youtube/20.10.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
             .post(secondaryPayload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "com.google.android.apps.youtube.music/6.40.52 (Linux; U; Android 14)")
-            .addHeader("X-YouTube-Client-Name", "ANDROID")
-            .addHeader("X-YouTube-Client-Version", "20.10.38")
             .build()
 
         val secondaryResponse = okHttpClient.newCall(secondaryRequest).execute()
