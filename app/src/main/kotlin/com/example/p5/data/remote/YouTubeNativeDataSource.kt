@@ -101,9 +101,10 @@ class YouTubeNativeDataSource(
         val primaryRequest = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)
             .post(primaryPayload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "com.google.android.youtube/20.10.38 (Linux; U; Android 11) gzip")
-            .addHeader("X-YouTube-Client-Name", "3")
-            .addHeader("X-YouTube-Client-Version", "20.10.38")
+            .addHeader("User-Agent", "com.google.ios.youtube/20.10.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
+            .addHeader("X-YouTube-Client-Name", "5")
+            .addHeader("X-YouTube-Client-Version", "20.10.1")
+            .addHeader("Origin", "https://www.youtube.com")
             .build()
 
         try {
@@ -121,9 +122,10 @@ class YouTubeNativeDataSource(
         val secondaryRequest = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)
             .post(secondaryPayload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "com.google.android.youtube/20.05.34 (Linux; U; Android 11) gzip")
-            .addHeader("X-YouTube-Client-Name", "3")
-            .addHeader("X-YouTube-Client-Version", "20.05.34")
+            .addHeader("User-Agent", "com.google.ios.youtube/20.15.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
+            .addHeader("X-YouTube-Client-Name", "5")
+            .addHeader("X-YouTube-Client-Version", "20.15.1")
+            .addHeader("Origin", "https://www.youtube.com")
             .build()
 
         try {
@@ -137,11 +139,14 @@ class YouTubeNativeDataSource(
         } catch (_: Exception) {
         }
 
-        val fallbackPayload = sessionManager.buildVrPlayerPayload(videoId)
+        val fallbackPayload = sessionManager.buildFallbackPlayerPayload(videoId)
         val fallbackRequest = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)
             .post(fallbackPayload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "Mozilla/5.0 (Linux; Android 10; Quest 2) AppleWebKit/537.36 (KHTML, like Gecko) OculusBrowser/15.0.0.4.44.247754366 SamsungBrowser/4.0 Chrome/91.0.4472.114 Mobile VR Safari/537.36")
+            .addHeader("User-Agent", "com.google.android.youtube/20.10.38 (Linux; U; Android 11) gzip")
+            .addHeader("X-YouTube-Client-Name", "3")
+            .addHeader("X-YouTube-Client-Version", "20.10.38")
+            .addHeader("Origin", "https://www.youtube.com")
             .build()
 
         val fallbackResponse = okHttpClient.newCall(fallbackRequest).execute()
