@@ -36,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -72,6 +73,7 @@ fun PlayerLyricsView(
     currentPositionMs: Long,
     onSeekTo: (Long) -> Unit,
     onRetryFetchLyrics: () -> Unit,
+    accentColor: Color = ToscaPrimary,
     modifier: Modifier = Modifier
 ) {
     val lyricsShape = remember { RoundedCornerShape(CornerRadiusPill) }
@@ -96,7 +98,7 @@ fun PlayerLyricsView(
                 verticalArrangement = Arrangement.Center
             ) {
                 CircularProgressIndicator(
-                    color = ToscaPrimary,
+                    color = accentColor,
                     strokeWidth = StrokeWidthProgress,
                     modifier = Modifier.size(ActionButtonSizeSm)
                 )
@@ -137,8 +139,8 @@ fun PlayerLyricsView(
                 Button(
                     onClick = onRetryFetchLyrics,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = ToscaPrimary.copy(alpha = 0.16f),
-                        contentColor = ToscaPrimary
+                        containerColor = accentColor.copy(alpha = 0.16f),
+                        contentColor = accentColor
                     ),
                     shape = RoundedCornerShape(CornerRadiusMd)
                 ) {
@@ -164,7 +166,7 @@ fun PlayerLyricsView(
                     Icon(
                         imageVector = Icons.Rounded.MusicNote,
                         contentDescription = null,
-                        tint = ToscaPrimary,
+                        tint = accentColor,
                         modifier = Modifier.size(IconSizeHero)
                     )
                     Spacer(modifier = Modifier.height(SpacingSm))

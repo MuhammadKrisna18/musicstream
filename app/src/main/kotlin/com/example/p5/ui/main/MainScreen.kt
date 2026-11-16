@@ -45,6 +45,7 @@ import com.example.p5.ui.search.SearchScreen
 import com.example.p5.ui.search.SearchViewModel
 import com.example.p5.ui.theme.ObsidianBackground
 import com.example.p5.ui.theme.ObsidianBlack
+import com.example.p5.ui.theme.rememberDynamicPlayerPalette
 import com.example.p5.ui.update.UpdateViewModel
 import kotlinx.coroutines.launch
 
@@ -154,6 +155,8 @@ fun MainScreen(
                 }
             }
 
+            val miniPlayerPalette = rememberDynamicPlayerPalette(artworkUrl = playerState.currentSong?.thumbnailUrl)
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -164,7 +167,8 @@ fun MainScreen(
                     playerState = playerState,
                     onTogglePlayPause = playerViewModel::togglePlayPause,
                     onOpenFullPlayer = { isFullPlayerVisible = true },
-                    onSkipNext = playerViewModel::playNext
+                    onSkipNext = playerViewModel::playNext,
+                    accentColor = miniPlayerPalette.accent
                 )
 
                 FloatingDock(

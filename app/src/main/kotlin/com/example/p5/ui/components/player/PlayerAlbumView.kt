@@ -62,6 +62,8 @@ fun PlayerAlbumView(
     isPlaying: Boolean,
     isFavorite: Boolean,
     onToggleFavorite: () -> Unit,
+    accentColor: Color = ToscaPrimary,
+    glowColor: Color = ToscaPrimary,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -86,7 +88,7 @@ fun PlayerAlbumView(
                 .glassBorder(
                     shape = albumShape,
                     strokeWidth = StrokeWidthBorder,
-                    startColor = GlassBorderBright.copy(alpha = 0.55f),
+                    startColor = glowColor.copy(alpha = 0.55f),
                     endColor = GlassBorderSubtle
                 )
         ) {
@@ -119,7 +121,7 @@ fun PlayerAlbumView(
 
                 Text(
                     text = song.artist,
-                    color = ToscaPrimary,
+                    color = accentColor,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,

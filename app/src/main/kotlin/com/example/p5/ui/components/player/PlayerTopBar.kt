@@ -58,6 +58,7 @@ fun PlayerTopBar(
     onOpenSleepTimer: () -> Unit,
     onToggleLyrics: () -> Unit,
     onToggleQueue: () -> Unit,
+    activeColor: Color = ToscaPrimary,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -126,19 +127,22 @@ fun PlayerTopBar(
                 PlayerTopActionIcon(
                     icon = Icons.Rounded.Bedtime,
                     isActive = isSleepTimerActive,
-                    onClick = onOpenSleepTimer
+                    onClick = onOpenSleepTimer,
+                    activeColor = activeColor
                 )
 
                 PlayerTopActionIcon(
                     icon = Icons.Rounded.Lyrics,
                     isActive = centerView == PlayerCenterView.LYRICS,
-                    onClick = onToggleLyrics
+                    onClick = onToggleLyrics,
+                    activeColor = activeColor
                 )
 
                 PlayerTopActionIcon(
                     icon = Icons.AutoMirrored.Rounded.QueueMusic,
                     isActive = centerView == PlayerCenterView.QUEUE,
-                    onClick = onToggleQueue
+                    onClick = onToggleQueue,
+                    activeColor = activeColor
                 )
             }
         }
@@ -149,7 +153,8 @@ fun PlayerTopBar(
 private fun PlayerTopActionIcon(
     icon: ImageVector,
     isActive: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    activeColor: Color = ToscaPrimary
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Box(
@@ -157,13 +162,13 @@ private fun PlayerTopActionIcon(
             .size(ActionButtonSizeSm)
             .pressedScale(targetScale = ScalePressedRound, interactionSource = interactionSource)
             .clip(CircleShape)
-            .background(if (isActive) ToscaPrimary.copy(alpha = 0.16f) else GlassFillLight)
+            .background(if (isActive) activeColor.copy(alpha = 0.16f) else GlassFillLight)
             .then(
                 if (isActive) {
                     Modifier.glassBorder(
                         shape = CircleShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = ToscaGlassBorder,
+                        startColor = activeColor.copy(alpha = 0.40f),
                         endColor = GlassBorderSubtle
                     )
                 } else {
@@ -185,7 +190,7 @@ private fun PlayerTopActionIcon(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = if (isActive) ToscaPrimary else TextSecondary,
+            tint = if (isActive) activeColor else TextSecondary,
             modifier = Modifier.size(19.dp)
         )
     }

@@ -90,6 +90,7 @@ fun MiniPlayer(
     onTogglePlayPause: () -> Unit,
     onOpenFullPlayer: () -> Unit,
     modifier: Modifier = Modifier,
+    accentColor: Color = ToscaPrimary,
     onSkipNext: () -> Unit = {}
 ) {
     val currentSong = playerState.currentSong
@@ -135,7 +136,7 @@ fun MiniPlayer(
                         Modifier.glassBorder(
                             shape = islandShape,
                             strokeWidth = StrokeWidthBorder,
-                            startColor = ToscaGlassBorder,
+                            startColor = accentColor.copy(alpha = 0.45f),
                             endColor = GlassBorderSubtle
                         )
                     } else {
@@ -203,7 +204,7 @@ fun MiniPlayer(
 
                     if (playerState.isBuffering) {
                         CircularProgressIndicator(
-                            color = ToscaPrimary,
+                            color = accentColor,
                             strokeWidth = StrokeWidthThick,
                             modifier = Modifier.size(28.dp)
                         )
@@ -216,7 +217,7 @@ fun MiniPlayer(
                                     interactionSource = playInteractionSource
                                 )
                                 .clip(CircleShape)
-                                .background(ToscaPrimary)
+                                .background(accentColor)
                                 .clickable(
                                     interactionSource = playInteractionSource,
                                     indication = null,
@@ -261,7 +262,7 @@ fun MiniPlayer(
                             .height(ProgressBarHeightMini)
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    colors = listOf(ToscaPrimary, AuroraCyan)
+                                    colors = listOf(accentColor, AuroraCyan)
                                 )
                             )
                     )

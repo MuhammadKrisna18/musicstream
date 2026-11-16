@@ -60,6 +60,7 @@ fun PlayerQueueView(
     currentQueueIndex: Int,
     isPlaying: Boolean,
     onPlayQueueIndex: (Int) -> Unit,
+    accentColor: Color = ToscaPrimary,
     modifier: Modifier = Modifier
 ) {
     val queueShape = remember { RoundedCornerShape(CornerRadiusPill) }
@@ -111,13 +112,13 @@ fun PlayerQueueView(
                             .fillMaxWidth()
                             .pressedScale(targetScale = ScalePressedGlass, interactionSource = rowSource)
                             .clip(rowShape)
-                            .background(if (isCurrent) ToscaPrimary.copy(alpha = 0.14f) else GlassFillSubtle)
+                            .background(if (isCurrent) accentColor.copy(alpha = 0.14f) else GlassFillSubtle)
                             .then(
                                 if (isCurrent) {
                                     Modifier.glassBorder(
                                         shape = rowShape,
                                         strokeWidth = StrokeWidthBorder,
-                                        startColor = ToscaGlassBorder,
+                                        startColor = accentColor.copy(alpha = 0.40f),
                                         endColor = GlassBorderSubtle
                                     )
                                 } else {
@@ -141,11 +142,11 @@ fun PlayerQueueView(
                             contentAlignment = Alignment.Center
                         ) {
                             if (isCurrent && isPlaying) {
-                                MiniEqualizer(isPlaying = true)
+                                MiniEqualizer(isPlaying = true, barColor = accentColor)
                             } else {
                                 Text(
                                     text = "${index + 1}",
-                                    color = if (isCurrent) ToscaPrimary else TextMuted,
+                                    color = if (isCurrent) accentColor else TextMuted,
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Medium
                                 )
@@ -168,7 +169,7 @@ fun PlayerQueueView(
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = song.title,
-                                color = if (isCurrent) ToscaPrimary else TextPrimary,
+                                color = if (isCurrent) accentColor else TextPrimary,
                                 fontSize = 13.sp,
                                 fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.SemiBold,
                                 maxLines = 1,

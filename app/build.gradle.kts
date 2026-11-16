@@ -121,6 +121,7 @@ dependencies {
   implementation(libs.androidx.media3.common)
 
   implementation(libs.androidx.compose.material.icons.extended)
+  implementation(libs.androidx.palette)
   implementation(libs.coil.compose)
 
   implementation(libs.retrofit)

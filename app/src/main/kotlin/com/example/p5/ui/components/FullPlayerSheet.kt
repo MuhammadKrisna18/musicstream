@@ -52,6 +52,7 @@ import com.example.p5.ui.theme.SpacingLg
 import com.example.p5.ui.theme.SpacingMd
 import com.example.p5.ui.theme.SpacingXxl
 import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.rememberDynamicPlayerPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +74,7 @@ fun FullPlayerSheet(
 ) {
     val currentSong = playerState.currentSong ?: return
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val palette = rememberDynamicPlayerPalette(artworkUrl = currentSong.thumbnailUrl)
     var centerView by remember { mutableStateOf(PlayerCenterView.ALBUM) }
     var showSleepTimerDialog by remember { mutableStateOf(false) }
 
@@ -119,8 +121,8 @@ fun FullPlayerSheet(
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
-                                AuroraDeepIndigo.copy(alpha = 0.65f),
-                                ObsidianBlack.copy(alpha = 0.85f),
+                                palette.darkVibrant.copy(alpha = 0.70f),
+                                ObsidianBlack.copy(alpha = 0.88f),
                                 ObsidianBlack
                             ),
                             startY = auroraOffset1,
@@ -136,8 +138,8 @@ fun FullPlayerSheet(
                     .background(
                         Brush.radialGradient(
                             colors = listOf(
-                                ToscaPrimary.copy(alpha = 0.14f),
-                                AuroraCyan.copy(alpha = 0.08f),
+                                palette.vibrant.copy(alpha = 0.20f),
+                                palette.lightVibrant.copy(alpha = 0.08f),
                                 Color.Transparent
                             ),
                             radius = 650f
@@ -162,7 +164,8 @@ fun FullPlayerSheet(
                     },
                     onToggleQueue = {
                         centerView = if (centerView == PlayerCenterView.QUEUE) PlayerCenterView.ALBUM else PlayerCenterView.QUEUE
-                    }
+                    },
+                    activeColor = palette.accent
                 )
 
                 Spacer(modifier = Modifier.height(SpacingLg))
@@ -184,7 +187,9 @@ fun FullPlayerSheet(
                                     song = currentSong,
                                     isPlaying = playerState.isPlaying,
                                     isFavorite = playerState.isCurrentSongFavorite,
-                                    onToggleFavorite = onToggleFavorite
+                                    onToggleFavorite = onToggleFavorite,
+                                    accentColor = palette.accent,
+                                    glowColor = palette.vibrant
                                 )
                             }
                             PlayerCenterView.QUEUE -> {
@@ -192,7 +197,8 @@ fun FullPlayerSheet(
                                     queue = playerState.queue,
                                     currentQueueIndex = playerState.currentQueueIndex,
                                     isPlaying = playerState.isPlaying,
-                                    onPlayQueueIndex = onPlayQueueIndex
+                                    onPlayQueueIndex = onPlayQueueIndex,
+                                    accentColor = palette.accent
                                 )
                             }
                             PlayerCenterView.LYRICS -> {
@@ -201,7 +207,8 @@ fun FullPlayerSheet(
                                     isLyricsLoading = playerState.isLyricsLoading,
                                     currentPositionMs = playerState.currentPositionMs,
                                     onSeekTo = onSeekTo,
-                                    onRetryFetchLyrics = onRetryFetchLyrics
+                                    onRetryFetchLyrics = onRetryFetchLyrics,
+                                    accentColor = palette.accent
                                 )
                             }
                         }
@@ -224,7 +231,8 @@ fun FullPlayerSheet(
                     onSkipNext = onSkipNext,
                     onSkipPrevious = onSkipPrevious,
                     onToggleShuffle = onToggleShuffle,
-                    onToggleRepeatMode = onToggleRepeatMode
+                    onToggleRepeatMode = onToggleRepeatMode,
+                    accentColor = palette.accent
                 )
             }
         }

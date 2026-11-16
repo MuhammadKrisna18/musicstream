@@ -34,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -74,13 +75,15 @@ fun PlayerControlsView(
     onSkipPrevious: () -> Unit,
     onToggleShuffle: () -> Unit,
     onToggleRepeatMode: () -> Unit,
+    accentColor: Color = ToscaPrimary,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         PlayerProgressBar(
             currentPositionMs = currentPositionMs,
             durationMs = durationMs,
-            onSeekTo = onSeekTo
+            onSeekTo = onSeekTo,
+            accentColor = accentColor
         )
 
         Spacer(modifier = Modifier.height(SpacingLg))
@@ -94,7 +97,8 @@ fun PlayerControlsView(
                 icon = Icons.Rounded.Shuffle,
                 contentDescription = stringResource(R.string.player_shuffle_desc),
                 isActive = isShuffleEnabled,
-                onClick = onToggleShuffle
+                onClick = onToggleShuffle,
+                accentColor = accentColor
             )
 
             PlayerIconButton(
@@ -102,7 +106,8 @@ fun PlayerControlsView(
                 contentDescription = stringResource(R.string.player_previous_desc),
                 enabled = hasPrevious,
                 size = IconSizeXl,
-                onClick = onSkipPrevious
+                onClick = onSkipPrevious,
+                accentColor = accentColor
             )
 
             val playSource = remember { MutableInteractionSource() }
@@ -111,7 +116,7 @@ fun PlayerControlsView(
                     .size(PlayButtonSizeFull)
                     .pressedScale(targetScale = ScalePressedButton, interactionSource = playSource)
                     .clip(CircleShape)
-                    .background(ToscaPrimary)
+                    .background(accentColor)
                     .clickable(
                         interactionSource = playSource,
                         indication = null,
@@ -140,14 +145,16 @@ fun PlayerControlsView(
                 contentDescription = stringResource(R.string.mini_player_next_desc),
                 enabled = hasNext,
                 size = IconSizeXl,
-                onClick = onSkipNext
+                onClick = onSkipNext,
+                accentColor = accentColor
             )
 
             PlayerIconButton(
                 icon = if (repeatMode == RepeatMode.ONE) Icons.Rounded.RepeatOne else Icons.Rounded.Repeat,
                 contentDescription = stringResource(R.string.player_repeat_desc),
                 isActive = repeatMode != RepeatMode.OFF,
-                onClick = onToggleRepeatMode
+                onClick = onToggleRepeatMode,
+                accentColor = accentColor
             )
         }
     }
@@ -158,6 +165,7 @@ fun PlayerProgressBar(
     currentPositionMs: Long,
     durationMs: Long,
     onSeekTo: (Long) -> Unit,
+    accentColor: Color = ToscaPrimary,
     modifier: Modifier = Modifier
 ) {
     var isDraggingSlider by remember { mutableStateOf(false) }
@@ -179,8 +187,8 @@ fun PlayerProgressBar(
                 onSeekTo(dragPositionMs.toLong())
             },
             colors = SliderDefaults.colors(
-                thumbColor = ToscaPrimary,
-                activeTrackColor = ToscaPrimary,
+                thumbColor = accentColor,
+                activeTrackColor = accentColor,
                 inactiveTrackColor = GlassBorderSubtle
             ),
             modifier = Modifier.fillMaxWidth()
@@ -215,6 +223,7 @@ fun PlayerIconButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     isActive: Boolean = false,
+    accentColor: Color = ToscaPrimary,
     size: Dp = 24.dp
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -236,7 +245,7 @@ fun PlayerIconButton(
             contentDescription = contentDescription,
             tint = when {
                 !enabled -> TextMuted.copy(alpha = 0.5f)
-                isActive -> ToscaPrimary
+                isActive -> accentColor
                 else -> TextPrimary
             },
             modifier = Modifier.size(size)
