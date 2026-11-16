@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.p5.MusicApplication
+import com.example.p5.ui.artist.ArtistProfileViewModel
 import com.example.p5.ui.library.LibraryViewModel
 import com.example.p5.ui.player.PlayerViewModel
 import com.example.p5.ui.search.SearchViewModel
@@ -42,6 +43,13 @@ object AppViewModelProvider {
         initializer {
             UpdateViewModel(
                 musicApplication().container.updateRepository
+            )
+        }
+        initializer {
+            ArtistProfileViewModel(
+                musicApplication().container.getArtistProfileUseCase,
+                musicApplication().container.getArtistAllSongsUseCase,
+                musicApplication().container.musicPlayerManager
             )
         }
     }
