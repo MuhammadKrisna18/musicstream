@@ -117,6 +117,26 @@ class YouTubeNativeDataSource(
         } catch (_: Exception) {
         }
 
+        val secondaryPayload = sessionManager.buildSecondaryPlayerPayload(videoId)
+        val secondaryRequest = Request.Builder()
+            .url(MusicConfig.YOUTUBE_PLAYER_URL)
+            .post(secondaryPayload.toString().toRequestBody(jsonMediaType))
+            .addHeader("User-Agent", "com.google.android.youtube/20.05.34 (Linux; U; Android 11) gzip")
+            .addHeader("X-YouTube-Client-Name", "3")
+            .addHeader("X-YouTube-Client-Version", "20.05.34")
+            .build()
+
+        try {
+            val response = okHttpClient.newCall(secondaryRequest).execute()
+            if (response.isSuccessful) {
+                val jsonString = response.body?.string()
+                if (!jsonString.isNullOrEmpty()) {
+                    return@withContext parser.parsePlayerResponse(videoId, jsonString)
+                }
+            }
+        } catch (_: Exception) {
+        }
+
         val fallbackPayload = sessionManager.buildVrPlayerPayload(videoId)
         val fallbackRequest = Request.Builder()
             .url(MusicConfig.YOUTUBE_PLAYER_URL)

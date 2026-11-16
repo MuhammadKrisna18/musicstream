@@ -23,30 +23,48 @@ object MediaCacheManager {
     fun getCache(context: Context): SimpleCache {
         return simpleCache ?: run {
             val cacheDir = File(context.cacheDir, "media_stream_cache")
-            if (!cacheDir.exists()) {
-                cacheDir.mkdirs()
-            }
             val evictor = LeastRecentlyUsedCacheEvictor(MAX_CACHE_SIZE_BYTES)
             val databaseProvider = StandaloneDatabaseProvider(context.applicationContext)
-            SimpleCache(cacheDir, evictor, databaseProvider).also {
-                simpleCache = it
+            try {
+                if (!cacheDir.exists()) {
+                    cacheDir.mkdirs()
+                }
+                SimpleCache(cacheDir, evictor, databaseProvider).also {
+                    simpleCache = it
+                }
+            } catch (_: Exception) {
+                cacheDir.deleteRecursively()
+                cacheDir.mkdirs()
+                SimpleCache(cacheDir, evictor, databaseProvider).also {
+                    simpleCache = it
+                }
             }
         }
     }
 
     fun createCacheDataSourceFactory(context: Context): DataSource.Factory {
         val httpDataSourceFactory = DefaultHttpDataSource.Factory()
-            .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
+            .setUserAgent("com.google.android.youtube/20.10.38 (Linux; U; Android 11) gzip")
             .setAllowCrossProtocolRedirects(true)
             .setConnectTimeoutMs(15_000)
             .setReadTimeoutMs(30_000)
 
         val upstreamFactory = DefaultDataSource.Factory(context.applicationContext, httpDataSourceFactory)
 
-        return CacheDataSource.Factory()
-            .setCache(getCache(context.applicationContext))
-            .setUpstreamDataSourceFactory(upstreamFactory)
-            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        val cache = try {
+            getCache(context.applicationContext)
+        } catch (_: Exception) {
+            null
+        }
+
+        return if (cache != null) {
+            CacheDataSource.Factory()
+                .setCache(cache)
+                .setUpstreamDataSourceFactory(upstreamFactory)
+                .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+        } else {
+            upstreamFactory
+        }
     }
 
     fun getCachedSizeBytes(context: Context): Long {

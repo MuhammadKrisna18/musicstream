@@ -95,6 +95,36 @@ class InnerTubeSessionManager(
         }
     }
 
+    fun buildSecondaryPlayerPayload(videoId: String): JSONObject {
+        refreshSessionDataIfNeeded()
+        return JSONObject().apply {
+            put("context", JSONObject().apply {
+                put("client", JSONObject().apply {
+                    put("clientName", "ANDROID")
+                    put("clientVersion", "20.05.34")
+                    put("androidSdkVersion", 30)
+                    put("osName", "Android")
+                    put("osVersion", "11")
+                    put("hl", "id")
+                    put("gl", "ID")
+                })
+                put("playback", JSONObject().apply {
+                    put("audioConfig", JSONObject().apply {
+                        put("audioQuality", "AUDIO_QUALITY_HIGH")
+                    })
+                })
+            })
+            put("videoId", videoId)
+            put("contentCheckOk", true)
+            put("racyCheckOk", true)
+            put("playbackContext", JSONObject().apply {
+                put("contentPlaybackContext", JSONObject().apply {
+                    put("signatureTimestamp", cachedSts)
+                })
+            })
+        }
+    }
+
     fun buildVrPlayerPayload(videoId: String): JSONObject {
         refreshSessionDataIfNeeded()
         return JSONObject().apply {
