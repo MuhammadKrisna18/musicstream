@@ -37,6 +37,10 @@ class YouTubeNativeDataSource(
     private val genreFeedCache = ConcurrentHashMap<String, List<HomeSection>>()
 
     suspend fun search(query: String, limit: Int = 20): List<Song> = withContext(ioDispatcher) {
+        searchWithPlaylists(query, limit).first
+    }
+
+    suspend fun searchWithPlaylists(query: String, limit: Int = 20): Pair<List<Song>, List<Playlist>> = withContext(ioDispatcher) {
         val payload = sessionManager.buildSearchPayload(query)
 
         val request = Request.Builder()
@@ -47,27 +51,6 @@ class YouTubeNativeDataSource(
             .addHeader("Referer", MusicConfig.YOUTUBE_MUSIC_REFERER)
             .addHeader("X-YouTube-Client-Name", "67")
             .addHeader("X-YouTube-Client-Version", "1.20240801.01.00")
-            .build()
-
-        val response = okHttpClient.newCall(request).execute()
-        if (!response.isSuccessful) {
-            throw IOException("Search request failed: ${response.code}")
-        }
-
-        val jsonString = response.body?.string() ?: throw IOException("Empty search response")
-        parser.parseSearchResults(jsonString, limit)
-    }
-
-    suspend fun searchWithPlaylists(query: String, limit: Int = 20): Pair<List<Song>, List<Playlist>> = withContext(ioDispatcher) {
-        val payload = sessionManager.buildSearchPayload(query)
-
-        val request = Request.Builder()
-            .url(MusicConfig.YOUTUBE_SEARCH_URL)
-            .post(payload.toString().toRequestBody(jsonMediaType))
-            .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36")
-            .addHeader("Origin", MusicConfig.YOUTUBE_BASE_ORIGIN)
-            .addHeader("X-YouTube-Client-Name", "1")
-            .addHeader("X-YouTube-Client-Version", "2.20240726.00.00")
             .build()
 
         val response = okHttpClient.newCall(request).execute()

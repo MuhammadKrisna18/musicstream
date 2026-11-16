@@ -28,9 +28,23 @@ class InnerTubeParser {
 
     fun parseSearchPayload(jsonString: String, limit: Int): SearchPayload {
         val root = JSONObject(jsonString)
-        val contents = root.optJSONObject("contents")
-            ?.optJSONObject("twoColumnSearchResultsRenderer")
-            ?.optJSONObject("primaryContents")
+        val contentsJson = root.optJSONObject("contents") ?: return SearchPayload(emptyList(), emptyList())
+
+        val twoCol = contentsJson.optJSONObject("twoColumnSearchResultsRenderer")
+        if (twoCol != null) {
+            return parseTwoColumnSearchResults(twoCol, limit)
+        }
+
+        val tabbed = contentsJson.optJSONObject("tabbedSearchResultsRenderer")
+        if (tabbed != null) {
+            return parseTabbedSearchResults(tabbed, limit)
+        }
+
+        return SearchPayload(emptyList(), emptyList())
+    }
+
+    private fun parseTwoColumnSearchResults(twoCol: JSONObject, limit: Int): SearchPayload {
+        val contents = twoCol.optJSONObject("primaryContents")
             ?.optJSONObject("sectionListRenderer")
             ?.optJSONArray("contents") ?: JSONArray()
 
@@ -146,6 +160,161 @@ class InnerTubeParser {
                         viewCount = viewCount
                     )
                 )
+            }
+        }
+
+        return SearchPayload(songs, playlists)
+    }
+
+    private fun parseTabbedSearchResults(tabbed: JSONObject, limit: Int): SearchPayload {
+        val tabs = tabbed.optJSONArray("tabs") ?: JSONArray()
+        if (tabs.length() == 0) return SearchPayload(emptyList(), emptyList())
+
+        val tabContents = tabs.optJSONObject(0)
+            ?.optJSONObject("tabRenderer")
+            ?.optJSONObject("content")
+            ?.optJSONObject("sectionListRenderer")
+            ?.optJSONArray("contents") ?: JSONArray()
+
+        val songs = mutableListOf<Song>()
+        val playlists = mutableListOf<Playlist>()
+
+        for (i in 0 until tabContents.length()) {
+            val section = tabContents.optJSONObject(i) ?: continue
+
+            val items = mutableListOf<JSONObject>()
+
+            val shelf = section.optJSONObject("musicShelfRenderer")
+            if (shelf != null) {
+                val shelfContents = shelf.optJSONArray("contents")
+                if (shelfContents != null) {
+                    for (k in 0 until shelfContents.length()) {
+                        shelfContents.optJSONObject(k)?.let { items.add(it) }
+                    }
+                }
+            }
+
+            val itemSection = section.optJSONObject("itemSectionRenderer")
+            if (itemSection != null) {
+                val secContents = itemSection.optJSONArray("contents")
+                if (secContents != null) {
+                    for (k in 0 until secContents.length()) {
+                        secContents.optJSONObject(k)?.let { items.add(it) }
+                    }
+                }
+            }
+
+            for (item in items) {
+                val responsive = item.optJSONObject("musicResponsiveListItemRenderer")
+                if (responsive != null) {
+                    val parsedSong = parseSongFromResponsive(responsive)
+                    if (parsedSong != null && songs.size < limit) {
+                        if (songs.none { it.id == parsedSong.id }) {
+                            songs.add(parsedSong)
+                        }
+                    } else if (playlists.size < 5) {
+                        val navEndpoint = responsive.optJSONObject("navigationEndpoint")
+                        val browseEndpoint = navEndpoint?.optJSONObject("browseEndpoint")
+                        val browseId = browseEndpoint?.optString("browseId") ?: ""
+                        if (browseId.startsWith("VL") || browseId.startsWith("PL") || browseId.startsWith("RD") || browseId.startsWith("MPRE")) {
+                            val flexColumns = responsive.optJSONArray("flexColumns")
+                            val title = flexColumns?.optJSONObject(0)
+                                ?.optJSONObject("musicResponsiveListItemFlexColumnRenderer")
+                                ?.optJSONObject("text")
+                                ?.optJSONArray("runs")
+                                ?.optJSONObject(0)
+                                ?.optString("text") ?: ""
+
+                            if (title.isNotBlank()) {
+                                val runs = flexColumns?.optJSONObject(1)
+                                    ?.optJSONObject("musicResponsiveListItemFlexColumnRenderer")
+                                    ?.optJSONObject("text")
+                                    ?.optJSONArray("runs")
+                                val subtitleBuilder = StringBuilder()
+                                if (runs != null) {
+                                    for (r in 0 until runs.length()) {
+                                        subtitleBuilder.append(runs.optJSONObject(r)?.optString("text") ?: "")
+                                    }
+                                }
+                                val subtitle = if (subtitleBuilder.isNotBlank()) subtitleBuilder.toString() else "YouTube Music"
+
+                                val thumbs = responsive.optJSONObject("thumbnail")
+                                    ?.optJSONObject("musicThumbnailRenderer")
+                                    ?.optJSONObject("thumbnail")
+                                    ?.optJSONArray("thumbnails")
+                                val thumbUrl = if (thumbs != null && thumbs.length() > 0) {
+                                    thumbs.optJSONObject(thumbs.length() - 1)?.optString("url") ?: ""
+                                } else ""
+
+                                val type = when {
+                                    title.contains("mix", ignoreCase = true) || title.contains("radio", ignoreCase = true) -> PlaylistType.RANDOM
+                                    title.contains("pop", ignoreCase = true) || title.contains("rock", ignoreCase = true) ||
+                                        title.contains("indie", ignoreCase = true) || title.contains("jazz", ignoreCase = true) ||
+                                        title.contains("dangdut", ignoreCase = true) || title.contains("koplo", ignoreCase = true) -> PlaylistType.GENRE
+                                    else -> PlaylistType.ARTIST
+                                }
+
+                                if (playlists.none { it.id == browseId }) {
+                                    playlists.add(
+                                        Playlist(
+                                            id = browseId,
+                                            title = title,
+                                            subtitle = subtitle,
+                                            thumbnailUrl = thumbUrl,
+                                            type = type,
+                                            query = title
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                val twoRow = item.optJSONObject("musicTwoRowItemRenderer")
+                if (twoRow != null) {
+                    val navEndpoint = twoRow.optJSONObject("navigationEndpoint")
+                    val browseEndpoint = navEndpoint?.optJSONObject("browseEndpoint")
+                    val browseId = browseEndpoint?.optString("browseId") ?: ""
+                    if (browseId.startsWith("VL") || browseId.startsWith("PL") || browseId.startsWith("RD") || browseId.startsWith("MPRE")) {
+                        if (playlists.size < 5) {
+                            val title = twoRow.optJSONObject("title")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
+                            val subtitle = twoRow.optJSONObject("subtitle")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: "YouTube Music"
+                            val thumbs = twoRow.optJSONObject("thumbnailRenderer")
+                                ?.optJSONObject("musicThumbnailRenderer")
+                                ?.optJSONObject("thumbnail")
+                                ?.optJSONArray("thumbnails")
+                            val thumbUrl = if (thumbs != null && thumbs.length() > 0) {
+                                thumbs.optJSONObject(thumbs.length() - 1)?.optString("url") ?: ""
+                            } else ""
+
+                            if (title.isNotBlank() && playlists.none { it.id == browseId }) {
+                                playlists.add(
+                                    Playlist(
+                                        id = browseId,
+                                        title = title,
+                                        subtitle = subtitle,
+                                        thumbnailUrl = thumbUrl,
+                                        type = when {
+                                            title.contains("mix", ignoreCase = true) || title.contains("radio", ignoreCase = true) -> PlaylistType.RANDOM
+                                            title.contains("pop", ignoreCase = true) || title.contains("rock", ignoreCase = true) ||
+                                                title.contains("indie", ignoreCase = true) || title.contains("jazz", ignoreCase = true) ||
+                                                title.contains("dangdut", ignoreCase = true) || title.contains("koplo", ignoreCase = true) -> PlaylistType.GENRE
+                                            else -> PlaylistType.ARTIST
+                                        },
+                                        query = title
+                                    )
+                                )
+                            }
+                        }
+                    } else if (songs.size < limit) {
+                        parseSongFromTwoRow(twoRow)?.let { song ->
+                            if (songs.none { it.id == song.id }) {
+                                songs.add(song)
+                            }
+                        }
+                    }
+                }
             }
         }
 

@@ -106,4 +106,82 @@ class InnerTubeParserTest {
         assertEquals("Tulus", tracks.first().artist)
         assertEquals("3:34", tracks.first().durationFormatted)
     }
+
+    @Test
+    fun parseSearchPayload_parsesTabbedSearchResults_forYouTubeMusic() {
+        val json = """
+            {
+              "contents": {
+                "tabbedSearchResultsRenderer": {
+                  "tabs": [
+                    {
+                      "tabRenderer": {
+                        "content": {
+                          "sectionListRenderer": {
+                            "contents": [
+                              {
+                                "musicShelfRenderer": {
+                                  "contents": [
+                                    {
+                                      "musicResponsiveListItemRenderer": {
+                                        "playlistItemData": { "videoId": "song001" },
+                                        "flexColumns": [
+                                          {
+                                            "musicResponsiveListItemFlexColumnRenderer": {
+                                              "text": { "runs": [ { "text": "Raiso Ngapusi" } ] }
+                                            }
+                                          },
+                                          {
+                                            "musicResponsiveListItemFlexColumnRenderer": {
+                                              "text": { "runs": [ { "text": "Lavora" }, { "text": " • " }, { "text": "4:12" } ] }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    {
+                                      "musicResponsiveListItemRenderer": {
+                                        "navigationEndpoint": {
+                                          "browseEndpoint": {
+                                            "browseId": "VLPLtestalbum"
+                                          }
+                                        },
+                                        "flexColumns": [
+                                          {
+                                            "musicResponsiveListItemFlexColumnRenderer": {
+                                              "text": { "runs": [ { "text": "Koleksi Lagu Jawa" } ] }
+                                            }
+                                          },
+                                          {
+                                            "musicResponsiveListItemFlexColumnRenderer": {
+                                              "text": { "runs": [ { "text": "Playlist" }, { "text": " • " }, { "text": "Denny Caknan" } ] }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+        """.trimIndent()
+
+        val payload = parser.parseSearchPayload(json, limit = 10)
+        assertEquals(1, payload.songs.size)
+        assertEquals("song001", payload.songs.first().id)
+        assertEquals("Raiso Ngapusi", payload.songs.first().title)
+        assertEquals("Lavora", payload.songs.first().artist)
+
+        assertEquals(1, payload.playlists.size)
+        assertEquals("VLPLtestalbum", payload.playlists.first().id)
+        assertEquals("Koleksi Lagu Jawa", payload.playlists.first().title)
+    }
 }
