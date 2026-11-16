@@ -58,6 +58,9 @@
     <string name="player_lyrics_not_found_title">Lirik Belum Tersedia</string>
     <string name="player_lyrics_not_found_desc">Lirik untuk lagu ini belum ditemukan di arsip</string>
     <string name="player_lyrics_retry">Coba Muat Ulang</string>
+    <string name="player_lyrics_karaoke_badge">KARAOKE SYNC</string>
+    <string name="player_lyrics_plain_badge">LIRIK TEKS</string>
+    <string name="player_lyrics_line_count">%1$d Baris</string>
     <string name="player_instrumental_title">Musik Instrumental</string>
     <string name="player_instrumental_desc">Trek ini dinikmati tanpa vokal</string>
     <string name="player_shuffle_desc">Acak</string>

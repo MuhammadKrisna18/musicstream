@@ -37,8 +37,8 @@ android {
     applicationId = "com.example.p5app"
     minSdk = 24
     targetSdk = 36
-    versionCode = 20
-    versionName = "2.6.6"
+    versionCode = 21
+    versionName = "2.7.0"
   }
 
   signingConfigs {

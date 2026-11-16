@@ -1,5 +1,9 @@
 package com.example.p5.ui.components.player
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -7,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -31,9 +37,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
@@ -54,7 +62,6 @@ import com.example.p5.ui.theme.GlassFillLight
 import com.example.p5.ui.theme.IconSizeDisplay
 import com.example.p5.ui.theme.IconSizeHero
 import com.example.p5.ui.theme.IconSizeSm
-import com.example.p5.ui.theme.ScaleActiveLyric
 import com.example.p5.ui.theme.SpacingLg
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.SpacingXs
@@ -189,56 +196,155 @@ fun PlayerLyricsView(
             val listState = rememberLazyListState()
 
             LaunchedEffect(activeIndex) {
-                if (activeIndex >= 0) {
-                    listState.animateScrollToItem((activeIndex - 2).coerceAtLeast(0))
+                if (activeIndex in lines.indices) {
+                    listState.animateScrollToItem(
+                        index = (activeIndex - 1).coerceAtLeast(0),
+                        scrollOffset = -120
+                    )
                 }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(CornerRadiusPill))
+                        .background(accentColor.copy(alpha = 0.14f))
+                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(accentColor)
+                    )
+                    Text(
+                        text = stringResource(R.string.player_lyrics_karaoke_badge),
+                        color = accentColor,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.8.sp
+                    )
+                }
+
+                Text(
+                    text = stringResource(R.string.player_lyrics_line_count, lines.size),
+                    color = TextMuted,
+                    fontSize = 11.sp
+                )
             }
 
             LazyColumn(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(vertical = 48.dp),
-                verticalArrangement = Arrangement.spacedBy(18.dp)
+                contentPadding = PaddingValues(top = 16.dp, bottom = 64.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 itemsIndexed(lines) { index, line ->
                     val isActive = index == activeIndex
                     val isPast = index < activeIndex
                     val lineSource = remember { MutableInteractionSource() }
 
+                    val lineScale by animateFloatAsState(
+                        targetValue = if (isActive) 1.05f else 1.0f,
+                        animationSpec = spring(dampingRatio = 0.75f, stiffness = 380f),
+                        label = "karaoke_scale"
+                    )
+
+                    val lineAlpha by animateFloatAsState(
+                        targetValue = when {
+                            isActive -> 1.0f
+                            isPast -> 0.48f
+                            else -> 0.36f
+                        },
+                        animationSpec = tween(durationMillis = 250),
+                        label = "karaoke_alpha"
+                    )
+
+                    val textColor by animateColorAsState(
+                        targetValue = if (isActive) TextPrimary else TextSecondary,
+                        animationSpec = tween(durationMillis = 250),
+                        label = "karaoke_text_color"
+                    )
+
+                    val hasLongBreakBefore = index > 0 && (line.timestampMs - lines[index - 1].timestampMs) > 9000L
+
+                    if (hasLongBreakBefore) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "·  ·  ·",
+                                color = accentColor.copy(alpha = 0.45f),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
                     Text(
                         text = line.text,
                         fontSize = if (isActive) 21.sp else 16.sp,
                         fontWeight = if (isActive) FontWeight.ExtraBold else FontWeight.Medium,
-                        color = when {
-                            isActive -> TextPrimary
-                            isPast -> TextSecondary.copy(alpha = 0.5f)
-                            else -> TextMuted.copy(alpha = 0.45f)
-                        },
+                        color = textColor,
                         lineHeight = if (isActive) 29.sp else 23.sp,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .scale(if (isActive) ScaleActiveLyric else 1.0f)
+                            .scale(lineScale)
+                            .alpha(lineAlpha)
                             .clickable(
                                 interactionSource = lineSource,
                                 indication = null
                             ) { onSeekTo(line.timestampMs) }
-                            .padding(horizontal = 10.dp, vertical = 2.dp)
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
                     )
                 }
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(10.dp)
-            ) {
-                Text(
-                    text = lyrics.plainLyrics,
-                    fontSize = 15.sp,
-                    color = TextSecondary,
-                    lineHeight = 24.sp
-                )
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.player_lyrics_plain_badge),
+                        color = TextSecondary,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 0.8.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(CornerRadiusPill))
+                            .background(GlassBorderSubtle)
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = 8.dp, vertical = 12.dp)
+                ) {
+                    Text(
+                        text = lyrics.plainLyrics,
+                        fontSize = 15.sp,
+                        color = TextSecondary,
+                        lineHeight = 26.sp
+                    )
+                }
             }
         }
     }

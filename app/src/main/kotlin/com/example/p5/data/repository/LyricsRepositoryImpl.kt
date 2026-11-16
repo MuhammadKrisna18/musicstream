@@ -37,6 +37,14 @@ class LyricsRepositoryImpl(
                 lyricsData = fetchSearchLyrics(song.id, searchQuery)
             }
 
+            if (lyricsData == null && song.title != trackName) {
+                lyricsData = fetchSearchLyrics(song.id, song.title)
+            }
+
+            if (lyricsData == null) {
+                lyricsData = fetchFallbackOvhLyrics(song.id, artistName, trackName)
+            }
+
             lyricsData?.also {
                 cache[song.id] = it
             } ?: throw IllegalStateException("Lirik tidak ditemukan untuk lagu ini")
@@ -96,6 +104,39 @@ class LyricsRepositoryImpl(
             }
             null
         } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun fetchFallbackOvhLyrics(songId: String, artist: String, title: String): LyricsData? {
+        if (artist.isBlank() || title.isBlank() || artist.equals("YouTube Music", ignoreCase = true)) return null
+        return try {
+            val encodedArtist = URLEncoder.encode(artist, "UTF-8")
+            val encodedTitle = URLEncoder.encode(title, "UTF-8")
+            val url = "https://api.lyrics.ovh/v1/$encodedArtist/$encodedTitle"
+
+            val request = Request.Builder()
+                .url(url)
+                .header("User-Agent", "MusicStream-Android/1.0")
+                .build()
+
+            val response = okHttpClient.newCall(request).execute()
+            if (!response.isSuccessful) return null
+            val body = response.body?.string() ?: return null
+            val json = JSONObject(body)
+            val lyricsText = json.optString("lyrics", "").trim()
+            if (lyricsText.isNotEmpty()) {
+                LyricsData(
+                    trackId = songId,
+                    isSynced = false,
+                    lines = emptyList(),
+                    plainLyrics = lyricsText,
+                    isInstrumental = false
+                )
+            } else {
+                null
+            }
+        } catch (_: Exception) {
             null
         }
     }
