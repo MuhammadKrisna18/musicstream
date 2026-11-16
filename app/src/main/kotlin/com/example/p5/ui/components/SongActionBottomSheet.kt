@@ -22,6 +22,7 @@ import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.BookmarkBorder
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -77,6 +78,7 @@ fun SongActionBottomSheet(
     onToggleSave: (Song) -> Unit,
     onToggleFavorite: (Song) -> Unit,
     onAddToQueueNext: (Song) -> Unit,
+    onViewArtist: ((channelId: String?, artistName: String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     if (song == null) return
@@ -204,6 +206,19 @@ fun SongActionBottomSheet(
                     onDismiss()
                 }
             )
+
+            if (onViewArtist != null) {
+                ActionSheetRow(
+                    icon = Icons.Rounded.Person,
+                    iconTint = ToscaPrimary,
+                    title = "Lihat Profil Artis",
+                    subtitle = "Kunjungi profil dan diskografi ${song.artist}",
+                    onClick = {
+                        onDismiss()
+                        onViewArtist(song.channelId, song.artist)
+                    }
+                )
+            }
 
             Spacer(modifier = Modifier.height(SpacingSm))
         }

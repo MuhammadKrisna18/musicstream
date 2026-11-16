@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
+    onNavigateToArtist: (channelId: String, artistName: String) -> Unit = { _, _ -> },
     searchViewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
     playerViewModel: PlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     libraryViewModel: LibraryViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -201,7 +202,11 @@ fun MainScreen(
                     onCancelSleepTimer = playerViewModel::cancelSleepTimer,
                     onRetryFetchLyrics = playerViewModel::retryFetchLyrics,
                     onToggleFavorite = playerViewModel::toggleFavoriteCurrentSong,
-                    onDismiss = { isFullPlayerVisible = false }
+                    onDismiss = { isFullPlayerVisible = false },
+                    onArtistClick = { channelId, artistName ->
+                        isFullPlayerVisible = false
+                        onNavigateToArtist(channelId ?: "", artistName)
+                    }
                 )
             }
 
@@ -240,6 +245,9 @@ fun MainScreen(
                                 if (added) "Ditambahkan ke antrean berikutnya" else "Lagu sedang diputar"
                             )
                         }
+                    },
+                    onViewArtist = { channelId, artistName ->
+                        onNavigateToArtist(channelId ?: "", artistName)
                     }
                 )
             }

@@ -223,4 +223,24 @@ class ArtistProfileViewModelTest {
 
         assertEquals("s1", playerManager.playerState.value.currentSong?.id)
     }
+
+    @Test
+    fun loadArtist_emptyChannelIdWithFallback_updatesUiStateToErrorWithFallback() = runTest(testDispatcher) {
+        viewModel.loadArtist("", "Denny Caknan")
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ArtistProfileUiState.Error)
+        val error = state as ArtistProfileUiState.Error
+        assertEquals("Profil artis tidak ditemukan untuk Denny Caknan", error.message)
+    }
+
+    @Test
+    fun loadArtist_emptyChannelIdWithoutFallback_updatesUiStateToError() = runTest(testDispatcher) {
+        viewModel.loadArtist("   ")
+
+        val state = viewModel.uiState.value
+        assertTrue(state is ArtistProfileUiState.Error)
+        val error = state as ArtistProfileUiState.Error
+        assertEquals("Channel ID tidak valid", error.message)
+    }
 }

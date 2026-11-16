@@ -64,6 +64,7 @@ fun PlayerAlbumView(
     onToggleFavorite: () -> Unit,
     accentColor: Color = ToscaPrimary,
     glowColor: Color = ToscaPrimary,
+    onArtistClick: ((channelId: String?, artistName: String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -119,6 +120,7 @@ fun PlayerAlbumView(
                     overflow = TextOverflow.Ellipsis
                 )
 
+                val artistSource = remember { MutableInteractionSource() }
                 Text(
                     text = song.artist,
                     color = accentColor,
@@ -126,7 +128,21 @@ fun PlayerAlbumView(
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = SpacingXs)
+                    modifier = Modifier
+                        .padding(top = SpacingXs)
+                        .then(
+                            if (onArtistClick != null) {
+                                Modifier
+                                    .pressedScale(targetScale = ScalePressedIcon, interactionSource = artistSource)
+                                    .clickable(
+                                        interactionSource = artistSource,
+                                        indication = null,
+                                        onClick = { onArtistClick(song.channelId, song.artist) }
+                                    )
+                            } else {
+                                Modifier
+                            }
+                        )
                 )
             }
 

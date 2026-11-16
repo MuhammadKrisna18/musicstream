@@ -72,7 +72,8 @@ fun FullPlayerSheet(
     onCancelSleepTimer: () -> Unit,
     onRetryFetchLyrics: () -> Unit,
     onToggleFavorite: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onArtistClick: ((channelId: String?, artistName: String) -> Unit)? = null
 ) {
     val currentSong = playerState.currentSong ?: return
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -191,7 +192,8 @@ fun FullPlayerSheet(
                                     isFavorite = playerState.isCurrentSongFavorite,
                                     onToggleFavorite = onToggleFavorite,
                                     accentColor = palette.accent,
-                                    glowColor = palette.vibrant
+                                    glowColor = palette.vibrant,
+                                    onArtistClick = onArtistClick
                                 )
                             }
                             PlayerCenterView.QUEUE -> {

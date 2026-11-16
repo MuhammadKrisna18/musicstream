@@ -26,9 +26,17 @@ class ArtistProfileViewModel(
 
     private var currentChannelId: String? = null
 
-    fun loadArtist(channelId: String) {
+    fun loadArtist(channelId: String, artistNameFallback: String = "") {
         val trimmed = channelId.trim()
-        if (trimmed.isEmpty()) return
+        if (trimmed.isEmpty()) {
+            val message = if (artistNameFallback.isNotBlank()) {
+                "Profil artis tidak ditemukan untuk $artistNameFallback"
+            } else {
+                "Channel ID tidak valid"
+            }
+            _uiState.value = ArtistProfileUiState.Error(message)
+            return
+        }
         if (currentChannelId == trimmed && _uiState.value is ArtistProfileUiState.Success) return
 
         currentChannelId = trimmed

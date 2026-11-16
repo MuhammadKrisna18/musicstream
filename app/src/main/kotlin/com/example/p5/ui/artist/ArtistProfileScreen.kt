@@ -1,5 +1,6 @@
 package com.example.p5.ui.artist
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,9 +32,16 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -40,18 +49,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.p5.R
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.artist.components.ArtistAlbumsSection
 import com.example.p5.ui.artist.components.ArtistHeaderSection
 import com.example.p5.ui.artist.components.ArtistTopSongsSection
 import com.example.p5.ui.common.AppViewModelProvider
+import com.example.p5.ui.components.FullPlayerSheet
+import com.example.p5.ui.components.MiniPlayer
+import com.example.p5.ui.components.SongActionBottomSheet
 import com.example.p5.ui.components.SongItem
+import com.example.p5.ui.library.LibraryViewModel
+import com.example.p5.ui.player.PlayerViewModel
 import com.example.p5.ui.theme.ObsidianBackground
+import com.example.p5.ui.theme.ObsidianBlack
 import com.example.p5.ui.theme.ObsidianSurface
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.VelvetPrimary
+import com.example.p5.ui.theme.rememberDynamicPlayerPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,14 +79,20 @@ fun ArtistProfileScreen(
     onPlaylistClick: (Playlist) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ArtistProfileViewModel = viewModel(factory = AppViewModelProvider.Factory),
-    onMoreOptionsClick: ((Song) -> Unit)? = null
+    playerViewModel: PlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    libraryViewModel: LibraryViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    onNavigateToArtist: ((channelId: String, artistName: String) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val playerState by viewModel.playerState.collectAsStateWithLifecycle()
+    val playerState by playerViewModel.playerState.collectAsStateWithLifecycle()
+    val libraryUiState by libraryViewModel.uiState.collectAsStateWithLifecycle()
     val currentSongId = playerState.currentSong?.id
 
+    var isFullPlayerVisible by remember { mutableStateOf(false) }
+    var selectedSongForMenu by remember { mutableStateOf<Song?>(null) }
+
     LaunchedEffect(channelId) {
-        viewModel.loadArtist(channelId)
+        viewModel.loadArtist(channelId, artistNameFallback)
     }
 
     Scaffold(
@@ -105,7 +128,7 @@ fun ArtistProfileScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = ObsidianBackground.copy(alpha = 0.95f)
+                    containerColor = ObsidianBackground.copy(alpha = 0.92f)
                 )
             )
         }
@@ -115,6 +138,29 @@ fun ArtistProfileScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.bg_anime_midnight),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(0.20f)
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                ObsidianBlack.copy(alpha = 0.70f),
+                                Color.Transparent,
+                                ObsidianBlack.copy(alpha = 0.90f)
+                            )
+                        )
+                    )
+            )
+
             when (val state = uiState) {
                 is ArtistProfileUiState.Loading -> {
                     Box(
@@ -128,43 +174,54 @@ fun ArtistProfileScreen(
                         )
                     }
                 }
+
                 is ArtistProfileUiState.Error -> {
-                    Column(
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = state.message,
-                            color = TextMuted,
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = { viewModel.loadArtist(channelId) },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = VelvetPrimary,
-                                contentColor = Color.Black
-                            ),
-                            shape = RoundedCornerShape(20.dp)
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Refresh,
-                                contentDescription = "Coba Lagi",
-                                modifier = Modifier.size(18.dp)
+                            Text(
+                                text = state.message,
+                                color = TextMuted,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
                             )
-                            Spacer(modifier = Modifier.size(6.dp))
-                            Text(text = "Coba Lagi", fontWeight = FontWeight.Bold)
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Button(
+                                onClick = { viewModel.loadArtist(channelId, artistNameFallback) },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = VelvetPrimary
+                                ),
+                                shape = RoundedCornerShape(20.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.size(8.dp))
+                                Text(
+                                    text = "Coba Lagi",
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
                         }
                     }
                 }
+
                 is ArtistProfileUiState.Success -> {
+                    val bottomPadding = if (playerState.currentSong != null) 92.dp else 24.dp
+
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 120.dp)
+                        contentPadding = PaddingValues(bottom = bottomPadding)
                     ) {
                         item(key = "header") {
                             ArtistHeaderSection(
@@ -179,7 +236,9 @@ fun ArtistProfileScreen(
                                 ArtistTopSongsSection(
                                     songs = state.profile.topSongs,
                                     currentPlayingSongId = currentSongId,
-                                    onSongClick = { viewModel.playSong(it, state.profile.topSongs) }
+                                    onSongClick = { song ->
+                                        viewModel.playSong(song, state.profile.topSongs)
+                                    }
                                 )
                             }
                         }
@@ -228,7 +287,9 @@ fun ArtistProfileScreen(
                                         isPlaying = isPlaying,
                                         isSelected = isPlaying,
                                         onClick = { viewModel.playSong(song, state.allSongs) },
-                                        onMoreOptionsClick = onMoreOptionsClick
+                                        onMoreOptionsClick = { songMenu ->
+                                            selectedSongForMenu = songMenu
+                                        }
                                     )
                                 }
                             }
@@ -265,6 +326,79 @@ fun ArtistProfileScreen(
                         }
                     }
                 }
+            }
+
+            if (playerState.currentSong != null) {
+                val miniPlayerPalette = rememberDynamicPlayerPalette(artworkUrl = playerState.currentSong?.thumbnailUrl)
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .navigationBarsPadding()
+                ) {
+                    MiniPlayer(
+                        playerState = playerState,
+                        onTogglePlayPause = playerViewModel::togglePlayPause,
+                        onOpenFullPlayer = { isFullPlayerVisible = true },
+                        onSkipNext = playerViewModel::playNext,
+                        accentColor = miniPlayerPalette.accent
+                    )
+                }
+            }
+
+            if (isFullPlayerVisible && playerState.currentSong != null) {
+                FullPlayerSheet(
+                    playerState = playerState,
+                    onTogglePlayPause = playerViewModel::togglePlayPause,
+                    onSeekTo = playerViewModel::seekTo,
+                    onSkipNext = playerViewModel::playNext,
+                    onSkipPrevious = playerViewModel::playPrevious,
+                    onToggleShuffle = playerViewModel::toggleShuffle,
+                    onToggleRepeatMode = playerViewModel::toggleRepeatMode,
+                    onPlayQueueIndex = playerViewModel::playQueueIndex,
+                    onMoveQueueItem = playerViewModel::moveQueueItem,
+                    onRemoveQueueItem = playerViewModel::removeQueueItem,
+                    onSetSleepTimerMinutes = playerViewModel::setSleepTimerMinutes,
+                    onSetSleepTimerEndOfTrack = playerViewModel::setSleepTimerEndOfTrack,
+                    onCancelSleepTimer = playerViewModel::cancelSleepTimer,
+                    onRetryFetchLyrics = playerViewModel::retryFetchLyrics,
+                    onToggleFavorite = playerViewModel::toggleFavoriteCurrentSong,
+                    onDismiss = { isFullPlayerVisible = false },
+                    onArtistClick = { nextChannelId, nextArtistName ->
+                        isFullPlayerVisible = false
+                        if (!nextChannelId.isNullOrBlank() && nextChannelId != channelId) {
+                            onNavigateToArtist?.invoke(nextChannelId, nextArtistName)
+                        }
+                    }
+                )
+            }
+
+            if (selectedSongForMenu != null) {
+                val isSongFavorite = libraryUiState.favoriteSongs.any { it.id == selectedSongForMenu?.id }
+                val isSongSaved = libraryUiState.savedSongs.any { it.id == selectedSongForMenu?.id }
+
+                SongActionBottomSheet(
+                    song = selectedSongForMenu,
+                    isSaved = isSongSaved,
+                    isFavorite = isSongFavorite,
+                    onDismiss = { selectedSongForMenu = null },
+                    onToggleSave = { song -> libraryViewModel.toggleSaveSong(song) },
+                    onToggleFavorite = { song ->
+                        libraryViewModel.toggleFavorite(song)
+                        if (playerState.currentSong?.id == song.id) {
+                            playerViewModel.toggleFavoriteCurrentSong()
+                        }
+                    },
+                    onAddToQueueNext = { song ->
+                        playerViewModel.addToQueueNext(song)
+                    },
+                    onViewArtist = { nextChannelId, nextArtistName ->
+                        if (!nextChannelId.isNullOrBlank() && nextChannelId != channelId) {
+                            onNavigateToArtist?.invoke(nextChannelId, nextArtistName)
+                        }
+                    }
+                )
             }
         }
     }
