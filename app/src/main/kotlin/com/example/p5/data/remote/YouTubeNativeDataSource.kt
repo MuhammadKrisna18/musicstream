@@ -4,6 +4,7 @@ import com.example.p5.data.config.MusicConfig
 import com.example.p5.data.remote.innertube.InnerTubeFormatter
 import com.example.p5.data.remote.innertube.InnerTubeParser
 import com.example.p5.data.remote.innertube.InnerTubeSessionManager
+import com.example.p5.domain.model.ArtistProfile
 import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
@@ -76,6 +77,15 @@ class YouTubeNativeDataSource(
         } catch (_: Exception) {
         }
         emptyList()
+    }
+
+    suspend fun getArtistProfile(channelId: String): ArtistProfile = withContext(ioDispatcher) {
+        val jsonString = fetchBrowse(channelId)
+        parser.parseArtistProfile(channelId, jsonString)
+    }
+
+    suspend fun getArtistAllSongs(playlistId: String): List<Song> = withContext(ioDispatcher) {
+        getPlaylistTracks(playlistId)
     }
 
     suspend fun getAudioStream(videoId: String): AudioStream = withContext(ioDispatcher) {

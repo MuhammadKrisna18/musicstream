@@ -184,4 +184,128 @@ class InnerTubeParserTest {
         assertEquals("VLPLtestalbum", payload.playlists.first().id)
         assertEquals("Koleksi Lagu Jawa", payload.playlists.first().title)
     }
+
+    @Test
+    fun parseArtistProfile_parsesHeaderTopSongsAndAlbums() {
+        val json = """
+            {
+              "header": {
+                "musicImmersiveHeaderRenderer": {
+                  "title": { "runs": [ { "text": "Denny Caknan" } ] },
+                  "description": { "runs": [ { "text": "Penyanyi Dangdut dan Pop Jawa" } ] },
+                  "thumbnail": {
+                    "musicThumbnailRenderer": {
+                      "thumbnail": {
+                        "thumbnails": [ { "url": "https://example.com/denny.jpg" } ]
+                      }
+                    }
+                  },
+                  "subscriptionButton": {
+                    "subscribeButtonRenderer": {
+                      "subscriberCountText": {
+                        "runs": [ { "text": "7 Juta" } ]
+                      }
+                    }
+                  }
+                }
+              },
+              "contents": {
+                "singleColumnBrowseResultsRenderer": {
+                  "tabs": [
+                    {
+                      "tabRenderer": {
+                        "content": {
+                          "sectionListRenderer": {
+                            "contents": [
+                              {
+                                "musicShelfRenderer": {
+                                  "title": { "runs": [ { "text": "Lagu teratas" } ] },
+                                  "bottomEndpoint": {
+                                    "browseEndpoint": {
+                                      "browseId": "VLOLAK_all_songs"
+                                    }
+                                  },
+                                  "contents": [
+                                    {
+                                      "musicResponsiveListItemRenderer": {
+                                        "playlistItemData": { "videoId": "vid001" },
+                                        "flexColumns": [
+                                          {
+                                            "musicResponsiveListItemFlexColumnRenderer": {
+                                              "text": { "runs": [ { "text": "Negoro Angin" } ] }
+                                            }
+                                          },
+                                          {
+                                            "musicResponsiveListItemFlexColumnRenderer": {
+                                              "text": {
+                                                "runs": [
+                                                  {
+                                                    "text": "Denny Caknan",
+                                                    "navigationEndpoint": {
+                                                      "browseEndpoint": {
+                                                        "browseId": "UCrXRY_7SVVmc6TykwhRGUNQ"
+                                                      }
+                                                    }
+                                                  },
+                                                  { "text": " • " },
+                                                  { "text": "3:45" }
+                                                ]
+                                              }
+                                            }
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "musicCarouselShelfRenderer": {
+                                  "header": {
+                                    "musicCarouselShelfBasicHeaderRenderer": {
+                                      "title": { "runs": [ { "text": "Album" } ] }
+                                    }
+                                  },
+                                  "contents": [
+                                    {
+                                      "musicTwoRowItemRenderer": {
+                                        "title": { "runs": [ { "text": "Kalih Welasku" } ] },
+                                        "subtitle": { "runs": [ { "text": "Denny Caknan • 2023" } ] },
+                                        "navigationEndpoint": {
+                                          "browseEndpoint": {
+                                            "browseId": "MPREb_album1"
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+        """.trimIndent()
+
+        val profile = parser.parseArtistProfile("UCrXRY_7SVVmc6TykwhRGUNQ", json)
+        assertEquals("UCrXRY_7SVVmc6TykwhRGUNQ", profile.id)
+        assertEquals("Denny Caknan", profile.name)
+        assertEquals("https://example.com/denny.jpg", profile.avatarUrl)
+        assertEquals("7 Juta", profile.subscriberCount)
+        assertEquals("VLOLAK_all_songs", profile.allSongsPlaylistId)
+
+        assertEquals(1, profile.topSongs.size)
+        assertEquals("vid001", profile.topSongs.first().id)
+        assertEquals("Negoro Angin", profile.topSongs.first().title)
+        assertEquals("UCrXRY_7SVVmc6TykwhRGUNQ", profile.topSongs.first().channelId)
+
+        assertEquals(1, profile.albums.size)
+        assertEquals("MPREb_album1", profile.albums.first().id)
+        assertEquals("Kalih Welasku", profile.albums.first().title)
+    }
 }
