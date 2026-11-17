@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,9 +34,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import java.util.Locale
 import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
-import com.example.p5.domain.model.SearchSortOrder
+import com.example.p5.domain.model.SearchFilter
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
+import com.example.p5.ui.search.components.ArtistSearchItem
 import com.example.p5.ui.search.components.CategoryGridSection
 import com.example.p5.ui.search.components.EditorialHeroCard
 import com.example.p5.ui.search.components.GenreFilterRow
@@ -43,10 +45,12 @@ import com.example.p5.ui.search.components.HomeTrackSection
 import com.example.p5.ui.search.components.PlaylistDetailContent
 import com.example.p5.ui.search.components.PlaylistRowSection
 import com.example.p5.ui.search.components.SearchBarField
+import com.example.p5.ui.search.components.SearchArtistItem
 import com.example.p5.ui.search.components.SearchEmptyState
 import com.example.p5.ui.search.components.SearchErrorState
+import com.example.p5.ui.search.components.SearchFilterBar
 import com.example.p5.ui.search.components.SearchHistorySection
-import com.example.p5.ui.search.components.SearchSortBar
+import com.example.p5.ui.search.components.SearchPlaylistItem
 import com.example.p5.ui.search.components.SearchTopHeader
 import com.example.p5.ui.search.components.SectionDetailContent
 import com.example.p5.ui.search.components.rememberShimmerBrush
@@ -62,7 +66,8 @@ fun SearchScreen(
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
     onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) },
-    onMoreOptionsClick: (Song) -> Unit = {}
+    onMoreOptionsClick: (Song) -> Unit = {},
+    onArtistClick: (channelId: String, artistName: String) -> Unit = { _, _ -> }
 ) {
     val query by searchViewModel.query.collectAsStateWithLifecycle()
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
@@ -76,7 +81,7 @@ fun SearchScreen(
     val selectedPlaylistTracks by searchViewModel.selectedPlaylistTracks.collectAsStateWithLifecycle()
     val isPlaylistLoading by searchViewModel.isPlaylistLoading.collectAsStateWithLifecycle()
     val isGenreLoading by searchViewModel.isGenreLoading.collectAsStateWithLifecycle()
-    val searchSortOrder by searchViewModel.searchSortOrder.collectAsStateWithLifecycle()
+    val searchFilter by searchViewModel.searchFilter.collectAsStateWithLifecycle()
     val isHomeLoading by searchViewModel.isHomeLoading.collectAsStateWithLifecycle()
     val isRefreshing by searchViewModel.isRefreshing.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
@@ -264,13 +269,53 @@ fun SearchScreen(
                             }
 
                             is SearchUiState.Success -> {
-                                val sortedSongs = remember(state.songs, searchSortOrder) {
-                                    when (searchSortOrder) {
-                                        SearchSortOrder.RELEVANCE -> state.songs
-                                        SearchSortOrder.MOST_POPULAR -> state.songs.sortedByDescending { it.viewCount }
-                                        SearchSortOrder.DURATION -> state.songs.sortedByDescending { it.durationSeconds }
-                                        SearchSortOrder.TITLE_AZ -> state.songs.sortedBy { it.title.lowercase(Locale.ROOT) }
+                                val albums = remember(state.playlists) {
+                                    state.playlists.filter {
+                                        it.id.startsWith("MPRE") ||
+                                            it.subtitle.contains("album", ignoreCase = true) ||
+                                            it.title.contains("album", ignoreCase = true)
                                     }
+                                }
+
+                                val playlistsOnly = remember(state.playlists) {
+                                    state.playlists.filter {
+                                        !it.id.startsWith("MPRE") &&
+                                            !it.subtitle.contains("album", ignoreCase = true) &&
+                                            !it.title.contains("album", ignoreCase = true)
+                                    }
+                                }
+
+                                val matchingArtists = remember(state.songs, state.playlists) {
+                                    val artistList = mutableListOf<ArtistSearchItem>()
+                                    val seenNames = mutableSetOf<String>()
+
+                                    for (song in state.songs) {
+                                        val name = song.artist.trim()
+                                        if (name.isNotBlank() && name != "YouTube Music" && seenNames.add(name.lowercase(Locale.ROOT))) {
+                                            artistList.add(
+                                                ArtistSearchItem(
+                                                    name = name,
+                                                    channelId = song.channelId ?: "",
+                                                    thumbnailUrl = song.thumbnailUrl
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    for (pl in state.playlists) {
+                                        val name = pl.subtitle.trim()
+                                        if (name.isNotBlank() && name != "YouTube Music" && seenNames.add(name.lowercase(Locale.ROOT))) {
+                                            artistList.add(
+                                                ArtistSearchItem(
+                                                    name = name,
+                                                    channelId = if (pl.id.startsWith("UC")) pl.id else "",
+                                                    thumbnailUrl = pl.thumbnailUrl
+                                                )
+                                            )
+                                        }
+                                    }
+
+                                    artistList
                                 }
 
                                 LazyColumn(
@@ -278,43 +323,141 @@ fun SearchScreen(
                                     contentPadding = PaddingValues(bottom = BottomScrollPadding),
                                     verticalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
-                                    if (state.playlists.isNotEmpty()) {
-                                        item(key = "search_playlists_row") {
-                                            PlaylistRowSection(
-                                                title = stringResource(R.string.search_playlists_title),
-                                                subtitle = stringResource(R.string.search_playlists_subtitle),
-                                                playlists = state.playlists,
-                                                onPlaylistClick = searchViewModel::onPlaylistSelectedFromSearch,
-                                                modifier = Modifier.padding(bottom = 8.dp)
-                                            )
-                                        }
+                                    item(key = "search_filter_bar") {
+                                        SearchFilterBar(
+                                            selectedFilter = searchFilter,
+                                            onSelectFilter = searchViewModel::setSearchFilter,
+                                            modifier = Modifier.padding(bottom = 6.dp)
+                                        )
                                     }
 
-                                    if (sortedSongs.isNotEmpty()) {
-                                        item(key = "search_sort_bar") {
-                                            SearchSortBar(
-                                                selectedOrder = searchSortOrder,
-                                                onSelectOrder = searchViewModel::setSearchSortOrder,
-                                                modifier = Modifier.padding(bottom = 4.dp)
-                                            )
+                                    when (searchFilter) {
+                                        SearchFilter.ALL -> {
+                                            if (state.playlists.isNotEmpty()) {
+                                                item(key = "search_playlists_row") {
+                                                    PlaylistRowSection(
+                                                        title = stringResource(R.string.search_playlists_title),
+                                                        subtitle = stringResource(R.string.search_playlists_subtitle),
+                                                        playlists = state.playlists,
+                                                        onPlaylistClick = searchViewModel::onPlaylistSelectedFromSearch,
+                                                        modifier = Modifier.padding(bottom = 8.dp)
+                                                    )
+                                                }
+                                            }
+
+                                            itemsIndexed(
+                                                items = state.songs,
+                                                key = { _, item -> item.id }
+                                            ) { index, song ->
+                                                val isSelected = playerState.currentSong?.id == song.id
+
+                                                SongItem(
+                                                    song = song,
+                                                    isPlaying = playerState.isPlaying,
+                                                    isSelected = isSelected,
+                                                    onClick = {
+                                                        searchViewModel.onSongSelectedFromSearch(song)
+                                                        onPlayQueue(state.songs, index)
+                                                    },
+                                                    onMoreOptionsClick = onMoreOptionsClick
+                                                )
+                                            }
                                         }
 
-                                        itemsIndexed(
-                                            items = sortedSongs,
-                                            key = { _, item -> item.id }
-                                        ) { index, song ->
-                                            val isSelected = playerState.currentSong?.id == song.id
+                                        SearchFilter.SONGS -> {
+                                            if (state.songs.isNotEmpty()) {
+                                                itemsIndexed(
+                                                    items = state.songs,
+                                                    key = { _, item -> item.id }
+                                                ) { index, song ->
+                                                    val isSelected = playerState.currentSong?.id == song.id
 
-                                            SongItem(
-                                                song = song,
-                                                isPlaying = playerState.isPlaying,
-                                                isSelected = isSelected,
-                                                onClick = {
-                                                    searchViewModel.onSongSelectedFromSearch(song)
-                                                    onPlayQueue(sortedSongs, index)
-                                                },
-                                                onMoreOptionsClick = onMoreOptionsClick
-                                            )
+                                                    SongItem(
+                                                        song = song,
+                                                        isPlaying = playerState.isPlaying,
+                                                        isSelected = isSelected,
+                                                        onClick = {
+                                                            searchViewModel.onSongSelectedFromSearch(song)
+                                                            onPlayQueue(state.songs, index)
+                                                        },
+                                                        onMoreOptionsClick = onMoreOptionsClick
+                                                    )
+                                                }
+                                            } else {
+                                                item {
+                                                    SearchEmptyState(
+                                                        query = "Lagu untuk \"$query\"",
+                                                        modifier = Modifier.padding(vertical = 32.dp)
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        SearchFilter.ALBUMS -> {
+                                            if (albums.isNotEmpty()) {
+                                                items(
+                                                    items = albums,
+                                                    key = { it.id }
+                                                ) { album ->
+                                                    SearchPlaylistItem(
+                                                        playlist = album,
+                                                        categoryBadge = "Album",
+                                                        onClick = { searchViewModel.onPlaylistSelectedFromSearch(album) }
+                                                    )
+                                                }
+                                            } else {
+                                                item {
+                                                    SearchEmptyState(
+                                                        query = "Album untuk \"$query\"",
+                                                        modifier = Modifier.padding(vertical = 32.dp)
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        SearchFilter.PLAYLISTS -> {
+                                            if (playlistsOnly.isNotEmpty()) {
+                                                items(
+                                                    items = playlistsOnly,
+                                                    key = { it.id }
+                                                ) { playlist ->
+                                                    SearchPlaylistItem(
+                                                        playlist = playlist,
+                                                        categoryBadge = "Playlist",
+                                                        onClick = { searchViewModel.onPlaylistSelectedFromSearch(playlist) }
+                                                    )
+                                                }
+                                            } else {
+                                                item {
+                                                    SearchEmptyState(
+                                                        query = "Playlist untuk \"$query\"",
+                                                        modifier = Modifier.padding(vertical = 32.dp)
+                                                    )
+                                                }
+                                            }
+                                        }
+
+                                        SearchFilter.ARTISTS -> {
+                                            if (matchingArtists.isNotEmpty()) {
+                                                items(
+                                                    items = matchingArtists,
+                                                    key = { it.name }
+                                                ) { artistItem ->
+                                                    SearchArtistItem(
+                                                        artist = artistItem,
+                                                        onClick = {
+                                                            onArtistClick(artistItem.channelId, artistItem.name)
+                                                        }
+                                                    )
+                                                }
+                                            } else {
+                                                item {
+                                                    SearchEmptyState(
+                                                        query = "Artis untuk \"$query\"",
+                                                        modifier = Modifier.padding(vertical = 32.dp)
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }

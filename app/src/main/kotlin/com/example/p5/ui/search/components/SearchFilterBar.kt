@@ -18,7 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.p5.domain.model.SearchSortOrder
+import com.example.p5.domain.model.SearchFilter
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.GlassBorderBright
@@ -29,17 +29,18 @@ import com.example.p5.ui.theme.TextPrimary
 import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
-fun SearchSortBar(
-    selectedOrder: SearchSortOrder,
-    onSelectOrder: (SearchSortOrder) -> Unit,
+fun SearchFilterBar(
+    selectedFilter: SearchFilter,
+    onSelectFilter: (SearchFilter) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val sortOptions = remember {
+    val filterOptions = remember {
         listOf(
-            SearchSortOrder.RELEVANCE to "Relevan",
-            SearchSortOrder.MOST_POPULAR to "Populer",
-            SearchSortOrder.DURATION to "Durasi",
-            SearchSortOrder.TITLE_AZ to "A - Z"
+            SearchFilter.ALL to "Semua",
+            SearchFilter.SONGS to "Lagu",
+            SearchFilter.ALBUMS to "Album",
+            SearchFilter.PLAYLISTS to "Playlist",
+            SearchFilter.ARTISTS to "Artis"
         )
     }
 
@@ -51,10 +52,10 @@ fun SearchSortBar(
         contentPadding = PaddingValues(vertical = 4.dp)
     ) {
         items(
-            items = sortOptions,
+            items = filterOptions,
             key = { it.first.name }
-        ) { (order, label) ->
-            val isSelected = selectedOrder == order
+        ) { (filter, label) ->
+            val isSelected = selectedFilter == filter
             val interactionSource = remember { MutableInteractionSource() }
 
             Box(
@@ -79,9 +80,10 @@ fun SearchSortBar(
                     )
                     .clickable(
                         interactionSource = interactionSource,
-                        indication = null
-                    ) { onSelectOrder(order) }
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                        indication = null,
+                        onClick = { onSelectFilter(filter) }
+                    )
+                    .padding(horizontal = 14.dp, vertical = 7.dp)
             ) {
                 Text(
                     text = label,

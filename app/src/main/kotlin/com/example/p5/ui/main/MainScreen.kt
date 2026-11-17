@@ -138,6 +138,7 @@ fun MainScreen(
                             onSongClick = { song -> playerViewModel.playSong(song) },
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
                             onMoreOptionsClick = { song -> selectedSongForMenu = song },
+                            onArtistClick = onNavigateToArtist,
                             modifier = Modifier.fillMaxSize()
                         )
                     }

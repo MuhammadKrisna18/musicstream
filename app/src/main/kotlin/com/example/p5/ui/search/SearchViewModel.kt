@@ -6,7 +6,7 @@ import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Playlist
-import com.example.p5.domain.model.SearchSortOrder
+import com.example.p5.domain.model.SearchFilter
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
@@ -47,11 +47,11 @@ class SearchViewModel(
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
 
-    private val _searchSortOrder = MutableStateFlow(SearchSortOrder.RELEVANCE)
-    val searchSortOrder: StateFlow<SearchSortOrder> = _searchSortOrder.asStateFlow()
+    private val _searchFilter = MutableStateFlow(SearchFilter.ALL)
+    val searchFilter: StateFlow<SearchFilter> = _searchFilter.asStateFlow()
 
-    fun setSearchSortOrder(order: SearchSortOrder) {
-        _searchSortOrder.value = order
+    fun setSearchFilter(filter: SearchFilter) {
+        _searchFilter.value = filter
     }
 
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
@@ -300,6 +300,7 @@ class SearchViewModel(
         _selectedSection.value = null
         _selectedPlaylist.value = null
         _query.value = newQuery
+        _searchFilter.value = SearchFilter.ALL
         searchJob?.cancel()
 
         val trimmed = newQuery.trim()
