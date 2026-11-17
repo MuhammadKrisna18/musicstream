@@ -5,12 +5,36 @@ import java.util.Locale
 object InnerTubeFormatter {
 
     fun parseDurationToSeconds(formatted: String): Int {
+        if (formatted.isBlank()) return 0
         val parts = formatted.split(":").mapNotNull { it.trim().toIntOrNull() }
         return when (parts.size) {
             1 -> parts[0]
             2 -> parts[0] * 60 + parts[1]
             3 -> parts[0] * 3600 + parts[1] * 60 + parts[2]
-            else -> 210
+            else -> 0
+        }
+    }
+
+    fun parseViewCount(rawText: String): Long {
+        if (rawText.isBlank()) return 0L
+        val clean = rawText.lowercase(Locale.ROOT).trim()
+
+        val multiplier = when {
+            clean.contains("miliar") || clean.contains("milyar") || clean.contains("billion") || Regex("""\d\s*b\b""").containsMatchIn(clean) -> 1_000_000_000.0
+            clean.contains("jt") || clean.contains("juta") || clean.contains("million") || Regex("""\d\s*m\b""").containsMatchIn(clean) -> 1_000_000.0
+            clean.contains("rb") || clean.contains("ribu") || clean.contains("thousand") || Regex("""\d\s*k\b""").containsMatchIn(clean) -> 1_000.0
+            else -> 1.0
+        }
+
+        return if (multiplier > 1.0) {
+            val numberPattern = Regex("""[\d]+(?:[.,]\d+)?""")
+            val match = numberPattern.find(clean)?.value ?: return 0L
+            val normalizedNumber = match.replace(',', '.')
+            val doubleVal = normalizedNumber.toDoubleOrNull() ?: 0.0
+            (doubleVal * multiplier).toLong()
+        } else {
+            val digitsOnly = clean.filter { it.isDigit() }
+            digitsOnly.toLongOrNull() ?: 0L
         }
     }
 

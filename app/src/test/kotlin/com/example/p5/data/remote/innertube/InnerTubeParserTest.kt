@@ -308,4 +308,164 @@ class InnerTubeParserTest {
         assertEquals("MPREb_album1", profile.albums.first().id)
         assertEquals("Kalih Welasku", profile.albums.first().title)
     }
+
+    @Test
+    fun parseDurationToSeconds_handlesEmptyAndVariousFormats() {
+        assertEquals(0, InnerTubeFormatter.parseDurationToSeconds(""))
+        assertEquals(0, InnerTubeFormatter.parseDurationToSeconds("invalid"))
+        assertEquals(45, InnerTubeFormatter.parseDurationToSeconds("45"))
+        assertEquals(225, InnerTubeFormatter.parseDurationToSeconds("3:45"))
+        assertEquals(3725, InnerTubeFormatter.parseDurationToSeconds("1:02:05"))
+    }
+
+    @Test
+    fun parseViewCount_handlesIndonesianAndEnglishFormats() {
+        assertEquals(1_200_000L, InnerTubeFormatter.parseViewCount("1,2 jt x ditonton"))
+        assertEquals(1_200_000L, InnerTubeFormatter.parseViewCount("1.2M views"))
+        assertEquals(450_000L, InnerTubeFormatter.parseViewCount("450 rb x diputar"))
+        assertEquals(850_000L, InnerTubeFormatter.parseViewCount("850K views"))
+        assertEquals(12_345_678L, InnerTubeFormatter.parseViewCount("12.345.678 ditonton"))
+        assertEquals(12_345_678L, InnerTubeFormatter.parseViewCount("12,345,678 views"))
+        assertEquals(890L, InnerTubeFormatter.parseViewCount("890 ditonton"))
+        assertEquals(0L, InnerTubeFormatter.parseViewCount(""))
+    }
+
+    @Test
+    fun parseSongFromResponsive_extractsDurationFromFixedColumns() {
+        val json = org.json.JSONObject(
+            """
+            {
+              "playlistItemData": { "videoId": "sigar123" },
+              "flexColumns": [
+                {
+                  "musicResponsiveListItemFlexColumnRenderer": {
+                    "text": { "runs": [ { "text": "Sigar" } ] }
+                  }
+                },
+                {
+                  "musicResponsiveListItemFlexColumnRenderer": {
+                    "text": { "runs": [ { "text": "Denny Caknan" } ] }
+                  }
+                }
+              ],
+              "fixedColumns": [
+                {
+                  "musicResponsiveListItemFixedColumnRenderer": {
+                    "text": { "runs": [ { "text": "4:48" } ] }
+                  }
+                }
+              ]
+            }
+            """.trimIndent()
+        )
+
+        val song = parser.parseSongFromResponsive(json)
+        org.junit.Assert.assertNotNull(song)
+        assertEquals("sigar123", song!!.id)
+        assertEquals("Sigar", song.title)
+        assertEquals("Denny Caknan", song.artist)
+        assertEquals("4:48", song.durationFormatted)
+        assertEquals(288, song.durationSeconds)
+    }
+
+    @Test
+    fun parseSongFromResponsive_extractsDurationFromThirdFlexColumn() {
+        val json = org.json.JSONObject(
+            """
+            {
+              "playlistItemData": { "videoId": "sekti123" },
+              "flexColumns": [
+                {
+                  "musicResponsiveListItemFlexColumnRenderer": {
+                    "text": { "runs": [ { "text": "Sekti" } ] }
+                  }
+                },
+                {
+                  "musicResponsiveListItemFlexColumnRenderer": {
+                    "text": { "runs": [ { "text": "Denny Caknan" } ] }
+                  }
+                },
+                {
+                  "musicResponsiveListItemFlexColumnRenderer": {
+                    "text": { "runs": [ { "text": "Album Sekti" } ] }
+                  }
+                },
+                {
+                  "musicResponsiveListItemFlexColumnRenderer": {
+                    "text": { "runs": [ { "text": "5:12" } ] }
+                  }
+                }
+              ]
+            }
+            """.trimIndent()
+        )
+
+        val song = parser.parseSongFromResponsive(json)
+        org.junit.Assert.assertNotNull(song)
+        assertEquals("sekti123", song!!.id)
+        assertEquals("5:12", song.durationFormatted)
+        assertEquals(312, song.durationSeconds)
+    }
+
+    @Test
+    fun parseSongFromTwoRow_extractsDurationAndChannelIdFromSubtitle() {
+        val json = org.json.JSONObject(
+            """
+            {
+              "title": { "runs": [ { "text": "Cundamani" } ] },
+              "subtitle": {
+                "runs": [
+                  { "text": "Lagu" },
+                  { "text": " • " },
+                  {
+                    "text": "Denny Caknan",
+                    "navigationEndpoint": {
+                      "browseEndpoint": { "browseId": "UCrXRY_7SVVmc6TykwhRGUNQ" }
+                    }
+                  },
+                  { "text": " • " },
+                  { "text": "3:58" }
+                ]
+              },
+              "navigationEndpoint": {
+                "watchEndpoint": { "videoId": "cunda123" }
+              }
+            }
+            """.trimIndent()
+        )
+
+        val song = parser.parseSongFromTwoRow(json)
+        org.junit.Assert.assertNotNull(song)
+        assertEquals("cunda123", song!!.id)
+        assertEquals("Cundamani", song.title)
+        assertEquals("Denny Caknan", song.artist)
+        assertEquals("UCrXRY_7SVVmc6TykwhRGUNQ", song.channelId)
+        assertEquals("3:58", song.durationFormatted)
+        assertEquals(238, song.durationSeconds)
+    }
+
+    @Test
+    fun parseSongFromTwoRow_returnsEmptyDurationWhenMissing() {
+        val json = org.json.JSONObject(
+            """
+            {
+              "title": { "runs": [ { "text": "Dumes" } ] },
+              "subtitle": {
+                "runs": [
+                  { "text": "Wawes" }
+                ]
+              },
+              "navigationEndpoint": {
+                "watchEndpoint": { "videoId": "dumes123" }
+              }
+            }
+            """.trimIndent()
+        )
+
+        val song = parser.parseSongFromTwoRow(json)
+        org.junit.Assert.assertNotNull(song)
+        assertEquals("dumes123", song!!.id)
+        assertEquals("", song.durationFormatted)
+        assertEquals(0, song.durationSeconds)
+    }
 }

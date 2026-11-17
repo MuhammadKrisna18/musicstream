@@ -122,7 +122,7 @@ class InnerTubeParser {
                 val durationSimple = vr.optJSONObject("lengthText")?.optString("simpleText")
                     ?: vr.optJSONObject("lengthText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")
                     ?: ""
-                val durationFormatted = if (durationSimple.isNotEmpty()) durationSimple.replace('.', ':') else "3:30"
+                val durationFormatted = if (durationSimple.isNotEmpty()) durationSimple.replace('.', ':').trim() else ""
                 val durationSec = InnerTubeFormatter.parseDurationToSeconds(durationFormatted)
 
                 val isLikelyCompilation = durationSec > 600 || (durationSec > 360 && (
@@ -147,7 +147,7 @@ class InnerTubeParser {
                 val viewCountText = vr.optJSONObject("viewCountText")?.optString("simpleText")
                     ?: vr.optJSONObject("viewCountText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")
                     ?: ""
-                val viewCount = viewCountText.replace("[^0-9]".toRegex(), "").toLongOrNull() ?: 0L
+                val viewCount = InnerTubeFormatter.parseViewCount(viewCountText)
 
                 val channelId = vr.optJSONObject("ownerText")?.optJSONArray("runs")?.optJSONObject(0)?.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
                     ?: vr.optJSONObject("longBylineText")?.optJSONArray("runs")?.optJSONObject(0)?.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
@@ -636,43 +636,72 @@ class InnerTubeParser {
         if (title.isBlank()) return null
 
         var artist = "YouTube Music"
-        var durationFormatted = "3:30"
+        var durationFormatted = ""
         var viewCount = 0L
         var channelId: String? = null
 
-        if (flexColumns.length() > 1) {
-            val col1 = flexColumns.optJSONObject(1)?.optJSONObject("musicResponsiveListItemFlexColumnRenderer")
-            val runs = col1?.optJSONObject("text")?.optJSONArray("runs")
-            if (runs != null) {
-                val texts = mutableListOf<String>()
-                for (k in 0 until runs.length()) {
-                    val runObj = runs.optJSONObject(k)
-                    val t = runObj?.optString("text", "") ?: ""
-                    if (t.isNotBlank() && t != " • ") {
-                        texts.add(t)
-                    }
-                    if (channelId == null && runObj != null) {
-                        val bId = runObj.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
-                        if (!bId.isNullOrBlank() && (bId.startsWith("UC") || bId.startsWith("FE") || bId.startsWith("MP"))) {
-                            channelId = bId
+        val fixedColumns = responsive.optJSONArray("fixedColumns")
+        if (fixedColumns != null) {
+            for (i in 0 until fixedColumns.length()) {
+                val fixedCol = fixedColumns.optJSONObject(i)?.optJSONObject("musicResponsiveListItemFixedColumnRenderer")
+                val fixedRuns = fixedCol?.optJSONObject("text")?.optJSONArray("runs")
+                if (fixedRuns != null) {
+                    for (k in 0 until fixedRuns.length()) {
+                        val text = fixedRuns.optJSONObject(k)?.optString("text")?.trim() ?: ""
+                        if (text.matches(Regex("""^\d{1,2}:\d{2}(?::\d{2})?$"""))) {
+                            durationFormatted = text
+                            break
                         }
                     }
                 }
-                if (texts.isNotEmpty()) {
-                    artist = texts[0]
+                if (durationFormatted.isNotBlank()) break
+            }
+        }
+
+        for (colIdx in 1 until flexColumns.length()) {
+            val col = flexColumns.optJSONObject(colIdx)?.optJSONObject("musicResponsiveListItemFlexColumnRenderer")
+            val runs = col?.optJSONObject("text")?.optJSONArray("runs") ?: continue
+            val texts = mutableListOf<String>()
+            for (k in 0 until runs.length()) {
+                val runObj = runs.optJSONObject(k) ?: continue
+                val t = runObj.optString("text", "").trim()
+                if (t.isNotBlank() && t != "•") {
+                    texts.add(t)
                 }
-                for (t in texts) {
-                    if (t.matches(Regex("^\\d{1,2}:\\d{2}$"))) {
-                        durationFormatted = t
-                    } else if (t.contains("x ditonton", ignoreCase = true) || t.contains("views", ignoreCase = true) || t.contains("x diputar", ignoreCase = true)) {
-                        val digits = t.replace("[^0-9]".toRegex(), "").toLongOrNull()
-                        if (digits != null) {
-                            viewCount = if (t.contains("jt", ignoreCase = true) || t.contains("m", ignoreCase = true)) digits * 1_000_000L
-                            else if (t.contains("rb", ignoreCase = true) || t.contains("k", ignoreCase = true)) digits * 1_000L
-                            else digits
-                        }
+                if (channelId == null) {
+                    val bId = runObj.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
+                    if (!bId.isNullOrBlank() && (bId.startsWith("UC") || bId.startsWith("FE") || bId.startsWith("MP"))) {
+                        channelId = bId
                     }
                 }
+            }
+
+            if (colIdx == 1 && texts.isNotEmpty() && artist == "YouTube Music") {
+                val candidateArtist = texts.firstOrNull {
+                    it != "Lagu" && it != "Song" && it != "Video" && !it.matches(Regex("""^\d{1,2}:\d{2}(?::\d{2})?$""")) &&
+                        !it.contains("ditonton", ignoreCase = true) && !it.contains("views", ignoreCase = true) &&
+                        !it.contains("diputar", ignoreCase = true) && !it.contains("plays", ignoreCase = true)
+                }
+                if (!candidateArtist.isNullOrBlank()) {
+                    artist = candidateArtist
+                }
+            }
+
+            for (t in texts) {
+                if (durationFormatted.isBlank() && t.matches(Regex("""^\d{1,2}:\d{2}(?::\d{2})?$"""))) {
+                    durationFormatted = t
+                } else if (viewCount == 0L && (t.contains("ditonton", ignoreCase = true) || t.contains("views", ignoreCase = true) || t.contains("diputar", ignoreCase = true) || t.contains("plays", ignoreCase = true))) {
+                    viewCount = InnerTubeFormatter.parseViewCount(t)
+                }
+            }
+        }
+
+        if (durationFormatted.isBlank()) {
+            val lengthText = responsive.optJSONObject("lengthText")?.optString("simpleText")
+                ?: responsive.optJSONObject("lengthText")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text")
+                ?: ""
+            if (lengthText.isNotBlank()) {
+                durationFormatted = lengthText.replace('.', ':').trim()
             }
         }
 
@@ -719,11 +748,59 @@ class InnerTubeParser {
         val title = twoRow.optJSONObject("title")?.optJSONArray("runs")?.optJSONObject(0)?.optString("text") ?: ""
         if (title.isBlank()) return null
 
-        val subRuns = twoRow.optJSONObject("subtitle")?.optJSONArray("runs")
-        val artist = subRuns?.optJSONObject(0)?.optString("text") ?: "YouTube Music"
+        var artist = "YouTube Music"
+        var channelId: String? = null
+        var durationFormatted = ""
+        var viewCount = 0L
 
-        val channelId = subRuns?.optJSONObject(0)?.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
-            ?: twoRow.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
+        val subRuns = twoRow.optJSONObject("subtitle")?.optJSONArray("runs")
+        if (subRuns != null) {
+            val texts = mutableListOf<String>()
+            for (i in 0 until subRuns.length()) {
+                val runObj = subRuns.optJSONObject(i) ?: continue
+                val text = runObj.optString("text", "").trim()
+                if (text.isNotBlank() && text != "•") {
+                    texts.add(text)
+                }
+                if (channelId == null) {
+                    val bId = runObj.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
+                    if (!bId.isNullOrBlank() && (bId.startsWith("UC") || bId.startsWith("FE") || bId.startsWith("MP"))) {
+                        channelId = bId
+                    }
+                }
+            }
+
+            val candidateArtist = texts.firstOrNull {
+                it != "Lagu" && it != "Song" && it != "Video" && !it.matches(Regex("""^\d{1,2}:\d{2}(?::\d{2})?$""")) &&
+                    !it.contains("ditonton", ignoreCase = true) && !it.contains("views", ignoreCase = true) &&
+                    !it.contains("diputar", ignoreCase = true) && !it.contains("plays", ignoreCase = true)
+            }
+            if (!candidateArtist.isNullOrBlank()) {
+                artist = candidateArtist
+            }
+
+            for (text in texts) {
+                if (durationFormatted.isBlank() && text.matches(Regex("""^\d{1,2}:\d{2}(?::\d{2})?$"""))) {
+                    durationFormatted = text
+                } else if (viewCount == 0L && (text.contains("ditonton", ignoreCase = true) || text.contains("views", ignoreCase = true) || text.contains("diputar", ignoreCase = true) || text.contains("plays", ignoreCase = true))) {
+                    viewCount = InnerTubeFormatter.parseViewCount(text)
+                }
+            }
+        }
+
+        if (channelId == null) {
+            channelId = twoRow.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
+        }
+
+        if (durationFormatted.isBlank()) {
+            val overlayTime = twoRow.optJSONObject("thumbnailOverlay")
+                ?.optJSONObject("thumbnailOverlayTimeStatusRenderer")
+                ?.optJSONObject("text")
+                ?.optString("simpleText")
+            if (!overlayTime.isNullOrBlank()) {
+                durationFormatted = overlayTime.replace('.', ':').trim()
+            }
+        }
 
         var videoId = twoRow.optJSONObject("navigationEndpoint")
             ?.optJSONObject("watchEndpoint")
@@ -753,14 +830,17 @@ class InnerTubeParser {
             MusicConfig.THUMBNAIL_HQ_TEMPLATE.format(videoId)
         }
 
+        val durationSec = InnerTubeFormatter.parseDurationToSeconds(durationFormatted)
+
         return Song(
             id = videoId,
             title = title,
             artist = artist,
-            durationSeconds = 210,
-            durationFormatted = "3:30",
+            durationSeconds = durationSec,
+            durationFormatted = durationFormatted,
             thumbnailUrl = thumbnailUrl,
             webUrl = MusicConfig.WATCH_URL_TEMPLATE.format(videoId),
+            viewCount = viewCount,
             channelId = channelId
         )
     }
