@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.domain.model.RepeatMode
+import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.ActionButtonSizeSm
 import com.example.p5.ui.theme.ActionButtonSizeXl
@@ -53,6 +55,7 @@ import com.example.p5.ui.theme.PlayButtonSizeFull
 import com.example.p5.ui.theme.ScalePressedButton
 import com.example.p5.ui.theme.ScalePressedRound
 import com.example.p5.ui.theme.SpacingLg
+import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.StrokeWidthProgress
 import com.example.p5.ui.theme.TextMuted
 import com.example.p5.ui.theme.TextPrimary
@@ -111,10 +114,18 @@ fun PlayerControlsView(
             )
 
             val playSource = remember { MutableInteractionSource() }
+            val iconTint = if (accentColor.luminance() > 0.45f) ObsidianBlack else Color.White
             Box(
                 modifier = Modifier
                     .size(PlayButtonSizeFull)
                     .pressedScale(targetScale = ScalePressedButton, interactionSource = playSource)
+                    .glassBorder(
+                        shape = CircleShape,
+                        strokeWidth = StrokeWidthBorder,
+                        startColor = Color.White.copy(alpha = 0.45f),
+                        endColor = accentColor.copy(alpha = 0.20f),
+                        accentGlow = accentColor.copy(alpha = 0.50f)
+                    )
                     .clip(CircleShape)
                     .background(accentColor)
                     .clickable(
@@ -126,7 +137,7 @@ fun PlayerControlsView(
             ) {
                 if (isBuffering) {
                     CircularProgressIndicator(
-                        color = ObsidianBlack,
+                        color = iconTint,
                         strokeWidth = StrokeWidthProgress,
                         modifier = Modifier.size(IconSizeXl)
                     )
@@ -134,7 +145,7 @@ fun PlayerControlsView(
                     Icon(
                         imageVector = if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                         contentDescription = if (isPlaying) stringResource(R.string.action_pause) else stringResource(R.string.action_play),
-                        tint = ObsidianBlack,
+                        tint = iconTint,
                         modifier = Modifier.size(ActionButtonSizeSm)
                     )
                 }

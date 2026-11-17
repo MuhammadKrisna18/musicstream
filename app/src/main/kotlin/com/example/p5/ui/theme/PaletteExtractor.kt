@@ -15,6 +15,31 @@ import kotlinx.coroutines.withContext
 object PaletteExtractor {
     private val cache = LruCache<String, PlayerColorPalette>(60)
 
+    fun ensureAccessibleAccent(color: Color, fallback: Color = PlayerColorPalette.Default.vibrant): Color {
+        val r = color.red
+        val g = color.green
+        val b = color.blue
+        val max = maxOf(r, g, b)
+        val min = minOf(r, g, b)
+        val delta = max - min
+        val l = (max + min) / 2f
+        val s = if (delta == 0f) 0f else delta / (1f - kotlin.math.abs(2f * l - 1f))
+
+        return when {
+            s < 0.12f -> fallback
+            l < 0.45f -> {
+                val boost = 0.58f / maxOf(l, 0.01f)
+                Color(
+                    red = (r * boost).coerceIn(0f, 1f),
+                    green = (g * boost).coerceIn(0f, 1f),
+                    blue = (b * boost).coerceIn(0f, 1f),
+                    alpha = color.alpha
+                )
+            }
+            else -> color
+        }
+    }
+
     suspend fun extractFromUrl(context: Context, url: String?): PlayerColorPalette = withContext(Dispatchers.IO) {
         if (url.isNullOrBlank()) {
             return@withContext PlayerColorPalette.Default
@@ -53,12 +78,14 @@ object PaletteExtractor {
         val lightVibrant = Color(lightVibrantInt)
         val muted = Color(mutedInt)
 
-        val accent = when {
+        val rawAccent = when {
             palette.vibrantSwatch != null -> vibrant
             palette.lightVibrantSwatch != null -> lightVibrant
             palette.dominantSwatch != null -> dominant
             else -> defaultVibrant
         }
+
+        val accent = ensureAccessibleAccent(rawAccent, defaultVibrant)
 
         val result = PlayerColorPalette(
             dominant = dominant,

@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -202,6 +203,7 @@ fun MiniPlayer(
 
                     Spacer(modifier = Modifier.width(SpacingSm))
 
+                    val iconTint = if (accentColor.luminance() > 0.45f) ObsidianBlack else Color.White
                     if (playerState.isBuffering) {
                         CircularProgressIndicator(
                             color = accentColor,
@@ -216,6 +218,13 @@ fun MiniPlayer(
                                     targetScale = ScalePressedRound,
                                     interactionSource = playInteractionSource
                                 )
+                                .glassBorder(
+                                    shape = CircleShape,
+                                    strokeWidth = StrokeWidthBorder,
+                                    startColor = Color.White.copy(alpha = 0.40f),
+                                    endColor = accentColor.copy(alpha = 0.20f),
+                                    accentGlow = accentColor.copy(alpha = 0.45f)
+                                )
                                 .clip(CircleShape)
                                 .background(accentColor)
                                 .clickable(
@@ -228,7 +237,7 @@ fun MiniPlayer(
                             Icon(
                                 imageVector = if (playerState.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                                 contentDescription = null,
-                                tint = ObsidianBlack,
+                                tint = iconTint,
                                 modifier = Modifier.size(IconSizeStandard)
                             )
                         }
