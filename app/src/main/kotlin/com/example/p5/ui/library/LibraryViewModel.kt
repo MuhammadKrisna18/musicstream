@@ -1,6 +1,5 @@
 package com.example.p5.ui.library
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.LibrarySortOrder
@@ -8,8 +7,6 @@ import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.FavoriteRepository
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.SavedSongRepository
-import com.example.p5.playback.MediaCacheManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +22,6 @@ class LibraryViewModel(
 ) : ViewModel() {
 
     private val messageFlow = MutableStateFlow<String?>(null)
-    private val cacheSizeBytesFlow = MutableStateFlow(0L)
     private val _sortOrder = MutableStateFlow(LibrarySortOrder.LATEST_ADDED)
     val sortOrder: StateFlow<LibrarySortOrder> = _sortOrder.asStateFlow()
     private val _selectedArtist = MutableStateFlow<String?>(null)
@@ -47,36 +43,19 @@ class LibraryViewModel(
         favoriteRepository.getAllFavoriteSongs(),
         savedSongRepository.getAllSavedSongs(),
         historyRepository.getRecentlyPlayed(50),
-        messageFlow,
-        cacheSizeBytesFlow
-    ) { favorites, saved, history, message, cacheSize ->
+        messageFlow
+    ) { favorites, saved, history, message ->
         LibraryUiState(
             favoriteSongs = favorites,
             savedSongs = saved,
             historySongs = history,
-            message = message,
-            cacheSizeBytes = cacheSize
+            message = message
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = LibraryUiState()
     )
-
-    fun refreshCacheSize(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val size = MediaCacheManager.getCachedSizeBytes(context)
-            cacheSizeBytesFlow.value = size
-        }
-    }
-
-    fun clearStreamingCache(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            MediaCacheManager.clearCache(context)
-            cacheSizeBytesFlow.value = 0L
-            messageFlow.value = "Cache streaming dibersihkan"
-        }
-    }
 
     fun removeFavorite(songId: String) {
         viewModelScope.launch {

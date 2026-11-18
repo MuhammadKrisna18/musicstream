@@ -29,12 +29,9 @@
     <string name="library_subtitle_favorites">%1$d lagu disukai</string>
     <string name="library_subtitle_saved">%1$d lagu tersimpan</string>
     <string name="library_subtitle_history">%1$d trek pernah diputar</string>
-    <string name="library_check_update_desc">Cek Pembaruan</string>
     <string name="library_tab_favorites">Favorit (%1$d)</string>
     <string name="library_tab_saved">Tersimpan (%1$d)</string>
     <string name="library_tab_history">Riwayat (%1$d)</string>
-    <string name="library_cache_label">Cache Streaming: %1$s</string>
-    <string name="library_cache_clear">Bersihkan</string>
     <string name="library_empty_favorites_title">Belum Ada Lagu Favorit</string>
     <string name="library_empty_favorites_desc">Ketuk ikon hati pada lagu yang sedang diputar untuk menyimpannya ke koleksi favorit Anda.</string>
     <string name="library_empty_saved_title">Belum Ada Lagu Tersimpan</string>

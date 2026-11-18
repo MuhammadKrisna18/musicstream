@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,7 +25,6 @@ import com.example.p5.R
 import com.example.p5.domain.model.LibrarySortOrder
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
-import com.example.p5.ui.library.components.LibraryCacheBar
 import com.example.p5.ui.library.components.LibraryEmptyState
 import com.example.p5.ui.library.components.LibraryFilterBar
 import com.example.p5.ui.library.components.LibraryHistoryHeader
@@ -43,8 +41,6 @@ fun LibraryScreen(
     playerState: PlayerState,
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
-    currentVersion: String = "2.5.2",
-    onCheckForUpdate: () -> Unit = {},
     onPlayQueue: (List<Song>, Int) -> Unit = { list, idx -> onSongClick(list[idx]) },
     onMoreOptionsClick: (Song) -> Unit = {}
 ) {
@@ -54,12 +50,7 @@ fun LibraryScreen(
     val historySongs = uiState.historySongs
     val sortOrder by libraryViewModel.sortOrder.collectAsStateWithLifecycle()
     val selectedArtist by libraryViewModel.selectedArtist.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     var selectedTab by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(Unit) {
-        libraryViewModel.refreshCacheSize(context)
-    }
 
     val favoriteArtists = remember(favoriteSongs) {
         favoriteSongs.map { it.artist }.distinct().filter { it.isNotBlank() }.sorted()
@@ -109,8 +100,7 @@ fun LibraryScreen(
             selectedTab = selectedTab,
             favoriteCount = favoriteSongs.size,
             savedCount = savedSongs.size,
-            historyCount = historySongs.size,
-            onCheckForUpdate = onCheckForUpdate
+            historyCount = historySongs.size
         )
 
         Spacer(modifier = Modifier.height(14.dp))
@@ -127,13 +117,6 @@ fun LibraryScreen(
         )
 
         Spacer(modifier = Modifier.height(SpacingMd))
-
-        LibraryCacheBar(
-            cacheSizeBytes = uiState.cacheSizeBytes,
-            onClearCache = { libraryViewModel.clearStreamingCache(context) }
-        )
-
-        Spacer(modifier = Modifier.height(14.dp))
 
         when (selectedTab) {
             0 -> {

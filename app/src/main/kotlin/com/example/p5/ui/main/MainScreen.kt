@@ -149,8 +149,6 @@ fun MainScreen(
                             onSongClick = { song -> playerViewModel.playSong(song) },
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
                             onMoreOptionsClick = { song -> selectedSongForMenu = song },
-                            currentVersion = updateViewModel.currentVersionName,
-                            onCheckForUpdate = { updateViewModel.checkForUpdates(isManualCheck = true) },
                             modifier = Modifier.fillMaxSize()
                         )
                     }
