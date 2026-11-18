@@ -4,6 +4,7 @@
     <string name="app_title_stream">Stream</string>
 
     <string name="nav_home">Beranda</string>
+    <string name="nav_search">Cari</string>
     <string name="nav_library">Koleksi</string>
     <string name="nav_settings">Pengaturan</string>
 

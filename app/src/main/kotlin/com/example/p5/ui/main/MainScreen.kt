@@ -38,6 +38,7 @@ import com.example.p5.ui.components.FullPlayerSheet
 import com.example.p5.ui.components.MiniPlayer
 import com.example.p5.ui.components.SongActionBottomSheet
 import com.example.p5.ui.components.UpdateDialog
+import com.example.p5.ui.home.HomeScreen
 import com.example.p5.ui.library.LibraryScreen
 import com.example.p5.ui.library.LibraryViewModel
 import com.example.p5.ui.player.PlayerViewModel
@@ -146,6 +147,16 @@ fun MainScreen(
             ) { tab ->
                 when (tab) {
                     0 -> {
+                        HomeScreen(
+                            searchViewModel = searchViewModel,
+                            playerState = playerState,
+                            onSongClick = { song -> playerViewModel.playSong(song) },
+                            onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
+                            onMoreOptionsClick = { song -> selectedSongForMenu = song },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    1 -> {
                         SearchScreen(
                             searchViewModel = searchViewModel,
                             playerState = playerState,
@@ -156,7 +167,7 @@ fun MainScreen(
                             modifier = Modifier.fillMaxSize()
                         )
                     }
-                    1 -> {
+                    2 -> {
                         LibraryScreen(
                             libraryViewModel = libraryViewModel,
                             playerState = playerState,
@@ -166,7 +177,7 @@ fun MainScreen(
                             modifier = Modifier.fillMaxSize()
                         )
                     }
-                    2 -> {
+                    3 -> {
                         SettingsScreen(
                             settingsViewModel = settingsViewModel,
                             isCheckingUpdate = updateUiState.isChecking,
@@ -196,11 +207,7 @@ fun MainScreen(
                 FloatingDock(
                     selectedTab = selectedTab,
                     onTabSelected = { tab ->
-                        if (tab == 0 && selectedTab == 0) {
-                            searchViewModel.onQueryChanged("")
-                        } else {
-                            selectedTab = tab
-                        }
+                        selectedTab = tab
                     },
                     favoriteCount = libraryUiState.favoriteSongs.size
                 )
