@@ -23,11 +23,10 @@ import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.BottomScrollPadding
 import com.example.p5.ui.theme.CornerRadiusXs
 import com.example.p5.ui.theme.SpacingSm
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun LibrarySongList(
@@ -68,6 +67,8 @@ fun LibraryHistoryHeader(
     onClearHistory: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -77,14 +78,14 @@ fun LibraryHistoryHeader(
     ) {
         Text(
             text = stringResource(R.string.library_history_last_listened),
-            color = TextSecondary,
+            color = appColors.textSecondary,
             fontSize = 13.sp,
             fontWeight = FontWeight.Medium
         )
 
         Text(
             text = stringResource(R.string.library_history_clear),
-            color = ToscaPrimary,
+            color = appColors.accent,
             fontSize = 12.sp,
             fontWeight = FontWeight.SemiBold,
             modifier = Modifier

@@ -22,14 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.theme.ActionButtonSizeSm
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.SpacingLg
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun LibraryEmptyState(
@@ -38,6 +33,8 @@ fun LibraryEmptyState(
     description: String,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -48,19 +45,19 @@ fun LibraryEmptyState(
             modifier = Modifier
                 .size(76.dp)
                 .clip(CircleShape)
-                .background(GlassFillLight)
+                .background(appColors.glassFillLight)
                 .glassBorder(
                     shape = CircleShape,
                     strokeWidth = StrokeWidthBorder,
-                    startColor = GlassBorderBright.copy(alpha = 0.35f),
-                    endColor = GlassBorderSubtle
+                    startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                    endColor = appColors.glassBorderSubtle
                 ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = ToscaPrimary,
+                tint = appColors.accent,
                 modifier = Modifier.size(ActionButtonSizeSm)
             )
         }
@@ -69,14 +66,14 @@ fun LibraryEmptyState(
 
         Text(
             text = title,
-            color = TextPrimary,
+            color = appColors.textPrimary,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
 
         Text(
             text = description,
-            color = TextSecondary,
+            color = appColors.textSecondary,
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(horizontal = 32.dp, vertical = 6.dp)

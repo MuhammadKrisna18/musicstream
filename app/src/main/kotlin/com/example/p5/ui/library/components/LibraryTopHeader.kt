@@ -9,8 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun LibraryTopHeader(
@@ -20,10 +19,12 @@ fun LibraryTopHeader(
     historyCount: Int,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
+
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.library_title),
-            color = TextPrimary,
+            color = appColors.textPrimary,
             fontSize = 24.sp,
             fontWeight = FontWeight.ExtraBold,
             letterSpacing = (-0.5).sp
@@ -34,7 +35,7 @@ fun LibraryTopHeader(
                 1 -> stringResource(R.string.library_subtitle_saved, savedCount)
                 else -> stringResource(R.string.library_subtitle_history, historyCount)
             },
-            color = TextSecondary,
+            color = appColors.textSecondary,
             fontSize = 12.sp
         )
     }

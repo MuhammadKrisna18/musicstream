@@ -26,18 +26,13 @@ import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.CornerRadiusPill
 import com.example.p5.ui.theme.CornerRadiusTab
 import com.example.p5.ui.theme.DurationFast
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
 import com.example.p5.ui.theme.ScalePressedCard
 import com.example.p5.ui.theme.SpacingXs
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun LibraryTabBar(
@@ -48,18 +43,19 @@ fun LibraryTabBar(
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val tabContainerShape = remember { RoundedCornerShape(CornerRadiusPill) }
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(tabContainerShape)
-            .background(GlassFillLight)
+            .background(appColors.glassFillLight)
             .glassBorder(
                 shape = tabContainerShape,
                 strokeWidth = StrokeWidthBorder,
-                startColor = GlassBorderBright.copy(alpha = 0.35f),
-                endColor = GlassBorderSubtle
+                startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                endColor = appColors.glassBorderSubtle
             )
             .padding(SpacingXs),
         horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -76,13 +72,13 @@ fun LibraryTabBar(
             val itemSource = remember { MutableInteractionSource() }
 
             val itemBg by animateColorAsState(
-                targetValue = if (selected) ToscaPrimary.copy(alpha = 0.16f) else Color.Transparent,
+                targetValue = if (selected) appColors.accent.copy(alpha = 0.16f) else Color.Transparent,
                 animationSpec = tween(DurationFast),
                 label = "tab_bg"
             )
 
             val textColor by animateColorAsState(
-                targetValue = if (selected) ToscaPrimary else TextSecondary,
+                targetValue = if (selected) appColors.accent else appColors.textSecondary,
                 animationSpec = tween(DurationFast),
                 label = "tab_text"
             )
@@ -98,8 +94,8 @@ fun LibraryTabBar(
                             Modifier.glassBorder(
                                 shape = itemShape,
                                 strokeWidth = StrokeWidthBorder,
-                                startColor = ToscaGlassBorder,
-                                endColor = GlassBorderSubtle
+                                startColor = appColors.accent.copy(alpha = 0.4f),
+                                endColor = appColors.glassBorderSubtle
                             )
                         } else {
                             Modifier

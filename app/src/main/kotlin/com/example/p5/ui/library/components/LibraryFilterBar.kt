@@ -23,12 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.example.p5.domain.model.LibrarySortOrder
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun LibraryFilterBar(
@@ -39,6 +34,7 @@ fun LibraryFilterBar(
     onArtistSelected: (String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val sortOptions = remember {
         listOf(
             LibrarySortOrder.LATEST_ADDED to "Terbaru",
@@ -73,14 +69,14 @@ fun LibraryFilterBar(
                             interactionSource = interactionSource
                         )
                         .clip(chipShape)
-                        .background(if (isSelected) ToscaPrimary else GlassFillLight)
+                        .background(if (isSelected) appColors.accent else appColors.glassFillLight)
                         .then(
                             if (!isSelected) {
                                 Modifier.glassBorder(
                                     shape = chipShape,
                                     strokeWidth = 1.dp,
-                                    startColor = GlassBorderBright.copy(alpha = 0.35f),
-                                    endColor = GlassBorderSubtle
+                                    startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                                    endColor = appColors.glassBorderSubtle
                                 )
                             } else {
                                 Modifier
@@ -94,7 +90,7 @@ fun LibraryFilterBar(
                 ) {
                     Text(
                         text = label,
-                        color = if (isSelected) ObsidianBlack else TextPrimary,
+                        color = if (isSelected) appColors.onAccent else appColors.textPrimary,
                         fontSize = 12.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                     )
@@ -119,14 +115,14 @@ fun LibraryFilterBar(
                                 interactionSource = interactionSource
                             )
                             .clip(chipShape)
-                            .background(if (isAllSelected) ToscaPrimary else GlassFillLight)
+                            .background(if (isAllSelected) appColors.accent else appColors.glassFillLight)
                             .then(
                                 if (!isAllSelected) {
                                     Modifier.glassBorder(
                                         shape = chipShape,
                                         strokeWidth = 1.dp,
-                                        startColor = GlassBorderBright.copy(alpha = 0.35f),
-                                        endColor = GlassBorderSubtle
+                                        startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                                        endColor = appColors.glassBorderSubtle
                                     )
                                 } else {
                                     Modifier
@@ -140,7 +136,7 @@ fun LibraryFilterBar(
                     ) {
                         Text(
                             text = "Semua Artis",
-                            color = if (isAllSelected) ObsidianBlack else TextPrimary,
+                            color = if (isAllSelected) appColors.onAccent else appColors.textPrimary,
                             fontSize = 12.sp,
                             fontWeight = if (isAllSelected) FontWeight.Bold else FontWeight.Medium
                         )
@@ -161,14 +157,14 @@ fun LibraryFilterBar(
                                 interactionSource = interactionSource
                             )
                             .clip(chipShape)
-                            .background(if (isSelected) ToscaPrimary else GlassFillLight)
+                            .background(if (isSelected) appColors.accent else appColors.glassFillLight)
                             .then(
                                 if (!isSelected) {
                                     Modifier.glassBorder(
                                         shape = chipShape,
                                         strokeWidth = 1.dp,
-                                        startColor = GlassBorderBright.copy(alpha = 0.35f),
-                                        endColor = GlassBorderSubtle
+                                        startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                                        endColor = appColors.glassBorderSubtle
                                     )
                                 } else {
                                     Modifier
@@ -188,7 +184,7 @@ fun LibraryFilterBar(
                     ) {
                         Text(
                             text = artist,
-                            color = if (isSelected) ObsidianBlack else TextPrimary,
+                            color = if (isSelected) appColors.onAccent else appColors.textPrimary,
                             fontSize = 12.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                         )
