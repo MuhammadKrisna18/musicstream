@@ -19,8 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -39,9 +37,6 @@ import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.search.components.ArtistSearchItem
 import com.example.p5.ui.search.components.CategoryGridSection
-import com.example.p5.ui.search.components.EditorialHeroCard
-import com.example.p5.ui.search.components.GenreFilterRow
-import com.example.p5.ui.search.components.HomeTrackSection
 import com.example.p5.ui.search.components.PlaylistDetailContent
 import com.example.p5.ui.search.components.PlaylistRowSection
 import com.example.p5.ui.search.components.SearchBarField
@@ -51,14 +46,9 @@ import com.example.p5.ui.search.components.SearchErrorState
 import com.example.p5.ui.search.components.SearchFilterBar
 import com.example.p5.ui.search.components.SearchHistorySection
 import com.example.p5.ui.search.components.SearchPlaylistItem
-import com.example.p5.ui.search.components.SearchTopHeader
-import com.example.p5.ui.search.components.SectionDetailContent
-import com.example.p5.ui.search.components.rememberShimmerBrush
-import com.example.p5.ui.search.components.searchShimmerSkeleton
 import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.BottomScrollPadding
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel,
@@ -72,30 +62,18 @@ fun SearchScreen(
     val query by searchViewModel.query.collectAsStateWithLifecycle()
     val uiState by searchViewModel.uiState.collectAsStateWithLifecycle()
     val searchHistory by searchViewModel.searchHistory.collectAsStateWithLifecycle()
-    val homeSections by searchViewModel.homeSections.collectAsStateWithLifecycle()
     val categories by searchViewModel.categories.collectAsStateWithLifecycle()
-    val selectedGenre by searchViewModel.selectedGenre.collectAsStateWithLifecycle()
-    val selectedSection by searchViewModel.selectedSection.collectAsStateWithLifecycle()
-    val curatedPlaylists by searchViewModel.curatedPlaylists.collectAsStateWithLifecycle()
+    val searchFilter by searchViewModel.searchFilter.collectAsStateWithLifecycle()
     val selectedPlaylist by searchViewModel.selectedPlaylist.collectAsStateWithLifecycle()
     val selectedPlaylistTracks by searchViewModel.selectedPlaylistTracks.collectAsStateWithLifecycle()
     val isPlaylistLoading by searchViewModel.isPlaylistLoading.collectAsStateWithLifecycle()
-    val isGenreLoading by searchViewModel.isGenreLoading.collectAsStateWithLifecycle()
-    val searchFilter by searchViewModel.searchFilter.collectAsStateWithLifecycle()
-    val isHomeLoading by searchViewModel.isHomeLoading.collectAsStateWithLifecycle()
-    val isRefreshing by searchViewModel.isRefreshing.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
-    val shimmerBrush = rememberShimmerBrush()
 
-    val editorialFeaturedTrack = remember(homeSections) {
-        homeSections.firstOrNull { it.tracks.isNotEmpty() }?.tracks?.firstOrNull()
-    }
-
-    BackHandler(enabled = selectedSection != null || selectedPlaylist != null) {
+    BackHandler(enabled = selectedPlaylist != null || query.isNotEmpty()) {
         if (selectedPlaylist != null) {
             searchViewModel.closePlaylistDetail()
         } else {
-            searchViewModel.closeSectionDetail()
+            searchViewModel.onQueryChanged("")
         }
     }
 
@@ -106,11 +84,11 @@ fun SearchScreen(
             .padding(horizontal = 16.dp)
     ) {
         AnimatedContent(
-            targetState = Pair(selectedSection, selectedPlaylist),
+            targetState = selectedPlaylist,
             transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "section_or_playlist_detail_or_home",
+            label = "search_playlist_detail_or_search",
             modifier = Modifier.fillMaxSize()
-        ) { (currentSection, currentPlaylist) ->
+        ) { currentPlaylist ->
             if (currentPlaylist != null) {
                 PlaylistDetailContent(
                     playlist = currentPlaylist,
@@ -121,24 +99,8 @@ fun SearchScreen(
                     onPlayQueue = onPlayQueue,
                     onMoreOptionsClick = onMoreOptionsClick
                 )
-            } else if (currentSection != null) {
-                SectionDetailContent(
-                    section = currentSection,
-                    playerState = playerState,
-                    onBackClick = searchViewModel::closeSectionDetail,
-                    onPlayQueue = onPlayQueue,
-                    onMoreOptionsClick = onMoreOptionsClick
-                )
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    SearchTopHeader(
-                        isRefreshing = isRefreshing,
-                        isPlaying = playerState.isPlaying,
-                        onRefresh = searchViewModel::refreshHomeFeed
-                    )
-
                     Spacer(modifier = Modifier.height(14.dp))
 
                     SearchBarField(
@@ -157,99 +119,36 @@ fun SearchScreen(
                     ) { state ->
                         when (state) {
                             SearchUiState.Idle -> {
-                                PullToRefreshBox(
-                                    isRefreshing = isRefreshing,
-                                    onRefresh = searchViewModel::refreshHomeFeed,
-                                    modifier = Modifier.fillMaxSize()
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(bottom = BottomScrollPadding),
+                                    verticalArrangement = Arrangement.spacedBy(16.dp)
                                 ) {
-                                    LazyColumn(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentPadding = PaddingValues(bottom = BottomScrollPadding),
-                                        verticalArrangement = Arrangement.spacedBy(18.dp)
-                                    ) {
-                                        if (searchHistory.isNotEmpty()) {
-                                            item {
-                                                SearchHistorySection(
-                                                    searchHistory = searchHistory,
-                                                    onSelectQuery = { selectedQuery ->
-                                                        focusManager.clearFocus()
-                                                        searchViewModel.selectHistoryQuery(selectedQuery)
-                                                    },
-                                                    onDeleteItem = searchViewModel::deleteSearchHistoryItem,
-                                                    onClearAll = searchViewModel::clearSearchHistory
-                                                )
-                                            }
+                                    if (searchHistory.isNotEmpty()) {
+                                        item(key = "search_history_section") {
+                                            SearchHistorySection(
+                                                searchHistory = searchHistory,
+                                                onSelectQuery = { selectedQuery ->
+                                                    focusManager.clearFocus()
+                                                    searchViewModel.selectHistoryQuery(selectedQuery)
+                                                },
+                                                onDeleteItem = searchViewModel::deleteSearchHistoryItem,
+                                                onClearAll = searchViewModel::clearSearchHistory
+                                            )
                                         }
+                                    }
 
-                                        if (categories.isNotEmpty()) {
-                                            item(key = "genre_filter_row") {
-                                                GenreFilterRow(
-                                                    genres = categories,
-                                                    selectedGenre = selectedGenre,
-                                                    onSelectGenre = searchViewModel::selectGenre
-                                                )
-                                            }
-                                        }
-
-                                        if (selectedGenre == null) {
-                                            if (editorialFeaturedTrack != null && query.isEmpty()) {
-                                                item(key = "editorial_hero") {
-                                                    EditorialHeroCard(
-                                                        song = editorialFeaturedTrack,
-                                                        isPlaying = playerState.isPlaying,
-                                                        isSelected = playerState.currentSong?.id == editorialFeaturedTrack.id,
-                                                        onClick = { onSongClick(editorialFeaturedTrack) }
+                                    if (categories.isNotEmpty()) {
+                                        item(key = "category_grid_section") {
+                                            CategoryGridSection(
+                                                categories = categories,
+                                                onCategoryClick = { category ->
+                                                    focusManager.clearFocus()
+                                                    searchViewModel.searchCategory(
+                                                        category.query.ifBlank { category.title }
                                                     )
                                                 }
-                                            }
-                                        }
-
-                                        if ((isHomeLoading && homeSections.isEmpty()) || isGenreLoading) {
-                                            searchShimmerSkeleton(shimmerBrush)
-                                        } else {
-                                            if (selectedGenre == null && curatedPlaylists.isNotEmpty()) {
-                                                item(key = "section_curated_playlists") {
-                                                    PlaylistRowSection(
-                                                        title = stringResource(R.string.section_playlists_title),
-                                                        subtitle = stringResource(R.string.section_playlists_subtitle),
-                                                        playlists = curatedPlaylists,
-                                                        onPlaylistClick = searchViewModel::openPlaylistDetail
-                                                    )
-                                                }
-                                            }
-
-                                            homeSections.forEach { section ->
-                                                if (section.tracks.isNotEmpty()) {
-                                                    item(key = section.id) {
-                                                        HomeTrackSection(
-                                                            section = section,
-                                                            isPlaying = playerState.isPlaying,
-                                                            currentSongId = playerState.currentSong?.id,
-                                                            onPlayQueue = onPlayQueue,
-                                                            onSeeAllClick = searchViewModel::openSectionDetail,
-                                                            onMoreOptionsClick = onMoreOptionsClick
-                                                        )
-                                                    }
-                                                }
-                                            }
-                                        }
-
-                                        if (selectedGenre != null && homeSections.isEmpty() && !isGenreLoading) {
-                                            item {
-                                                SearchEmptyState(
-                                                    query = selectedGenre?.title.orEmpty(),
-                                                    modifier = Modifier.padding(vertical = 32.dp)
-                                                )
-                                            }
-                                        }
-
-                                        if (selectedGenre == null && categories.isNotEmpty()) {
-                                            item {
-                                                CategoryGridSection(
-                                                    categories = categories,
-                                                    onCategoryClick = searchViewModel::selectGenre
-                                                )
-                                            }
+                                            )
                                         }
                                     }
                                 }
