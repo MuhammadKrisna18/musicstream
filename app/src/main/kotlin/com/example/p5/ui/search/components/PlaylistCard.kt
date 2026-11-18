@@ -42,21 +42,12 @@ import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.PlaylistType
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.ArtworkCardHeight
 import com.example.p5.ui.theme.ArtworkCardWidth
 import com.example.p5.ui.theme.CornerRadiusCardLg
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianCard
 import com.example.p5.ui.theme.ScalePressedCard
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun PlaylistCard(
@@ -65,6 +56,7 @@ fun PlaylistCard(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false
 ) {
+    val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val cardShape = remember { RoundedCornerShape(CornerRadiusCardLg) }
     val badgeShape = remember { RoundedCornerShape(6.dp) }
@@ -76,8 +68,8 @@ fun PlaylistCard(
     }
 
     val badgeAccent = when (playlist.type) {
-        PlaylistType.GENRE -> ToscaPrimary
-        PlaylistType.ARTIST -> Color(0xFFA78BFA)
+        PlaylistType.GENRE -> appColors.accent
+        PlaylistType.ARTIST -> appColors.accentSecondary
         PlaylistType.RANDOM -> Color(0xFFFBBF24)
     }
 
@@ -87,22 +79,22 @@ fun PlaylistCard(
             .height(ArtworkCardHeight)
             .pressedScale(targetScale = ScalePressedCard, interactionSource = interactionSource)
             .clip(cardShape)
-            .background(ObsidianCard)
+            .background(appColors.card)
             .then(
                 if (isSelected) {
                     Modifier.glassBorder(
                         shape = cardShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = ToscaGlassBorder,
-                        endColor = GlassBorderSubtle,
-                        accentGlow = ToscaPrimary.copy(alpha = 0.5f)
+                        startColor = appColors.accent.copy(alpha = 0.5f),
+                        endColor = appColors.glassBorderSubtle,
+                        accentGlow = appColors.accentGlow
                     )
                 } else {
                     Modifier.glassBorder(
                         shape = cardShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = GlassBorderBright.copy(alpha = 0.3f),
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.glassBorderBright.copy(alpha = 0.3f),
+                        endColor = appColors.glassBorderSubtle
                     )
                 }
             )
@@ -159,7 +151,7 @@ fun PlaylistCard(
                         colors = listOf(
                             Color.Transparent,
                             Color.Black.copy(alpha = 0.45f),
-                            ObsidianBlack.copy(alpha = 0.94f)
+                            appColors.card.copy(alpha = 0.94f)
                         ),
                         startY = 50f
                     )
@@ -177,12 +169,12 @@ fun PlaylistCard(
             Box(
                 modifier = Modifier
                     .clip(badgeShape)
-                    .background(ObsidianBlack.copy(alpha = 0.75f))
+                    .background(appColors.background.copy(alpha = 0.75f))
                     .glassBorder(
                         shape = badgeShape,
                         strokeWidth = StrokeWidthBorder,
                         startColor = badgeAccent.copy(alpha = 0.6f),
-                        endColor = GlassBorderSubtle
+                        endColor = appColors.glassBorderSubtle
                     )
                     .padding(horizontal = 6.dp, vertical = 3.dp)
             ) {
@@ -199,19 +191,19 @@ fun PlaylistCard(
                 modifier = Modifier
                     .size(26.dp)
                     .clip(CircleShape)
-                    .background(GlassFillLight)
+                    .background(appColors.glassFillLight)
                     .glassBorder(
                         shape = CircleShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = GlassBorderBright.copy(alpha = 0.4f),
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.glassBorderBright.copy(alpha = 0.4f),
+                        endColor = appColors.glassBorderSubtle
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Rounded.PlayArrow,
                     contentDescription = null,
-                    tint = ToscaPrimary,
+                    tint = appColors.accent,
                     modifier = Modifier.size(15.dp)
                 )
             }
@@ -225,7 +217,7 @@ fun PlaylistCard(
         ) {
             Text(
                 text = playlist.title,
-                color = if (isSelected) ToscaPrimary else TextPrimary,
+                color = if (isSelected) appColors.accent else appColors.textPrimary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 lineHeight = 17.sp,
@@ -243,7 +235,7 @@ fun PlaylistCard(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.QueueMusic,
                     contentDescription = null,
-                    tint = TextMuted,
+                    tint = appColors.textMuted,
                     modifier = Modifier.size(11.dp)
                 )
 
@@ -251,7 +243,7 @@ fun PlaylistCard(
 
                 Text(
                     text = playlist.subtitle,
-                    color = TextSecondary,
+                    color = appColors.textSecondary,
                     fontSize = 11.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

@@ -32,19 +32,14 @@ import coil.compose.AsyncImage
 import com.example.p5.domain.model.Playlist
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.ArtworkTrackSize
 import com.example.p5.ui.theme.CornerRadiusCard
 import com.example.p5.ui.theme.CornerRadiusMd
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.ScalePressedSubtle
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.StrokeWidthHairline
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
 
 @Composable
 fun SearchPlaylistItem(
@@ -53,6 +48,7 @@ fun SearchPlaylistItem(
     modifier: Modifier = Modifier,
     categoryBadge: String? = null
 ) {
+    val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val cardShape = remember { RoundedCornerShape(CornerRadiusCard) }
 
@@ -74,12 +70,12 @@ fun SearchPlaylistItem(
             modifier = Modifier
                 .size(ArtworkTrackSize)
                 .clip(RoundedCornerShape(CornerRadiusMd))
-                .background(ObsidianSurfaceVariant)
+                .background(appColors.surfaceVariant)
                 .glassBorder(
                     shape = RoundedCornerShape(CornerRadiusMd),
                     strokeWidth = StrokeWidthHairline,
-                    startColor = GlassBorderBright.copy(alpha = 0.35f),
-                    endColor = GlassBorderSubtle
+                    startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                    endColor = appColors.glassBorderSubtle
                 )
         ) {
             AsyncImage(
@@ -95,7 +91,7 @@ fun SearchPlaylistItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = playlist.title,
-                color = TextPrimary,
+                color = appColors.textPrimary,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -105,7 +101,7 @@ fun SearchPlaylistItem(
             val subtitleText = categoryBadge ?: playlist.subtitle
             Text(
                 text = subtitleText,
-                color = TextSecondary,
+                color = appColors.textSecondary,
                 fontSize = 13.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -116,7 +112,7 @@ fun SearchPlaylistItem(
         Icon(
             imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
             contentDescription = null,
-            tint = TextMuted,
+            tint = appColors.textMuted,
             modifier = Modifier.size(IconSizeStandard)
         )
     }

@@ -32,17 +32,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.CornerRadiusCard
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.ScalePressedSubtle
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.StrokeWidthHairline
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
 
 data class ArtistSearchItem(
     val name: String,
@@ -56,6 +51,7 @@ fun SearchArtistItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val cardShape = remember { RoundedCornerShape(CornerRadiusCard) }
 
@@ -77,12 +73,12 @@ fun SearchArtistItem(
             modifier = Modifier
                 .size(52.dp)
                 .clip(CircleShape)
-                .background(ObsidianSurfaceVariant)
+                .background(appColors.surfaceVariant)
                 .glassBorder(
                     shape = CircleShape,
                     strokeWidth = StrokeWidthHairline,
-                    startColor = GlassBorderBright.copy(alpha = 0.35f),
-                    endColor = GlassBorderSubtle
+                    startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                    endColor = appColors.glassBorderSubtle
                 )
         ) {
             AsyncImage(
@@ -98,7 +94,7 @@ fun SearchArtistItem(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = artist.name,
-                color = TextPrimary,
+                color = appColors.textPrimary,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
@@ -107,7 +103,7 @@ fun SearchArtistItem(
 
             Text(
                 text = "Artis",
-                color = TextSecondary,
+                color = appColors.textSecondary,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(top = 2.dp)
             )
@@ -116,7 +112,7 @@ fun SearchArtistItem(
         Icon(
             imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
             contentDescription = null,
-            tint = TextMuted,
+            tint = appColors.textMuted,
             modifier = Modifier.size(IconSizeStandard)
         )
     }

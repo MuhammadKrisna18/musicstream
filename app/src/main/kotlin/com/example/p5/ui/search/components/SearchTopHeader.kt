@@ -34,13 +34,7 @@ import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun SearchTopHeader(
@@ -49,6 +43,7 @@ fun SearchTopHeader(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val refreshTransition = rememberInfiniteTransition(label = "refresh_angle")
     val refreshAngle by refreshTransition.animateFloat(
         initialValue = 0f,
@@ -69,14 +64,14 @@ fun SearchTopHeader(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.app_title_music),
-                    color = TextPrimary,
+                    color = appColors.textPrimary,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = (-0.5).sp
                 )
                 Text(
                     text = stringResource(R.string.app_title_stream),
-                    color = ToscaPrimary,
+                    color = appColors.accent,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = (-0.5).sp
@@ -84,7 +79,7 @@ fun SearchTopHeader(
             }
             Text(
                 text = stringResource(R.string.home_subtitle),
-                color = TextSecondary,
+                color = appColors.textSecondary,
                 fontSize = 12.sp
             )
         }
@@ -97,12 +92,12 @@ fun SearchTopHeader(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .background(ToscaPrimary.copy(alpha = 0.12f))
+                        .background(appColors.accent.copy(alpha = 0.12f))
                         .glassBorder(
                             shape = RoundedCornerShape(12.dp),
                             strokeWidth = 1.dp,
-                            startColor = ToscaGlassBorder,
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.accent.copy(alpha = 0.35f),
+                            endColor = appColors.glassBorderSubtle
                         )
                         .padding(horizontal = 8.dp, vertical = 6.dp)
                 ) {
@@ -114,12 +109,12 @@ fun SearchTopHeader(
                 modifier = Modifier
                     .size(38.dp)
                     .clip(CircleShape)
-                    .background(GlassFillLight)
+                    .background(appColors.glassFillLight)
                     .glassBorder(
                         shape = CircleShape,
                         strokeWidth = 1.dp,
-                        startColor = GlassBorderBright.copy(alpha = 0.35f),
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                        endColor = appColors.glassBorderSubtle
                     )
                     .clickable(
                         enabled = !isRefreshing,
@@ -130,7 +125,7 @@ fun SearchTopHeader(
                 Icon(
                     imageVector = Icons.Rounded.Refresh,
                     contentDescription = stringResource(R.string.home_refresh_content_desc),
-                    tint = if (isRefreshing) ToscaPrimary else TextSecondary,
+                    tint = if (isRefreshing) appColors.accent else appColors.textSecondary,
                     modifier = Modifier
                         .size(20.dp)
                         .rotate(if (isRefreshing) refreshAngle else 0f)

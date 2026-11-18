@@ -38,20 +38,13 @@ import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.CornerRadiusHero
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.HeroBannerHeight
 import com.example.p5.ui.theme.IconSizeLg
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianCardHigh
 import com.example.p5.ui.theme.PlayButtonSizeHero
 import com.example.p5.ui.theme.ScalePressedSubtle
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun EditorialHeroCard(
@@ -61,6 +54,7 @@ fun EditorialHeroCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val cardShape = remember { RoundedCornerShape(CornerRadiusHero) }
 
@@ -70,12 +64,12 @@ fun EditorialHeroCard(
             .height(HeroBannerHeight)
             .pressedScale(targetScale = ScalePressedSubtle, interactionSource = interactionSource)
             .clip(cardShape)
-            .background(ObsidianCardHigh)
+            .background(appColors.cardHigh)
             .glassBorder(
                 shape = cardShape,
                 strokeWidth = StrokeWidthBorder,
-                startColor = GlassBorderBright.copy(alpha = 0.5f),
-                endColor = GlassBorderSubtle
+                startColor = appColors.glassBorderBright.copy(alpha = 0.5f),
+                endColor = appColors.glassBorderSubtle
             )
             .clickable(
                 interactionSource = interactionSource,
@@ -98,7 +92,7 @@ fun EditorialHeroCard(
                         colors = listOf(
                             Color.Black.copy(alpha = 0.25f),
                             Color.Black.copy(alpha = 0.65f),
-                            ObsidianBlack.copy(alpha = 0.94f)
+                            appColors.cardHigh.copy(alpha = 0.94f)
                         )
                     )
                 )
@@ -113,12 +107,12 @@ fun EditorialHeroCard(
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-                    .background(ToscaPrimary.copy(alpha = 0.2f))
+                    .background(appColors.accent.copy(alpha = 0.2f))
                     .glassBorder(
                         shape = RoundedCornerShape(12.dp),
                         strokeWidth = 1.dp,
-                        startColor = ToscaGlassBorder,
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.accent.copy(alpha = 0.35f),
+                        endColor = appColors.glassBorderSubtle
                     )
                     .padding(horizontal = 10.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -127,12 +121,12 @@ fun EditorialHeroCard(
                 Icon(
                     imageVector = Icons.Rounded.AutoAwesome,
                     contentDescription = null,
-                    tint = ToscaPrimary,
+                    tint = appColors.accent,
                     modifier = Modifier.size(14.dp)
                 )
                 Text(
                     text = stringResource(R.string.editorial_spotlight_badge),
-                    color = ToscaPrimary,
+                    color = appColors.accent,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 0.8.sp
@@ -147,7 +141,7 @@ fun EditorialHeroCard(
                 Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                     Text(
                         text = song.title,
-                        color = TextPrimary,
+                        color = appColors.textPrimary,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -155,7 +149,7 @@ fun EditorialHeroCard(
                     )
                     Text(
                         text = song.artist,
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         fontSize = 13.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
@@ -167,19 +161,19 @@ fun EditorialHeroCard(
                     modifier = Modifier
                         .size(PlayButtonSizeHero)
                         .clip(CircleShape)
-                        .background(ToscaPrimary),
+                        .background(appColors.accent),
                     contentAlignment = Alignment.Center
                 ) {
                     if (isSelected && isPlaying) {
                         MiniEqualizer(
-                            barColor = ObsidianBlack,
+                            barColor = appColors.onAccent,
                             isPlaying = true
                         )
                     } else {
                         Icon(
                             imageVector = Icons.Rounded.PlayArrow,
                             contentDescription = stringResource(R.string.action_play),
-                            tint = ObsidianBlack,
+                            tint = appColors.onAccent,
                             modifier = Modifier.size(IconSizeLg)
                         )
                     }

@@ -32,13 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun SearchHistorySection(
@@ -49,6 +43,8 @@ fun SearchHistorySection(
     modifier: Modifier = Modifier
 ) {
     if (searchHistory.isEmpty()) return
+
+    val appColors = AppTheme.colors
 
     Column(
         modifier = modifier
@@ -68,12 +64,12 @@ fun SearchHistorySection(
                 Icon(
                     imageVector = Icons.Rounded.History,
                     contentDescription = null,
-                    tint = ToscaPrimary,
+                    tint = appColors.accent,
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
                     text = stringResource(R.string.search_recent_title),
-                    color = TextPrimary,
+                    color = appColors.textPrimary,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -81,7 +77,7 @@ fun SearchHistorySection(
 
             Text(
                 text = stringResource(R.string.search_clear_all),
-                color = TextSecondary,
+                color = appColors.textSecondary,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
@@ -104,12 +100,12 @@ fun SearchHistorySection(
                             interactionSource = interactionSource
                         )
                         .clip(RoundedCornerShape(20.dp))
-                        .background(GlassFillLight)
+                        .background(appColors.glassFillLight)
                         .glassBorder(
                             shape = RoundedCornerShape(20.dp),
                             strokeWidth = 1.dp,
-                            startColor = GlassBorderBright.copy(alpha = 0.35f),
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                            endColor = appColors.glassBorderSubtle
                         )
                         .clickable(
                             interactionSource = interactionSource,
@@ -123,7 +119,7 @@ fun SearchHistorySection(
                     ) {
                         Text(
                             text = historyQuery,
-                            color = TextPrimary,
+                            color = appColors.textPrimary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -137,7 +133,7 @@ fun SearchHistorySection(
                             Icon(
                                 imageVector = Icons.Rounded.Close,
                                 contentDescription = stringResource(R.string.search_remove_item_desc),
-                                tint = TextMuted,
+                                tint = appColors.textMuted,
                                 modifier = Modifier.size(13.dp)
                             )
                         }

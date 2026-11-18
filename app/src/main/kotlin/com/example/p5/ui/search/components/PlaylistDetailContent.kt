@@ -50,22 +50,13 @@ import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.BottomScrollPadding
 import com.example.p5.ui.theme.CornerRadiusCard
 import com.example.p5.ui.theme.CornerRadiusCardLg
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.IconSizeMd
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianCard
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaDark
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun PlaylistDetailContent(
@@ -78,6 +69,7 @@ fun PlaylistDetailContent(
     onMoreOptionsClick: (Song) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val playAllInteraction = remember { MutableInteractionSource() }
     val shuffleInteraction = remember { MutableInteractionSource() }
     val backInteraction = remember { MutableInteractionSource() }
@@ -92,8 +84,8 @@ fun PlaylistDetailContent(
     }
 
     val badgeAccent = when (playlist.type) {
-        PlaylistType.GENRE -> ToscaPrimary
-        PlaylistType.ARTIST -> Color(0xFFA78BFA)
+        PlaylistType.GENRE -> appColors.accent
+        PlaylistType.ARTIST -> appColors.accentSecondary
         PlaylistType.RANDOM -> Color(0xFFFBBF24)
     }
 
@@ -111,12 +103,12 @@ fun PlaylistDetailContent(
                     .size(42.dp)
                     .pressedScale(interactionSource = backInteraction)
                     .clip(CircleShape)
-                    .background(ObsidianCard)
+                    .background(appColors.card)
                     .glassBorder(
                         shape = CircleShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = GlassBorderBright,
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.glassBorderBright,
+                        endColor = appColors.glassBorderSubtle
                     )
                     .clickable(
                         interactionSource = backInteraction,
@@ -127,7 +119,7 @@ fun PlaylistDetailContent(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = null,
-                    tint = TextPrimary,
+                    tint = appColors.textPrimary,
                     modifier = Modifier.size(IconSizeStandard)
                 )
             }
@@ -137,7 +129,7 @@ fun PlaylistDetailContent(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = playlist.title,
-                    color = TextPrimary,
+                    color = appColors.textPrimary,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-0.3).sp,
@@ -151,7 +143,7 @@ fun PlaylistDetailContent(
                 }
                 Text(
                     text = countText,
-                    color = TextSecondary,
+                    color = appColors.textSecondary,
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -163,12 +155,12 @@ fun PlaylistDetailContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(cardShape)
-                .background(ObsidianCard)
+                .background(appColors.card)
                 .glassBorder(
                     shape = cardShape,
                     strokeWidth = StrokeWidthBorder,
-                    startColor = GlassBorderBright.copy(alpha = 0.35f),
-                    endColor = GlassBorderSubtle
+                    startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                    endColor = appColors.glassBorderSubtle
                 )
                 .padding(14.dp)
         ) {
@@ -180,12 +172,12 @@ fun PlaylistDetailContent(
                     modifier = Modifier
                         .size(80.dp)
                         .clip(RoundedCornerShape(14.dp))
-                        .background(ObsidianBlack)
+                        .background(appColors.background)
                         .glassBorder(
                             shape = RoundedCornerShape(14.dp),
                             strokeWidth = StrokeWidthBorder,
                             startColor = badgeAccent.copy(alpha = 0.5f),
-                            endColor = GlassBorderSubtle
+                            endColor = appColors.glassBorderSubtle
                         )
                 ) {
                     if (playlist.thumbnailUrl.isNotBlank()) {
@@ -237,12 +229,12 @@ fun PlaylistDetailContent(
                     Box(
                         modifier = Modifier
                             .clip(badgeShape)
-                            .background(ObsidianBlack.copy(alpha = 0.75f))
+                            .background(appColors.background.copy(alpha = 0.75f))
                             .glassBorder(
                                 shape = badgeShape,
                                 strokeWidth = StrokeWidthBorder,
                                 startColor = badgeAccent.copy(alpha = 0.6f),
-                                endColor = GlassBorderSubtle
+                                endColor = appColors.glassBorderSubtle
                             )
                             .padding(horizontal = 6.dp, vertical = 2.dp)
                     ) {
@@ -259,7 +251,7 @@ fun PlaylistDetailContent(
 
                     Text(
                         text = playlist.title,
-                        color = TextPrimary,
+                        color = appColors.textPrimary,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold,
                         maxLines = 1,
@@ -270,7 +262,7 @@ fun PlaylistDetailContent(
 
                     Text(
                         text = playlist.subtitle,
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         fontSize = 12.sp,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
@@ -289,7 +281,7 @@ fun PlaylistDetailContent(
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
-                    color = ToscaPrimary,
+                    color = appColors.accent,
                     strokeWidth = 3.dp,
                     modifier = Modifier.size(36.dp)
                 )
@@ -309,14 +301,14 @@ fun PlaylistDetailContent(
                         .clip(buttonShape)
                         .background(
                             Brush.horizontalGradient(
-                                listOf(ToscaPrimary, ToscaDark)
+                                listOf(appColors.accent, appColors.accentDark)
                             )
                         )
                         .glassBorder(
                             shape = buttonShape,
                             strokeWidth = StrokeWidthBorder,
-                            startColor = ToscaGlassBorder,
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.accent.copy(alpha = 0.5f),
+                            endColor = appColors.glassBorderSubtle
                         )
                         .clickable(
                             interactionSource = playAllInteraction,
@@ -330,13 +322,13 @@ fun PlaylistDetailContent(
                     Icon(
                         imageVector = Icons.Rounded.PlayArrow,
                         contentDescription = null,
-                        tint = ObsidianBlack,
+                        tint = appColors.onAccent,
                         modifier = Modifier.size(IconSizeStandard)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(R.string.action_play_all),
-                        color = ObsidianBlack,
+                        color = appColors.onAccent,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -348,12 +340,12 @@ fun PlaylistDetailContent(
                         .height(44.dp)
                         .pressedScale(interactionSource = shuffleInteraction)
                         .clip(buttonShape)
-                        .background(ObsidianCard)
+                        .background(appColors.card)
                         .glassBorder(
                             shape = buttonShape,
                             strokeWidth = StrokeWidthBorder,
-                            startColor = GlassBorderBright,
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.glassBorderBright,
+                            endColor = appColors.glassBorderSubtle
                         )
                         .clickable(
                             interactionSource = shuffleInteraction,
@@ -367,13 +359,13 @@ fun PlaylistDetailContent(
                     Icon(
                         imageVector = Icons.Rounded.Shuffle,
                         contentDescription = null,
-                        tint = ToscaPrimary,
+                        tint = appColors.accent,
                         modifier = Modifier.size(IconSizeMd)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(R.string.action_shuffle),
-                        color = TextPrimary,
+                        color = appColors.textPrimary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -408,7 +400,7 @@ fun PlaylistDetailContent(
             ) {
                 Text(
                     text = "Daftar lagu kosong atau gagal dimuat.",
-                    color = TextMuted,
+                    color = appColors.textMuted,
                     fontSize = 13.sp
                 )
             }

@@ -41,15 +41,12 @@ import com.example.p5.R
 import com.example.p5.domain.model.Category
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.CategoryCardHeight
 import com.example.p5.ui.theme.CornerRadiusCardLg
-import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.IconSizeHero
-import com.example.p5.ui.theme.ObsidianCardHigh
 import com.example.p5.ui.theme.ScalePressedCard
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun CategoryGridSection(
@@ -59,6 +56,8 @@ fun CategoryGridSection(
 ) {
     if (categories.isEmpty()) return
 
+    val appColors = AppTheme.colors
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -66,7 +65,7 @@ fun CategoryGridSection(
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = stringResource(R.string.categories_title),
-            color = TextPrimary,
+            color = appColors.textPrimary,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = (-0.3).sp
@@ -102,7 +101,8 @@ fun GenreCategoryCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val baseColor = parseHexColor(category.startColor, ToscaPrimary)
+    val appColors = AppTheme.colors
+    val baseColor = parseHexColor(category.startColor, appColors.accent)
     val icon = getCategoryIcon(category.icon)
     val cardShape = remember { RoundedCornerShape(CornerRadiusCardLg) }
     val interactionSource = remember { MutableInteractionSource() }
@@ -116,7 +116,7 @@ fun GenreCategoryCard(
                 Brush.linearGradient(
                     colors = listOf(
                         baseColor.copy(alpha = 0.3f),
-                        ObsidianCardHigh
+                        appColors.cardHigh
                     )
                 )
             )
@@ -124,7 +124,7 @@ fun GenreCategoryCard(
                 shape = cardShape,
                 strokeWidth = StrokeWidthBorder,
                 startColor = baseColor.copy(alpha = 0.45f),
-                endColor = GlassBorderSubtle
+                endColor = appColors.glassBorderSubtle
             )
             .clickable(
                 interactionSource = interactionSource,
@@ -144,7 +144,7 @@ fun GenreCategoryCard(
 
         Text(
             text = category.title,
-            color = TextPrimary,
+            color = appColors.textPrimary,
             fontSize = 15.sp,
             fontWeight = FontWeight.Bold,
             lineHeight = 19.sp,

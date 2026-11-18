@@ -21,12 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.example.p5.domain.model.Category
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun GenreFilterRow(
@@ -37,6 +32,7 @@ fun GenreFilterRow(
 ) {
     if (genres.isEmpty()) return
 
+    val appColors = AppTheme.colors
     val chipShape = remember { RoundedCornerShape(20.dp) }
 
     LazyRow(
@@ -55,14 +51,14 @@ fun GenreFilterRow(
                         interactionSource = interactionSource
                     )
                     .clip(chipShape)
-                    .background(if (isAllSelected) ToscaPrimary else GlassFillLight)
+                    .background(if (isAllSelected) appColors.accent else appColors.glassFillLight)
                     .then(
                         if (!isAllSelected) {
                             Modifier.glassBorder(
                                 shape = chipShape,
                                 strokeWidth = 1.dp,
-                                startColor = GlassBorderBright.copy(alpha = 0.35f),
-                                endColor = GlassBorderSubtle
+                                startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                                endColor = appColors.glassBorderSubtle
                             )
                         } else {
                             Modifier
@@ -76,7 +72,7 @@ fun GenreFilterRow(
             ) {
                 Text(
                     text = "Semua",
-                    color = if (isAllSelected) ObsidianBlack else TextPrimary,
+                    color = if (isAllSelected) appColors.onAccent else appColors.textPrimary,
                     fontSize = 13.sp,
                     fontWeight = if (isAllSelected) FontWeight.Bold else FontWeight.Medium
                 )
@@ -97,14 +93,14 @@ fun GenreFilterRow(
                         interactionSource = interactionSource
                     )
                     .clip(chipShape)
-                    .background(if (isSelected) ToscaPrimary else GlassFillLight)
+                    .background(if (isSelected) appColors.accent else appColors.glassFillLight)
                     .then(
                         if (!isSelected) {
                             Modifier.glassBorder(
                                 shape = chipShape,
                                 strokeWidth = 1.dp,
-                                startColor = GlassBorderBright.copy(alpha = 0.35f),
-                                endColor = GlassBorderSubtle
+                                startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                                endColor = appColors.glassBorderSubtle
                             )
                         } else {
                             Modifier
@@ -124,7 +120,7 @@ fun GenreFilterRow(
             ) {
                 Text(
                     text = genre.title,
-                    color = if (isSelected) ObsidianBlack else TextPrimary,
+                    color = if (isSelected) appColors.onAccent else appColors.textPrimary,
                     fontSize = 13.sp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                 )

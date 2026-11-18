@@ -23,12 +23,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.DurationShimmer
-import com.example.p5.ui.theme.ObsidianSurfaceVariant
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun rememberShimmerBrush(): Brush {
+    val appColors = AppTheme.colors
     val transition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim by transition.animateFloat(
         initialValue = -300f,
@@ -42,11 +42,11 @@ fun rememberShimmerBrush(): Brush {
 
     return Brush.linearGradient(
         colors = listOf(
-            ObsidianSurfaceVariant.copy(alpha = 0.5f),
-            ObsidianSurfaceVariant.copy(alpha = 0.85f),
-            ToscaPrimary.copy(alpha = 0.16f),
-            ObsidianSurfaceVariant.copy(alpha = 0.85f),
-            ObsidianSurfaceVariant.copy(alpha = 0.5f)
+            appColors.surfaceVariant.copy(alpha = 0.5f),
+            appColors.surfaceVariant.copy(alpha = 0.85f),
+            appColors.accent.copy(alpha = 0.16f),
+            appColors.surfaceVariant.copy(alpha = 0.85f),
+            appColors.surfaceVariant.copy(alpha = 0.5f)
         ),
         start = Offset(translateAnim, translateAnim),
         end = Offset(translateAnim + 260f, translateAnim + 260f)

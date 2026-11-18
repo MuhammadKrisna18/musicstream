@@ -21,12 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.example.p5.domain.model.SearchFilter
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun SearchFilterBar(
@@ -34,6 +29,7 @@ fun SearchFilterBar(
     onSelectFilter: (SearchFilter) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val filterOptions = remember {
         listOf(
             SearchFilter.ALL to "Semua",
@@ -65,14 +61,14 @@ fun SearchFilterBar(
                         interactionSource = interactionSource
                     )
                     .clip(chipShape)
-                    .background(if (isSelected) ToscaPrimary else GlassFillLight)
+                    .background(if (isSelected) appColors.accent else appColors.glassFillLight)
                     .then(
                         if (!isSelected) {
                             Modifier.glassBorder(
                                 shape = chipShape,
                                 strokeWidth = 1.dp,
-                                startColor = GlassBorderBright.copy(alpha = 0.35f),
-                                endColor = GlassBorderSubtle
+                                startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                                endColor = appColors.glassBorderSubtle
                             )
                         } else {
                             Modifier
@@ -87,7 +83,7 @@ fun SearchFilterBar(
             ) {
                 Text(
                     text = label,
-                    color = if (isSelected) ObsidianBlack else TextPrimary,
+                    color = if (isSelected) appColors.onAccent else appColors.textPrimary,
                     fontSize = 12.sp,
                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                 )

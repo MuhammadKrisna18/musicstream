@@ -42,7 +42,7 @@ import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.GlassFillSubtle
 import com.example.p5.ui.theme.ScalePressedGlass
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 fun Modifier.glassBackground(
     shape: Shape = RoundedCornerShape(CornerRadiusDefault),
@@ -158,9 +158,10 @@ fun GlassSurface(
 @Composable
 fun MiniEqualizer(
     modifier: Modifier = Modifier,
-    barColor: Color = ToscaPrimary,
+    barColor: Color = Color.Unspecified,
     isPlaying: Boolean = true
 ) {
+    val effectiveBarColor = if (barColor != Color.Unspecified) barColor else AppTheme.colors.accent
     val infiniteTransition = rememberInfiniteTransition(label = "equalizer")
 
     val bar1Height by infiniteTransition.animateFloat(
@@ -203,21 +204,21 @@ fun MiniEqualizer(
                 .width(3.dp)
                 .fillMaxHeight(if (isPlaying) bar1Height else 0.35f)
                 .clip(RoundedCornerShape(CornerRadiusXs))
-                .background(barColor)
+                .background(effectiveBarColor)
         )
         Box(
             modifier = Modifier
                 .width(3.dp)
                 .fillMaxHeight(if (isPlaying) bar2Height else 0.7f)
                 .clip(RoundedCornerShape(CornerRadiusXs))
-                .background(barColor)
+                .background(effectiveBarColor)
         )
         Box(
             modifier = Modifier
                 .width(3.dp)
                 .fillMaxHeight(if (isPlaying) bar3Height else 0.45f)
                 .clip(RoundedCornerShape(CornerRadiusXs))
-                .background(barColor)
+                .background(effectiveBarColor)
         )
     }
 }

@@ -43,23 +43,14 @@ import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.ActionButtonSizeXs
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.ArtworkCardHeight
 import com.example.p5.ui.theme.ArtworkCardWidth
 import com.example.p5.ui.theme.CornerRadiusCardLg
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
 import com.example.p5.ui.theme.IconSizeSm
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianCard
 import com.example.p5.ui.theme.ScalePressedButton
 import com.example.p5.ui.theme.ScalePressedCard
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun HomeTrackSection(
@@ -73,6 +64,8 @@ fun HomeTrackSection(
 ) {
     if (section.tracks.isEmpty()) return
 
+    val appColors = AppTheme.colors
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -85,7 +78,7 @@ fun HomeTrackSection(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = section.title,
-                    color = TextPrimary,
+                    color = appColors.textPrimary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-0.3).sp
@@ -93,7 +86,7 @@ fun HomeTrackSection(
                 if (!section.subtitle.isNullOrBlank()) {
                     Text(
                         text = section.subtitle,
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         fontSize = 12.sp
                     )
                 }
@@ -102,7 +95,7 @@ fun HomeTrackSection(
             if (section.tracks.isNotEmpty()) {
                 Text(
                     text = stringResource(R.string.section_see_all),
-                    color = ToscaPrimary,
+                    color = appColors.accent,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clickable { onSeeAllClick(section) }
@@ -138,6 +131,7 @@ fun TrendingTrackCard(
     modifier: Modifier = Modifier,
     onMoreOptionsClick: ((Song) -> Unit)? = null
 ) {
+    val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val cardShape = remember { RoundedCornerShape(CornerRadiusCardLg) }
 
@@ -147,22 +141,22 @@ fun TrendingTrackCard(
             .height(ArtworkCardHeight)
             .pressedScale(targetScale = ScalePressedCard, interactionSource = interactionSource)
             .clip(cardShape)
-            .background(ObsidianCard)
+            .background(appColors.card)
             .then(
                 if (isSelected) {
                     Modifier.glassBorder(
                         shape = cardShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = ToscaGlassBorder,
-                        endColor = GlassBorderSubtle,
-                        accentGlow = ToscaPrimary.copy(alpha = 0.5f)
+                        startColor = appColors.accent.copy(alpha = 0.5f),
+                        endColor = appColors.glassBorderSubtle,
+                        accentGlow = appColors.accentGlow
                     )
                 } else {
                     Modifier.glassBorder(
                         shape = cardShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = GlassBorderBright.copy(alpha = 0.3f),
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.glassBorderBright.copy(alpha = 0.3f),
+                        endColor = appColors.glassBorderSubtle
                     )
                 }
             )
@@ -186,7 +180,7 @@ fun TrendingTrackCard(
                         colors = listOf(
                             Color.Transparent,
                             Color.Black.copy(alpha = 0.45f),
-                            ObsidianBlack.copy(alpha = 0.92f)
+                            appColors.card.copy(alpha = 0.94f)
                         ),
                         startY = 60f
                     )
@@ -199,11 +193,11 @@ fun TrendingTrackCard(
                     .align(Alignment.TopStart)
                     .padding(8.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(ToscaPrimary.copy(alpha = 0.85f))
+                    .background(appColors.accent.copy(alpha = 0.85f))
                     .padding(horizontal = 6.dp, vertical = 4.dp)
             ) {
                 MiniEqualizer(
-                    barColor = ObsidianBlack,
+                    barColor = appColors.onAccent,
                     isPlaying = true
                 )
             }
@@ -218,12 +212,12 @@ fun TrendingTrackCard(
                     .size(ActionButtonSizeXs)
                     .pressedScale(targetScale = ScalePressedButton, interactionSource = moreSource)
                     .clip(CircleShape)
-                    .background(GlassFillLight)
+                    .background(appColors.glassFillLight)
                     .glassBorder(
                         shape = CircleShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = GlassBorderBright.copy(alpha = 0.35f),
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                        endColor = appColors.glassBorderSubtle
                     )
                     .clickable(
                         interactionSource = moreSource,
@@ -234,7 +228,7 @@ fun TrendingTrackCard(
                 Icon(
                     imageVector = Icons.Rounded.MoreVert,
                     contentDescription = null,
-                    tint = TextPrimary,
+                    tint = appColors.textPrimary,
                     modifier = Modifier.size(IconSizeSm)
                 )
             }
@@ -248,7 +242,7 @@ fun TrendingTrackCard(
         ) {
             Text(
                 text = song.title,
-                color = if (isSelected) ToscaPrimary else TextPrimary,
+                color = if (isSelected) appColors.accent else appColors.textPrimary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold,
                 lineHeight = 17.sp,
@@ -266,7 +260,7 @@ fun TrendingTrackCard(
             ) {
                 Text(
                     text = song.artist,
-                    color = TextSecondary,
+                    color = appColors.textSecondary,
                     fontSize = 11.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -276,7 +270,7 @@ fun TrendingTrackCard(
                 if (song.durationFormatted.isNotBlank()) {
                     Text(
                         text = song.durationFormatted,
-                        color = TextMuted,
+                        color = appColors.textMuted,
                         fontSize = 10.sp,
                         modifier = Modifier.padding(start = 4.dp)
                     )

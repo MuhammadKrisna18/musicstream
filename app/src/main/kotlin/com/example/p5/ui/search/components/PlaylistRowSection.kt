@@ -17,9 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.domain.model.Playlist
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun PlaylistRowSection(
@@ -33,6 +31,8 @@ fun PlaylistRowSection(
 ) {
     if (playlists.isEmpty()) return
 
+    val appColors = AppTheme.colors
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -45,7 +45,7 @@ fun PlaylistRowSection(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    color = TextPrimary,
+                    color = appColors.textPrimary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-0.3).sp
@@ -53,7 +53,7 @@ fun PlaylistRowSection(
                 if (!subtitle.isNullOrBlank()) {
                     Text(
                         text = subtitle,
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         fontSize = 12.sp
                     )
                 }
@@ -62,7 +62,7 @@ fun PlaylistRowSection(
             if (onSeeAllClick != null) {
                 Text(
                     text = stringResource(R.string.section_see_all),
-                    color = ToscaPrimary,
+                    color = appColors.accent,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clickable { onSeeAllClick(playlists, title) }

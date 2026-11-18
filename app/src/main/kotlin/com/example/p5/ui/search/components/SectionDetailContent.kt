@@ -43,20 +43,12 @@ import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.BottomScrollPadding
 import com.example.p5.ui.theme.CornerRadiusCard
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.IconSizeMd
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianCard
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaDark
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun SectionDetailContent(
@@ -67,6 +59,7 @@ fun SectionDetailContent(
     onMoreOptionsClick: (Song) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val playAllInteraction = remember { MutableInteractionSource() }
     val shuffleInteraction = remember { MutableInteractionSource() }
     val backInteraction = remember { MutableInteractionSource() }
@@ -85,12 +78,12 @@ fun SectionDetailContent(
                     .size(42.dp)
                     .pressedScale(interactionSource = backInteraction)
                     .clip(CircleShape)
-                    .background(ObsidianCard)
+                    .background(appColors.card)
                     .glassBorder(
                         shape = CircleShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = GlassBorderBright,
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.glassBorderBright,
+                        endColor = appColors.glassBorderSubtle
                     )
                     .clickable(
                         interactionSource = backInteraction,
@@ -101,7 +94,7 @@ fun SectionDetailContent(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = null,
-                    tint = TextPrimary,
+                    tint = appColors.textPrimary,
                     modifier = Modifier.size(IconSizeStandard)
                 )
             }
@@ -111,7 +104,7 @@ fun SectionDetailContent(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = section.title,
-                    color = TextPrimary,
+                    color = appColors.textPrimary,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-0.3).sp,
@@ -125,7 +118,7 @@ fun SectionDetailContent(
                 }
                 Text(
                     text = subtitleText,
-                    color = TextSecondary,
+                    color = appColors.textSecondary,
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -150,14 +143,14 @@ fun SectionDetailContent(
                         .clip(buttonShape)
                         .background(
                             Brush.horizontalGradient(
-                                listOf(ToscaPrimary, ToscaDark)
+                                listOf(appColors.accent, appColors.accentDark)
                             )
                         )
                         .glassBorder(
                             shape = buttonShape,
                             strokeWidth = StrokeWidthBorder,
-                            startColor = ToscaGlassBorder,
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.accent.copy(alpha = 0.5f),
+                            endColor = appColors.glassBorderSubtle
                         )
                         .clickable(
                             interactionSource = playAllInteraction,
@@ -171,13 +164,13 @@ fun SectionDetailContent(
                     Icon(
                         imageVector = Icons.Rounded.PlayArrow,
                         contentDescription = null,
-                        tint = ObsidianBlack,
+                        tint = appColors.onAccent,
                         modifier = Modifier.size(IconSizeStandard)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(R.string.action_play_all),
-                        color = ObsidianBlack,
+                        color = appColors.onAccent,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -189,12 +182,12 @@ fun SectionDetailContent(
                         .height(44.dp)
                         .pressedScale(interactionSource = shuffleInteraction)
                         .clip(buttonShape)
-                        .background(ObsidianCard)
+                        .background(appColors.card)
                         .glassBorder(
                             shape = buttonShape,
                             strokeWidth = StrokeWidthBorder,
-                            startColor = GlassBorderBright,
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.glassBorderBright,
+                            endColor = appColors.glassBorderSubtle
                         )
                         .clickable(
                             interactionSource = shuffleInteraction,
@@ -208,13 +201,13 @@ fun SectionDetailContent(
                     Icon(
                         imageVector = Icons.Rounded.Shuffle,
                         contentDescription = null,
-                        tint = ToscaPrimary,
+                        tint = appColors.accent,
                         modifier = Modifier.size(IconSizeMd)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(R.string.action_shuffle),
-                        color = TextPrimary,
+                        color = appColors.textPrimary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold
                     )

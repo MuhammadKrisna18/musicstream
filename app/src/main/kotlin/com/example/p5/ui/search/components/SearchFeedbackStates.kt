@@ -23,23 +23,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaDark
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun SearchEmptyState(
     query: String,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = stringResource(R.string.search_empty_message, query),
-            color = TextSecondary,
+            color = appColors.textSecondary,
             fontSize = 14.sp
         )
     }
@@ -51,6 +49,7 @@ fun SearchErrorState(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -61,7 +60,7 @@ fun SearchErrorState(
         Icon(
             imageVector = Icons.Rounded.ErrorOutline,
             contentDescription = null,
-            tint = ToscaDark,
+            tint = appColors.accent,
             modifier = Modifier.size(48.dp)
         )
 
@@ -69,7 +68,7 @@ fun SearchErrorState(
 
         Text(
             text = message,
-            color = TextSecondary,
+            color = appColors.textSecondary,
             fontSize = 13.sp,
             textAlign = TextAlign.Center
         )
@@ -78,11 +77,11 @@ fun SearchErrorState(
 
         Button(
             onClick = onRetry,
-            colors = ButtonDefaults.buttonColors(containerColor = ToscaPrimary)
+            colors = ButtonDefaults.buttonColors(containerColor = appColors.accent)
         ) {
             Text(
                 text = stringResource(R.string.action_retry),
-                color = ObsidianBlack,
+                color = appColors.onAccent,
                 fontWeight = FontWeight.Bold
             )
         }

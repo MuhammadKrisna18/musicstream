@@ -26,13 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.ui.components.glass.glassBorder
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun SearchBarField(
@@ -41,18 +35,19 @@ fun SearchBarField(
     onSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val focusManager = LocalFocusManager.current
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(22.dp))
-            .background(GlassFillLight)
+            .background(appColors.glassFillLight)
             .glassBorder(
                 shape = RoundedCornerShape(22.dp),
                 strokeWidth = 1.dp,
-                startColor = GlassBorderBright.copy(alpha = 0.4f),
-                endColor = GlassBorderSubtle
+                startColor = appColors.glassBorderBright.copy(alpha = 0.4f),
+                endColor = appColors.glassBorderSubtle
             )
     ) {
         OutlinedTextField(
@@ -61,7 +56,7 @@ fun SearchBarField(
             placeholder = {
                 Text(
                     text = stringResource(R.string.search_placeholder),
-                    color = TextMuted,
+                    color = appColors.textMuted,
                     fontSize = 14.sp
                 )
             },
@@ -69,7 +64,7 @@ fun SearchBarField(
                 Icon(
                     imageVector = Icons.Rounded.Search,
                     contentDescription = null,
-                    tint = ToscaPrimary,
+                    tint = appColors.accent,
                     modifier = Modifier.size(22.dp)
                 )
             },
@@ -79,7 +74,7 @@ fun SearchBarField(
                         Icon(
                             imageVector = Icons.Rounded.Clear,
                             contentDescription = null,
-                            tint = TextSecondary,
+                            tint = appColors.textSecondary,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -90,11 +85,11 @@ fun SearchBarField(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
-                focusedBorderColor = ToscaPrimary,
+                focusedBorderColor = appColors.accent,
                 unfocusedBorderColor = Color.Transparent,
-                focusedTextColor = TextPrimary,
-                unfocusedTextColor = TextPrimary,
-                cursorColor = ToscaPrimary
+                focusedTextColor = appColors.textPrimary,
+                unfocusedTextColor = appColors.textPrimary,
+                cursorColor = appColors.accent
             ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
