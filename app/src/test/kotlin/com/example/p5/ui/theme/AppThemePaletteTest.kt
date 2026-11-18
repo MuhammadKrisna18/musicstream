@@ -59,6 +59,9 @@ class AppThemePaletteTest {
             val palette = AppThemePalette.getPalette(theme)
             assertNotNull(palette.backgroundImageRes)
         }
+
+        val backgroundResIds = animeThemes.map { AppThemePalette.getPalette(it).backgroundImageRes }
+        assertEquals(5, backgroundResIds.toSet().size)
     }
 
     @Test

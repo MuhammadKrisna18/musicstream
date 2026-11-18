@@ -81,7 +81,7 @@ object AppThemePalette {
         textSecondary = Color(0xFFA5B4FC),
         textTertiary = Color(0xFF6366F1),
         textMuted = Color(0xFF475569),
-        backgroundImageRes = R.drawable.bg_anime_midnight
+        backgroundImageRes = R.drawable.bg_anime_cyberpunk
     )
 
     val animeInfinityBlue = AppColorScheme(
@@ -107,7 +107,7 @@ object AppThemePalette {
         textSecondary = Color(0xFFBAE6FD),
         textTertiary = Color(0xFF7DD3FC),
         textMuted = Color(0xFF475569),
-        backgroundImageRes = R.drawable.bg_anime_midnight
+        backgroundImageRes = R.drawable.bg_anime_infinity
     )
 
     val animeCrimsonFlame = AppColorScheme(
@@ -133,7 +133,7 @@ object AppThemePalette {
         textSecondary = Color(0xFFFECDD3),
         textTertiary = Color(0xFFFDA4AF),
         textMuted = Color(0xFF6B4750),
-        backgroundImageRes = R.drawable.bg_anime_midnight
+        backgroundImageRes = R.drawable.bg_anime_crimson
     )
 
     val animeSakuraTwilight = AppColorScheme(
@@ -159,7 +159,7 @@ object AppThemePalette {
         textSecondary = Color(0xFFFBCFE8),
         textTertiary = Color(0xFFF472B6),
         textMuted = Color(0xFF6E5677),
-        backgroundImageRes = R.drawable.bg_anime_midnight
+        backgroundImageRes = R.drawable.bg_anime_sakura
     )
 
     val animeEvaUnit01 = AppColorScheme(
@@ -185,7 +185,7 @@ object AppThemePalette {
         textSecondary = Color(0xFFDDD6FE),
         textTertiary = Color(0xFFA78BFA),
         textMuted = Color(0xFF5E4F76),
-        backgroundImageRes = R.drawable.bg_anime_midnight
+        backgroundImageRes = R.drawable.bg_anime_mecha
     )
 
     val minimalOled = AppColorScheme(
