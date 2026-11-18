@@ -48,7 +48,8 @@ object AppViewModelProvider {
         }
         initializer {
             SettingsViewModel(
-                musicApplication().container.updateRepository
+                musicApplication().container.updateRepository,
+                musicApplication().container.themeRepository
             )
         }
         initializer {

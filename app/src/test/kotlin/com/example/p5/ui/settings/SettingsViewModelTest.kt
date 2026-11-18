@@ -1,16 +1,29 @@
 package com.example.p5.ui.settings
 
+import com.example.p5.domain.model.AppThemeId
 import com.example.p5.domain.model.UpdateInfo
+import com.example.p5.domain.repository.ThemeRepository
 import com.example.p5.domain.repository.UpdateRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsViewModelTest {
+
+    private val testDispatcher = UnconfinedTestDispatcher()
 
     private class FakeUpdateRepository(
         override val currentVersionName: String = "2.9.1"
@@ -20,23 +33,70 @@ class SettingsViewModelTest {
         override fun installApk(apkFile: File) {}
     }
 
-    private val testDispatcher = StandardTestDispatcher()
+    private class FakeThemeRepository(
+        initialTheme: AppThemeId = AppThemeId.DEFAULT_DARK
+    ) : ThemeRepository {
+        val themeFlow = MutableStateFlow(initialTheme)
+        override val currentTheme: StateFlow<AppThemeId> = themeFlow.asStateFlow()
+        override suspend fun setTheme(themeId: AppThemeId) {
+            themeFlow.value = themeId
+        }
+    }
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 
     @Test
-    fun initialState_loadsCurrentVersionFromRepository() {
+    fun initialState_loadsCurrentVersionAndTheme() {
         val fakeRepo = FakeUpdateRepository(currentVersionName = "2.9.1")
-        val viewModel = SettingsViewModel(updateRepository = fakeRepo, ioDispatcher = testDispatcher)
+        val fakeThemeRepo = FakeThemeRepository(initialTheme = AppThemeId.DEFAULT_DARK)
+        val viewModel = SettingsViewModel(
+            updateRepository = fakeRepo,
+            themeRepository = fakeThemeRepo,
+            ioDispatcher = testDispatcher
+        )
 
         assertEquals("2.9.1", viewModel.uiState.value.currentVersion)
+        assertEquals(AppThemeId.DEFAULT_DARK, viewModel.uiState.value.currentTheme)
         assertEquals(0L, viewModel.uiState.value.cacheSizeBytes)
         assertEquals("0 B", viewModel.uiState.value.formattedCacheSize)
         assertNull(viewModel.uiState.value.userMessage)
     }
 
     @Test
+    fun selectTheme_updatesCurrentThemeInState() = runTest {
+        val fakeRepo = FakeUpdateRepository()
+        val fakeThemeRepo = FakeThemeRepository()
+        val viewModel = SettingsViewModel(
+            updateRepository = fakeRepo,
+            themeRepository = fakeThemeRepo,
+            ioDispatcher = testDispatcher
+        )
+
+        assertEquals(AppThemeId.DEFAULT_DARK, viewModel.uiState.value.currentTheme)
+
+        viewModel.selectTheme(AppThemeId.ANIME_CYBERPUNK)
+
+        assertEquals(AppThemeId.ANIME_CYBERPUNK, viewModel.uiState.value.currentTheme)
+        assertEquals(AppThemeId.ANIME_CYBERPUNK, fakeThemeRepo.currentTheme.value)
+    }
+
+    @Test
     fun updateCacheSize_updatesStateAndFormattedSizeAccurately() {
         val fakeRepo = FakeUpdateRepository()
-        val viewModel = SettingsViewModel(updateRepository = fakeRepo, ioDispatcher = testDispatcher)
+        val fakeThemeRepo = FakeThemeRepository()
+        val viewModel = SettingsViewModel(
+            updateRepository = fakeRepo,
+            themeRepository = fakeThemeRepo,
+            ioDispatcher = testDispatcher
+        )
 
         viewModel.updateCacheSize(1024L * 512L)
         assertEquals(524288L, viewModel.uiState.value.cacheSizeBytes)
@@ -49,7 +109,12 @@ class SettingsViewModelTest {
     @Test
     fun clearUserMessage_clearsActiveMessage() {
         val fakeRepo = FakeUpdateRepository()
-        val viewModel = SettingsViewModel(updateRepository = fakeRepo, ioDispatcher = testDispatcher)
+        val fakeThemeRepo = FakeThemeRepository()
+        val viewModel = SettingsViewModel(
+            updateRepository = fakeRepo,
+            themeRepository = fakeThemeRepo,
+            ioDispatcher = testDispatcher
+        )
 
         viewModel.clearUserMessage()
         assertNull(viewModel.uiState.value.userMessage)

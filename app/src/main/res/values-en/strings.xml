@@ -86,5 +86,35 @@
     <string name="search_tab_playlists">Playlists</string>
     <string name="search_playlists_title">Related Playlists</string>
     <string name="search_playlists_subtitle">Curated collections matching your search</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Manage preferences and system configuration</string>
+    <string name="settings_storage_title">Storage &amp; Cache</string>
+    <string name="settings_storage_subtitle">Manage temporary audio streaming cache</string>
+    <string name="settings_storage_cache_size">Current Cache Size</string>
+    <string name="settings_storage_clear">Clear Cache</string>
+    <string name="settings_storage_clearing">Clearing...</string>
+    <string name="settings_storage_desc">Clearing the streaming cache will remove cached audio files without removing your saved or favorite songs.</string>
+    <string name="settings_update_title">App Updates</string>
+    <string name="settings_update_subtitle">Check the latest releases directly from GitHub</string>
+    <string name="settings_update_current_version">Installed Version</string>
+    <string name="settings_update_check_button">Check for Updates</string>
+    <string name="settings_update_checking">Checking...</string>
+    <string name="settings_about_title">About Application</string>
+    <string name="settings_about_desc">High performance modern dark obsidian music player and streamer for YouTube Music.</string>
+    <string name="settings_about_developer">Developer</string>
+    <string name="settings_about_developer_name">Muhammad Krisna</string>
+    <string name="settings_about_github">GitHub Repository</string>
+    <string name="settings_about_github_url">https://github.com/MuhammadKrisna18/musicstream</string>
+
+    <string name="settings_theme_title">Theme &amp; Appearance</string>
+    <string name="settings_theme_subtitle">Choose app color scheme (Default, Anime, Minimalist)</string>
+    <string name="settings_theme_current">Active Theme</string>
+    <string name="settings_theme_change_button">Change Theme</string>
+    <string name="theme_sheet_title">Choose App Theme</string>
+    <string name="theme_tab_all">All</string>
+    <string name="theme_tab_default">Default</string>
+    <string name="theme_tab_anime">Anime</string>
+    <string name="theme_tab_minimalist">Minimalist</string>
 </resources>
 

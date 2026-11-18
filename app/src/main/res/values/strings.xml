@@ -116,4 +116,14 @@
     <string name="settings_about_developer_name">Muhammad Krisna</string>
     <string name="settings_about_github">Repositori GitHub</string>
     <string name="settings_about_github_url">https://github.com/MuhammadKrisna18/musicstream</string>
+
+    <string name="settings_theme_title">Tema &amp; Tampilan</string>
+    <string name="settings_theme_subtitle">Pilih tema warna aplikasi (Default, Anime, Minimalist)</string>
+    <string name="settings_theme_current">Tema Aktif</string>
+    <string name="settings_theme_change_button">Ganti Tema</string>
+    <string name="theme_sheet_title">Pilih Tema Aplikasi</string>
+    <string name="theme_tab_all">Semua</string>
+    <string name="theme_tab_default">Default</string>
+    <string name="theme_tab_anime">Anime</string>
+    <string name="theme_tab_minimalist">Minimalist</string>
 </resources>
