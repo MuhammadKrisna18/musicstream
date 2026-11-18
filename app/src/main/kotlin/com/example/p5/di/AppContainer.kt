@@ -10,6 +10,7 @@ import com.example.p5.data.repository.LyricsRepositoryImpl
 import com.example.p5.data.repository.MusicRepositoryImpl
 import com.example.p5.data.repository.SavedSongRepositoryImpl
 import com.example.p5.data.repository.SearchHistoryRepositoryImpl
+import com.example.p5.data.repository.ThemeRepositoryImpl
 import com.example.p5.data.repository.UpdateRepositoryImpl
 import com.example.p5.domain.player.AudioPlayer
 import com.example.p5.domain.repository.FavoriteRepository
@@ -18,6 +19,7 @@ import com.example.p5.domain.repository.LyricsRepository
 import com.example.p5.domain.repository.MusicRepository
 import com.example.p5.domain.repository.SavedSongRepository
 import com.example.p5.domain.repository.SearchHistoryRepository
+import com.example.p5.domain.repository.ThemeRepository
 import com.example.p5.domain.repository.UpdateRepository
 import com.example.p5.domain.usecase.GetArtistAllSongsUseCase
 import com.example.p5.domain.usecase.GetArtistProfileUseCase
@@ -59,6 +61,7 @@ interface AppContainer {
     val savedSongRepository: SavedSongRepository
     val historyRepository: HistoryRepository
     val searchHistoryRepository: SearchHistoryRepository
+    val themeRepository: ThemeRepository
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -166,5 +169,9 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val updateRepository: UpdateRepository by lazy {
         UpdateRepositoryImpl(context, okHttpClient)
+    }
+
+    override val themeRepository: ThemeRepository by lazy {
+        ThemeRepositoryImpl(context)
     }
 }
