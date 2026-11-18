@@ -9,6 +9,7 @@ import com.example.p5.ui.artist.ArtistProfileViewModel
 import com.example.p5.ui.library.LibraryViewModel
 import com.example.p5.ui.player.PlayerViewModel
 import com.example.p5.ui.search.SearchViewModel
+import com.example.p5.ui.settings.SettingsViewModel
 import com.example.p5.ui.update.UpdateViewModel
 
 object AppViewModelProvider {
@@ -42,6 +43,11 @@ object AppViewModelProvider {
         }
         initializer {
             UpdateViewModel(
+                musicApplication().container.updateRepository
+            )
+        }
+        initializer {
+            SettingsViewModel(
                 musicApplication().container.updateRepository
             )
         }

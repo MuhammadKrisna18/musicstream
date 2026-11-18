@@ -5,6 +5,7 @@
 
     <string name="nav_home">Beranda</string>
     <string name="nav_library">Koleksi</string>
+    <string name="nav_settings">Pengaturan</string>
 
     <string name="home_subtitle">Kurasi musik &amp; audio berkualitas</string>
     <string name="home_refresh_content_desc">Muat Ulang Beranda</string>
@@ -98,4 +99,24 @@
     <string name="search_tab_playlists">Playlist</string>
     <string name="search_playlists_title">Playlist Terkait</string>
     <string name="search_playlists_subtitle">Koleksi lagu pilihan sesuai pencarianmu</string>
+
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_subtitle">Kelola preferensi dan sistem aplikasi</string>
+    <string name="settings_storage_title">Penyimpanan &amp; Cache</string>
+    <string name="settings_storage_subtitle">Kelola penyimpanan sementara lagu streaming</string>
+    <string name="settings_storage_cache_size">Ukuran Cache Saat Ini</string>
+    <string name="settings_storage_clear">Bersihkan Cache</string>
+    <string name="settings_storage_clearing">Membersihkan...</string>
+    <string name="settings_storage_desc">Membersihkan cache streaming akan mengosongkan file audio sementara tanpa menghapus lagu yang tersimpan atau disukai.</string>
+    <string name="settings_update_title">Pembaruan Aplikasi</string>
+    <string name="settings_update_subtitle">Cek versi rilis terbaru langsung dari GitHub</string>
+    <string name="settings_update_current_version">Versi Terpasang</string>
+    <string name="settings_update_check_button">Periksa Pembaruan</string>
+    <string name="settings_update_checking">Memeriksa...</string>
+    <string name="settings_about_title">Tentang Aplikasi</string>
+    <string name="settings_about_desc">Pemutar dan streaming musik YouTube Music berkinerja tinggi dengan antarmuka Obsidian Glassmorphism gelap modern.</string>
+    <string name="settings_about_developer">Pengembang</string>
+    <string name="settings_about_developer_name">Muhammad Krisna</string>
+    <string name="settings_about_github">Repositori GitHub</string>
+    <string name="settings_about_github_url">https://github.com/MuhammadKrisna18/musicstream</string>
 </resources>
