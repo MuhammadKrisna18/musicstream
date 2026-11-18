@@ -35,12 +35,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.p5.domain.model.ArtistProfile
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.GlassBorderMedium
 import com.example.p5.ui.theme.GlassFillMedium
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.VelvetPrimary
 
 @Composable
 fun ArtistHeaderSection(
@@ -49,6 +46,8 @@ fun ArtistHeaderSection(
     onShuffle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -59,7 +58,7 @@ fun ArtistHeaderSection(
             modifier = Modifier
                 .size(130.dp)
                 .clip(CircleShape)
-                .border(2.dp, VelvetPrimary.copy(alpha = 0.6f), CircleShape)
+                .border(2.dp, appColors.accent.copy(alpha = 0.6f), CircleShape)
                 .background(GlassFillMedium)
         ) {
             AsyncImage(
@@ -76,7 +75,7 @@ fun ArtistHeaderSection(
 
         Text(
             text = profile.name,
-            color = TextPrimary,
+            color = appColors.textPrimary,
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -95,7 +94,7 @@ fun ArtistHeaderSection(
             ) {
                 Text(
                     text = "${profile.subscriberCount} Subscriber",
-                    color = TextSecondary,
+                    color = appColors.textSecondary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium
                 )
@@ -106,7 +105,7 @@ fun ArtistHeaderSection(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = profile.description,
-                color = TextMuted,
+                color = appColors.textMuted,
                 fontSize = 13.sp,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
@@ -126,8 +125,8 @@ fun ArtistHeaderSection(
                 onClick = onPlayAll,
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = VelvetPrimary,
-                    contentColor = Color.Black
+                    containerColor = appColors.accent,
+                    contentColor = appColors.onAccent
                 ),
                 modifier = Modifier
                     .weight(1f)
@@ -152,7 +151,7 @@ fun ArtistHeaderSection(
                 onClick = onShuffle,
                 shape = RoundedCornerShape(24.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = TextPrimary
+                    contentColor = appColors.textPrimary
                 ),
                 modifier = Modifier
                     .weight(1f)

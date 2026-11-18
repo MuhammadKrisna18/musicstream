@@ -17,6 +17,7 @@ data class AppColorScheme(
     val accentLight: Color,
     val accentDark: Color,
     val accentGlow: Color,
+    val onAccent: Color = if (isDark) Color(0xFF0D0E12) else Color(0xFFFFFFFF),
     val glassFillSubtle: Color,
     val glassFillLight: Color,
     val glassFillMedium: Color,

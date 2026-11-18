@@ -29,7 +29,7 @@ fun P5AppTheme(
     val colorScheme = if (colors.isDark) {
         darkColorScheme(
             primary = colors.accent,
-            onPrimary = colors.background,
+            onPrimary = colors.onAccent,
             primaryContainer = colors.surfaceVariant,
             onPrimaryContainer = colors.accentLight,
             secondary = colors.accentSecondary,
@@ -45,7 +45,7 @@ fun P5AppTheme(
     } else {
         lightColorScheme(
             primary = colors.accent,
-            onPrimary = Color.White,
+            onPrimary = colors.onAccent,
             primaryContainer = colors.surfaceVariant,
             onPrimaryContainer = colors.accentDark,
             secondary = colors.accentSecondary,

@@ -55,21 +55,15 @@ import com.example.p5.domain.model.PlayerState
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.ActionButtonSizeSm
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.ArtworkThumbSize
-import com.example.p5.ui.theme.AuroraCyan
 import com.example.p5.ui.theme.CornerRadiusCard
 import com.example.p5.ui.theme.CornerRadiusPill
 import com.example.p5.ui.theme.DurationAtmospheric
 import com.example.p5.ui.theme.DurationMedium
 import com.example.p5.ui.theme.DurationNormal
-import com.example.p5.ui.theme.GlassBorderBright
 import com.example.p5.ui.theme.GlassBorderMedium
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillSubtle
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianFloating
-import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.PlayButtonSizeMini
 import com.example.p5.ui.theme.ProgressBarHeightMini
 import com.example.p5.ui.theme.ScalePressedRound
@@ -79,11 +73,6 @@ import com.example.p5.ui.theme.SpacingXs
 import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.StrokeWidthHairline
 import com.example.p5.ui.theme.StrokeWidthThick
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun MiniPlayer(
@@ -91,9 +80,10 @@ fun MiniPlayer(
     onTogglePlayPause: () -> Unit,
     onOpenFullPlayer: () -> Unit,
     modifier: Modifier = Modifier,
-    accentColor: Color = ToscaPrimary,
+    accentColor: Color = AppTheme.colors.accent,
     onSkipNext: () -> Unit = {}
 ) {
+    val appColors = AppTheme.colors
     val currentSong = playerState.currentSong
     val islandShape = remember { RoundedCornerShape(CornerRadiusPill) }
     val playInteractionSource = remember { MutableInteractionSource() }
@@ -131,21 +121,21 @@ fun MiniPlayer(
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 4.dp)
                 .clip(islandShape)
-                .background(ObsidianFloating)
+                .background(appColors.floatingDock)
                 .then(
                     if (playerState.isPlaying) {
                         Modifier.glassBorder(
                             shape = islandShape,
                             strokeWidth = StrokeWidthBorder,
                             startColor = accentColor.copy(alpha = 0.45f),
-                            endColor = GlassBorderSubtle
+                            endColor = appColors.glassBorderSubtle
                         )
                     } else {
                         Modifier.glassBorder(
                             shape = islandShape,
                             strokeWidth = StrokeWidthBorder,
-                            startColor = GlassBorderBright.copy(alpha = 0.35f),
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                            endColor = appColors.glassBorderSubtle
                         )
                     }
                 )
@@ -162,7 +152,7 @@ fun MiniPlayer(
                         modifier = Modifier
                             .size(ArtworkThumbSize)
                             .clip(RoundedCornerShape(CornerRadiusCard))
-                            .background(ObsidianSurfaceVariant)
+                            .background(appColors.surfaceVariant)
                             .glassBorder(
                                 shape = RoundedCornerShape(CornerRadiusCard),
                                 strokeWidth = StrokeWidthHairline,
@@ -185,7 +175,7 @@ fun MiniPlayer(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = currentSong.title,
-                            color = TextPrimary,
+                            color = appColors.textPrimary,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
                             maxLines = 1,
@@ -193,7 +183,7 @@ fun MiniPlayer(
                         )
                         Text(
                             text = currentSong.artist,
-                            color = TextSecondary,
+                            color = appColors.textSecondary,
                             fontSize = 12.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -203,7 +193,7 @@ fun MiniPlayer(
 
                     Spacer(modifier = Modifier.width(SpacingSm))
 
-                    val iconTint = if (accentColor.luminance() > 0.45f) ObsidianBlack else Color.White
+                    val iconTint = if (accentColor.luminance() > 0.45f) appColors.onAccent else Color.White
                     if (playerState.isBuffering) {
                         CircularProgressIndicator(
                             color = accentColor,
@@ -253,7 +243,7 @@ fun MiniPlayer(
                         Icon(
                             imageVector = Icons.Rounded.SkipNext,
                             contentDescription = stringResource(R.string.mini_player_next_desc),
-                            tint = if (playerState.hasNext) TextPrimary else TextMuted,
+                            tint = if (playerState.hasNext) appColors.textPrimary else appColors.textMuted,
                             modifier = Modifier.size(IconSizeStandard)
                         )
                     }
@@ -263,7 +253,7 @@ fun MiniPlayer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(ProgressBarHeightMini)
-                        .background(GlassFillSubtle)
+                        .background(appColors.glassFillSubtle)
                 ) {
                     Box(
                         modifier = Modifier
@@ -271,7 +261,7 @@ fun MiniPlayer(
                             .height(ProgressBarHeightMini)
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    colors = listOf(accentColor, AuroraCyan)
+                                    colors = listOf(accentColor, appColors.accentLight)
                                 )
                             )
                     )

@@ -42,28 +42,17 @@ import com.example.p5.R
 import com.example.p5.domain.model.UpdateInfo
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.CornerRadiusMd
 import com.example.p5.ui.theme.CornerRadiusModal
 import com.example.p5.ui.theme.CornerRadiusXs
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
 import com.example.p5.ui.theme.IconSizeHero
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianCardHigh
-import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.ScalePressedDockItem
 import com.example.p5.ui.theme.SpacingMd
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.StrokeWidthStandard
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaContainer
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 import java.io.File
 
 @Composable
@@ -76,6 +65,7 @@ fun UpdateDialog(
     onStartDownload: () -> Unit,
     onInstall: () -> Unit
 ) {
+    val appColors = AppTheme.colors
     val isDownloaded = downloadedFile != null
     val dialogShape = remember { RoundedCornerShape(CornerRadiusModal) }
 
@@ -88,12 +78,12 @@ fun UpdateDialog(
             .glassBorder(
                 shape = dialogShape,
                 strokeWidth = StrokeWidthBorder,
-                startColor = GlassBorderBright.copy(alpha = 0.45f),
-                endColor = GlassBorderSubtle
+                startColor = appColors.glassBorderBright.copy(alpha = 0.45f),
+                endColor = appColors.glassBorderSubtle
             ),
-        containerColor = ObsidianCardHigh,
-        titleContentColor = TextPrimary,
-        textContentColor = TextSecondary,
+        containerColor = appColors.cardHigh,
+        titleContentColor = appColors.textPrimary,
+        textContentColor = appColors.textSecondary,
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -103,11 +93,11 @@ fun UpdateDialog(
                     modifier = Modifier
                         .size(IconSizeHero)
                         .clip(CircleShape)
-                        .background(ToscaContainer)
+                        .background(appColors.surfaceVariant)
                         .glassBorder(
                             shape = CircleShape,
                             strokeWidth = StrokeWidthBorder,
-                            startColor = ToscaGlassBorder,
+                            startColor = appColors.accentLight.copy(alpha = 0.45f),
                             endColor = Color.Transparent
                         ),
                     contentAlignment = Alignment.Center
@@ -115,7 +105,7 @@ fun UpdateDialog(
                     Icon(
                         imageVector = if (isDownloaded) Icons.Rounded.CheckCircle else Icons.Rounded.SystemUpdate,
                         contentDescription = null,
-                        tint = ToscaPrimary,
+                        tint = appColors.accent,
                         modifier = Modifier.size(IconSizeStandard)
                     )
                 }
@@ -125,12 +115,12 @@ fun UpdateDialog(
                         text = if (isDownloaded) stringResource(R.string.update_ready_title) else stringResource(R.string.update_available_title),
                         fontSize = 17.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = appColors.textPrimary
                     )
                     Text(
                         text = stringResource(R.string.update_version_label, updateInfo.latestVersion),
                         fontSize = 12.sp,
-                        color = ToscaPrimary,
+                        color = appColors.accent,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -143,7 +133,7 @@ fun UpdateDialog(
                         text = stringResource(R.string.update_release_notes_label),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         modifier = Modifier.padding(bottom = 6.dp)
                     )
                     Box(
@@ -151,11 +141,11 @@ fun UpdateDialog(
                             .fillMaxWidth()
                             .heightIn(max = 160.dp)
                             .clip(RoundedCornerShape(CornerRadiusMd))
-                            .background(GlassFillLight)
+                            .background(appColors.glassFillLight)
                             .glassBorder(
                                 shape = RoundedCornerShape(CornerRadiusMd),
                                 strokeWidth = StrokeWidthStandard,
-                                startColor = GlassBorderBright.copy(alpha = 0.25f),
+                                startColor = appColors.glassBorderBright.copy(alpha = 0.25f),
                                 endColor = Color.Transparent
                             )
                             .padding(SpacingMd)
@@ -164,7 +154,7 @@ fun UpdateDialog(
                         Text(
                             text = updateInfo.releaseNotes,
                             fontSize = 13.sp,
-                            color = TextPrimary,
+                            color = appColors.textPrimary,
                             lineHeight = 18.sp
                         )
                     }
@@ -182,28 +172,28 @@ fun UpdateDialog(
                                 .fillMaxWidth()
                                 .height(SpacingSm)
                                 .clip(RoundedCornerShape(CornerRadiusXs)),
-                            color = ToscaPrimary,
-                            trackColor = ObsidianSurfaceVariant,
+                            color = appColors.accent,
+                            trackColor = appColors.surfaceVariant,
                             strokeCap = StrokeCap.Round
                         )
                         Spacer(modifier = Modifier.height(SpacingSm))
                         Text(
                             text = stringResource(R.string.update_downloading_progress, (downloadProgress * 100).toInt()),
                             fontSize = 12.sp,
-                            color = TextSecondary
+                            color = appColors.textSecondary
                         )
                     }
                 } else if (isDownloaded) {
                     Text(
                         text = stringResource(R.string.update_downloaded_message, updateInfo.apkFileName),
                         fontSize = 13.sp,
-                        color = TextSecondary
+                        color = appColors.textSecondary
                     )
                 } else {
                     Text(
                         text = stringResource(R.string.update_available_message),
                         fontSize = 13.sp,
-                        color = TextSecondary
+                        color = appColors.textSecondary
                     )
                 }
             }
@@ -214,8 +204,8 @@ fun UpdateDialog(
                 Button(
                     onClick = onInstall,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = ToscaPrimary,
-                        contentColor = ObsidianBlack
+                        containerColor = appColors.accent,
+                        contentColor = appColors.onAccent
                     ),
                     shape = RoundedCornerShape(CornerRadiusMd),
                     modifier = Modifier.pressedScale(targetScale = ScalePressedDockItem, interactionSource = confirmSource)
@@ -227,8 +217,8 @@ fun UpdateDialog(
                     onClick = {},
                     enabled = false,
                     colors = ButtonDefaults.buttonColors(
-                        disabledContainerColor = ToscaContainer,
-                        disabledContentColor = TextMuted
+                        disabledContainerColor = appColors.accent.copy(alpha = 0.25f),
+                        disabledContentColor = appColors.textMuted
                     ),
                     shape = RoundedCornerShape(CornerRadiusMd)
                 ) {
@@ -238,8 +228,8 @@ fun UpdateDialog(
                 Button(
                     onClick = onStartDownload,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = ToscaPrimary,
-                        contentColor = ObsidianBlack
+                        containerColor = appColors.accent,
+                        contentColor = appColors.onAccent
                     ),
                     shape = RoundedCornerShape(CornerRadiusMd),
                     modifier = Modifier.pressedScale(targetScale = ScalePressedDockItem, interactionSource = confirmSource)
@@ -254,7 +244,7 @@ fun UpdateDialog(
                     onClick = onDismiss,
                     shape = RoundedCornerShape(CornerRadiusMd)
                 ) {
-                    Text(if (isDownloaded) stringResource(R.string.dialog_close) else stringResource(R.string.update_action_later), color = TextSecondary)
+                    Text(if (isDownloaded) stringResource(R.string.dialog_close) else stringResource(R.string.update_action_later), color = appColors.textSecondary)
                 }
             }
         }

@@ -50,26 +50,17 @@ import com.example.p5.domain.model.AppThemeId
 import com.example.p5.domain.model.ThemeCategory
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.AppThemePalette
 import com.example.p5.ui.theme.CornerRadiusCard
 import com.example.p5.ui.theme.CornerRadiusPill
 import com.example.p5.ui.theme.CornerRadiusSm
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianFloating
 import com.example.p5.ui.theme.ScalePressedCard
 import com.example.p5.ui.theme.SpacingMd
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.SpacingXs
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,6 +70,7 @@ fun ThemeSelectorBottomSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var selectedCategory by remember { mutableStateOf<ThemeCategory?>(null) }
 
@@ -100,8 +92,8 @@ fun ThemeSelectorBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = ObsidianFloating,
-        scrimColor = ObsidianBlack.copy(alpha = 0.65f),
+        containerColor = appColors.cardHigh,
+        scrimColor = appColors.background.copy(alpha = 0.65f),
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         dragHandle = null,
         modifier = modifier
@@ -121,7 +113,7 @@ fun ThemeSelectorBottomSheet(
             ) {
                 Text(
                     text = stringResource(R.string.theme_sheet_title),
-                    color = TextPrimary,
+                    color = appColors.textPrimary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -130,7 +122,7 @@ fun ThemeSelectorBottomSheet(
                     Icon(
                         imageVector = Icons.Rounded.Close,
                         contentDescription = stringResource(R.string.dialog_close),
-                        tint = TextSecondary,
+                        tint = appColors.textSecondary,
                         modifier = Modifier.size(IconSizeStandard)
                     )
                 }
@@ -151,12 +143,12 @@ fun ThemeSelectorBottomSheet(
                         modifier = Modifier
                             .pressedScale(targetScale = 0.95f, interactionSource = chipSource)
                             .clip(RoundedCornerShape(CornerRadiusPill))
-                            .background(if (isSelected) ToscaPrimary.copy(alpha = 0.18f) else GlassFillLight)
+                            .background(if (isSelected) appColors.accent.copy(alpha = 0.18f) else appColors.glassFillLight)
                             .glassBorder(
                                 shape = RoundedCornerShape(CornerRadiusPill),
                                 strokeWidth = StrokeWidthBorder,
-                                startColor = if (isSelected) ToscaPrimary else GlassBorderBright.copy(alpha = 0.25f),
-                                endColor = GlassBorderSubtle
+                                startColor = if (isSelected) appColors.accent else appColors.glassBorderBright.copy(alpha = 0.25f),
+                                endColor = appColors.glassBorderSubtle
                             )
                             .clickable(
                                 interactionSource = chipSource,
@@ -168,7 +160,7 @@ fun ThemeSelectorBottomSheet(
                     ) {
                         Text(
                             text = label,
-                            color = if (isSelected) ToscaPrimary else TextSecondary,
+                            color = if (isSelected) appColors.accent else appColors.textSecondary,
                             fontSize = 12.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                         )
@@ -197,12 +189,12 @@ fun ThemeSelectorBottomSheet(
                             .fillMaxWidth()
                             .pressedScale(targetScale = ScalePressedCard, interactionSource = itemSource)
                             .clip(RoundedCornerShape(CornerRadiusCard))
-                            .background(if (isSelected) palette.accent.copy(alpha = 0.12f) else GlassFillMedium)
+                            .background(if (isSelected) palette.accent.copy(alpha = 0.12f) else appColors.glassFillMedium)
                             .glassBorder(
                                 shape = RoundedCornerShape(CornerRadiusCard),
                                 strokeWidth = StrokeWidthBorder,
-                                startColor = if (isSelected) palette.accent else GlassBorderBright.copy(alpha = 0.30f),
-                                endColor = GlassBorderSubtle,
+                                startColor = if (isSelected) palette.accent else appColors.glassBorderBright.copy(alpha = 0.30f),
+                                endColor = appColors.glassBorderSubtle,
                                 accentGlow = if (isSelected) palette.accentGlow else null
                             )
                             .clickable(
@@ -249,7 +241,7 @@ fun ThemeSelectorBottomSheet(
 
                             Text(
                                 text = theme.title,
-                                color = TextPrimary,
+                                color = appColors.textPrimary,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Bold
                             )

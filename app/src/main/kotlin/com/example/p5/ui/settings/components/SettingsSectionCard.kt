@@ -24,18 +24,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.ui.components.glass.glassBorder
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.CornerRadiusCard
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianFloating
 import com.example.p5.ui.theme.SpacingMd
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun SettingsSectionCard(
@@ -45,18 +39,19 @@ fun SettingsSectionCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val appColors = AppTheme.colors
     val cardShape = remember { RoundedCornerShape(CornerRadiusCard) }
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .clip(cardShape)
-            .background(ObsidianFloating)
+            .background(appColors.card)
             .glassBorder(
                 shape = cardShape,
                 strokeWidth = StrokeWidthBorder,
-                startColor = GlassBorderBright.copy(alpha = 0.35f),
-                endColor = GlassBorderSubtle
+                startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                endColor = appColors.glassBorderSubtle
             )
             .padding(SpacingMd)
     ) {
@@ -69,13 +64,13 @@ fun SettingsSectionCard(
                     modifier = Modifier
                         .size(36.dp)
                         .clip(CircleShape)
-                        .background(GlassFillMedium),
+                        .background(appColors.glassFillMedium),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = ToscaPrimary,
+                        tint = appColors.accent,
                         modifier = Modifier.size(IconSizeStandard)
                     )
                 }
@@ -85,14 +80,14 @@ fun SettingsSectionCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = title,
-                        color = TextPrimary,
+                        color = appColors.textPrimary,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.Bold
                     )
                     if (subtitle != null) {
                         Text(
                             text = subtitle,
-                            color = TextSecondary,
+                            color = appColors.textSecondary,
                             fontSize = 12.sp,
                             lineHeight = 16.sp
                         )

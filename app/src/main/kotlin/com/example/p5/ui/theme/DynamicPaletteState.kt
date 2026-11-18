@@ -15,11 +15,24 @@ import androidx.compose.ui.platform.LocalContext
 @Composable
 fun rememberDynamicPlayerPalette(artworkUrl: String?): PlayerColorPalette {
     val context = LocalContext.current
-    var targetPalette by remember(artworkUrl) { mutableStateOf(PlayerColorPalette.Default) }
+    val appColors = AppTheme.colors
+    val fallbackPalette = remember(appColors) {
+        PlayerColorPalette(
+            dominant = appColors.card,
+            vibrant = appColors.accent,
+            darkVibrant = appColors.surface,
+            lightVibrant = appColors.accentLight,
+            muted = appColors.surfaceVariant,
+            accent = appColors.accent
+        )
+    }
+    var targetPalette by remember(artworkUrl, fallbackPalette) {
+        mutableStateOf(fallbackPalette)
+    }
 
-    LaunchedEffect(artworkUrl) {
+    LaunchedEffect(artworkUrl, fallbackPalette) {
         if (artworkUrl.isNullOrBlank()) {
-            targetPalette = PlayerColorPalette.Default
+            targetPalette = fallbackPalette
         } else {
             targetPalette = PaletteExtractor.extractFromUrl(context, artworkUrl)
         }

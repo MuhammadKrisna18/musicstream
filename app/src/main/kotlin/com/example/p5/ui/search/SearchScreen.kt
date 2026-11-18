@@ -55,8 +55,8 @@ import com.example.p5.ui.search.components.SearchTopHeader
 import com.example.p5.ui.search.components.SectionDetailContent
 import com.example.p5.ui.search.components.rememberShimmerBrush
 import com.example.p5.ui.search.components.searchShimmerSkeleton
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.BottomScrollPadding
-import com.example.p5.ui.theme.ToscaPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -261,7 +261,7 @@ fun SearchScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     CircularProgressIndicator(
-                                        color = ToscaPrimary,
+                                        color = AppTheme.colors.accent,
                                         strokeWidth = 3.dp,
                                         modifier = Modifier.size(36.dp)
                                     )

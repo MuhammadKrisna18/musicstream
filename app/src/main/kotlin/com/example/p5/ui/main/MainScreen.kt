@@ -45,8 +45,7 @@ import com.example.p5.ui.search.SearchScreen
 import com.example.p5.ui.search.SearchViewModel
 import com.example.p5.ui.settings.SettingsScreen
 import com.example.p5.ui.settings.SettingsViewModel
-import com.example.p5.ui.theme.ObsidianBackground
-import com.example.p5.ui.theme.ObsidianBlack
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.rememberDynamicPlayerPalette
 import com.example.p5.ui.update.UpdateViewModel
 import kotlinx.coroutines.launch
@@ -99,9 +98,11 @@ fun MainScreen(
         }
     }
 
+    val appColors = AppTheme.colors
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = ObsidianBackground,
+        containerColor = appColors.background,
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
@@ -109,32 +110,34 @@ fun MainScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(ObsidianBackground)
+                .background(appColors.background)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.bg_anime_midnight),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0.35f)
-            )
+            if (appColors.backgroundImageRes != null) {
+                Image(
+                    painter = painterResource(id = appColors.backgroundImageRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(0.35f)
+                )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                ObsidianBlack.copy(alpha = 0.72f),
-                                Color.Transparent,
-                                ObsidianBlack.copy(alpha = 0.88f)
-                            ),
-                            startY = 0f,
-                            endY = 1800f
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    appColors.background.copy(alpha = 0.72f),
+                                    Color.Transparent,
+                                    appColors.background.copy(alpha = 0.88f)
+                                ),
+                                startY = 0f,
+                                endY = 1800f
+                            )
                         )
-                    )
-            )
+                )
+            }
 
             Crossfade(
                 targetState = selectedTab,

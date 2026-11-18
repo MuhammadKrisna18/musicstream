@@ -22,10 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.p5.domain.model.Song
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.VelvetPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun ArtistTopSongsSection(
@@ -35,6 +32,7 @@ fun ArtistTopSongsSection(
     modifier: Modifier = Modifier
 ) {
     if (songs.isEmpty()) return
+    val appColors = AppTheme.colors
 
     Column(
         modifier = modifier
@@ -43,7 +41,7 @@ fun ArtistTopSongsSection(
     ) {
         Text(
             text = "Lagu Teratas",
-            color = TextPrimary,
+            color = appColors.textPrimary,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
         )
@@ -62,7 +60,7 @@ fun ArtistTopSongsSection(
             ) {
                 Text(
                     text = "${index + 1}",
-                    color = if (isPlaying) VelvetPrimary else TextMuted,
+                    color = if (isPlaying) appColors.accent else appColors.textMuted,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.width(24.dp)
@@ -82,7 +80,7 @@ fun ArtistTopSongsSection(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = song.title,
-                        color = if (isPlaying) VelvetPrimary else TextPrimary,
+                        color = if (isPlaying) appColors.accent else appColors.textPrimary,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
@@ -91,7 +89,7 @@ fun ArtistTopSongsSection(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "${song.artist} • ${song.durationFormatted}",
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis

@@ -36,26 +36,18 @@ import com.example.p5.R
 import com.example.p5.domain.model.SleepTimerPresets
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.CornerRadiusCard
 import com.example.p5.ui.theme.CornerRadiusMd
 import com.example.p5.ui.theme.CornerRadiusModal
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
 import com.example.p5.ui.theme.IconSizeHero
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianCardHigh
 import com.example.p5.ui.theme.ScalePressedCard
 import com.example.p5.ui.theme.SpacingMd
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.SpacingXs
 import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.StrokeWidthStandard
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaContainer
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun SleepTimerDialog(
@@ -66,6 +58,7 @@ fun SleepTimerDialog(
     onCancelTimer: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val appColors = AppTheme.colors
     val isTimerActive = secondsRemaining != null || isEndOfTrack
     val dialogShape = remember { RoundedCornerShape(CornerRadiusModal) }
 
@@ -76,12 +69,12 @@ fun SleepTimerDialog(
             .glassBorder(
                 shape = dialogShape,
                 strokeWidth = StrokeWidthBorder,
-                startColor = GlassBorderBright.copy(alpha = 0.45f),
-                endColor = GlassBorderSubtle
+                startColor = appColors.glassBorderBright.copy(alpha = 0.45f),
+                endColor = appColors.glassBorderSubtle
             ),
-        containerColor = ObsidianCardHigh,
-        titleContentColor = TextPrimary,
-        textContentColor = TextSecondary,
+        containerColor = appColors.cardHigh,
+        titleContentColor = appColors.textPrimary,
+        textContentColor = appColors.textSecondary,
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -91,11 +84,11 @@ fun SleepTimerDialog(
                     modifier = Modifier
                         .size(IconSizeHero)
                         .clip(CircleShape)
-                        .background(ToscaContainer)
+                        .background(appColors.surfaceVariant)
                         .glassBorder(
                             shape = CircleShape,
                             strokeWidth = StrokeWidthBorder,
-                            startColor = ToscaGlassBorder,
+                            startColor = appColors.accentLight.copy(alpha = 0.45f),
                             endColor = Color.Transparent
                         ),
                     contentAlignment = Alignment.Center
@@ -103,7 +96,7 @@ fun SleepTimerDialog(
                     Icon(
                         imageVector = Icons.Rounded.Bedtime,
                         contentDescription = null,
-                        tint = ToscaPrimary,
+                        tint = appColors.accent,
                         modifier = Modifier.size(IconSizeStandard)
                     )
                 }
@@ -113,7 +106,7 @@ fun SleepTimerDialog(
                         text = stringResource(R.string.sleep_timer_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = TextPrimary
+                        color = appColors.textPrimary
                     )
                     Text(
                         text = if (isTimerActive) {
@@ -121,7 +114,7 @@ fun SleepTimerDialog(
                             else stringResource(R.string.sleep_timer_subtitle_countdown, formatCountdown(secondsRemaining ?: 0L))
                         } else stringResource(R.string.sleep_timer_subtitle_idle),
                         fontSize = 12.sp,
-                        color = if (isTimerActive) ToscaPrimary else TextSecondary,
+                        color = if (isTimerActive) appColors.accent else appColors.textSecondary,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -163,12 +156,12 @@ fun SleepTimerDialog(
                             .fillMaxWidth()
                             .pressedScale(targetScale = ScalePressedCard, interactionSource = cancelSource)
                             .clip(RoundedCornerShape(CornerRadiusCard))
-                            .background(ToscaPrimary.copy(alpha = 0.12f))
+                            .background(appColors.accent.copy(alpha = 0.12f))
                             .glassBorder(
                                 shape = RoundedCornerShape(CornerRadiusCard),
                                 strokeWidth = StrokeWidthBorder,
-                                startColor = ToscaGlassBorder,
-                                endColor = GlassBorderSubtle
+                                startColor = appColors.accentLight.copy(alpha = 0.5f),
+                                endColor = appColors.glassBorderSubtle
                             )
                             .clickable(
                                 interactionSource = cancelSource,
@@ -183,14 +176,14 @@ fun SleepTimerDialog(
                     ) {
                         Text(
                             text = stringResource(R.string.sleep_timer_cancel),
-                            color = ToscaPrimary,
+                            color = appColors.accent,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                         Icon(
                             imageVector = Icons.Rounded.Close,
                             contentDescription = stringResource(R.string.sleep_timer_cancel_icon_desc),
-                            tint = ToscaPrimary,
+                            tint = appColors.accent,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -203,7 +196,7 @@ fun SleepTimerDialog(
                 onClick = onDismiss,
                 shape = RoundedCornerShape(CornerRadiusMd)
             ) {
-                Text(stringResource(R.string.dialog_close), color = TextSecondary)
+                Text(stringResource(R.string.dialog_close), color = appColors.textSecondary)
             }
         }
     )
@@ -215,6 +208,7 @@ private fun TimerOptionItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val itemShape = remember { RoundedCornerShape(CornerRadiusCard) }
 
@@ -223,20 +217,20 @@ private fun TimerOptionItem(
             .fillMaxWidth()
             .pressedScale(targetScale = ScalePressedCard, interactionSource = interactionSource)
             .clip(itemShape)
-            .background(if (isSelected) ToscaPrimary.copy(alpha = 0.16f) else GlassFillLight)
+            .background(if (isSelected) appColors.accent.copy(alpha = 0.16f) else appColors.glassFillLight)
             .then(
                 if (isSelected) {
                     Modifier.glassBorder(
                         shape = itemShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = ToscaGlassBorder,
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.accentLight.copy(alpha = 0.5f),
+                        endColor = appColors.glassBorderSubtle
                     )
                 } else {
                     Modifier.glassBorder(
                         shape = itemShape,
                         strokeWidth = StrokeWidthStandard,
-                        startColor = GlassBorderBright.copy(alpha = 0.25f),
+                        startColor = appColors.glassBorderBright.copy(alpha = 0.25f),
                         endColor = Color.Transparent
                     )
                 }
@@ -252,7 +246,7 @@ private fun TimerOptionItem(
     ) {
         Text(
             text = title,
-            color = if (isSelected) ToscaPrimary else TextPrimary,
+            color = if (isSelected) appColors.accent else appColors.textPrimary,
             fontSize = 14.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
         )
@@ -261,7 +255,7 @@ private fun TimerOptionItem(
             Icon(
                 imageVector = Icons.Rounded.Check,
                 contentDescription = null,
-                tint = ToscaPrimary,
+                tint = appColors.accent,
                 modifier = Modifier.size(18.dp)
             )
         }

@@ -53,14 +53,11 @@ import com.example.p5.ui.settings.components.SettingsSectionCard
 import com.example.p5.ui.settings.components.SettingsTopHeader
 import com.example.p5.ui.settings.components.ThemeSelectorBottomSheet
 import com.example.p5.ui.theme.ActionButtonSizeSm
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.AppThemePalette
 import com.example.p5.ui.theme.BottomScrollPadding
 import com.example.p5.ui.theme.CornerRadiusPill
 import com.example.p5.ui.theme.CornerRadiusSm
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
-import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.GlassFillMedium
 import com.example.p5.ui.theme.IconSizeSm
 import com.example.p5.ui.theme.ScalePressedButton
 import com.example.p5.ui.theme.SpacingLg
@@ -69,11 +66,6 @@ import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.SpacingXs
 import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.StrokeWidthThick
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun SettingsScreen(
@@ -82,6 +74,7 @@ fun SettingsScreen(
     onCheckForUpdate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val uiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -119,7 +112,7 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.settings_theme_current),
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -137,7 +130,7 @@ fun SettingsScreen(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(CornerRadiusPill))
-                                .background(GlassFillMedium)
+                                .background(appColors.glassFillMedium)
                                 .glassBorder(
                                     shape = RoundedCornerShape(CornerRadiusPill),
                                     strokeWidth = StrokeWidthBorder,
@@ -165,12 +158,12 @@ fun SettingsScreen(
                         .height(ActionButtonSizeSm)
                         .pressedScale(targetScale = ScalePressedButton, interactionSource = themeBtnSource)
                         .clip(RoundedCornerShape(CornerRadiusSm))
-                        .background(GlassFillLight)
+                        .background(appColors.glassFillLight)
                         .glassBorder(
                             shape = RoundedCornerShape(CornerRadiusSm),
                             strokeWidth = StrokeWidthBorder,
-                            startColor = GlassBorderBright.copy(alpha = 0.35f),
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                            endColor = appColors.glassBorderSubtle
                         )
                         .clickable(
                             interactionSource = themeBtnSource,
@@ -186,12 +179,12 @@ fun SettingsScreen(
                         Icon(
                             imageVector = Icons.Rounded.Palette,
                             contentDescription = null,
-                            tint = ToscaPrimary,
+                            tint = appColors.accent,
                             modifier = Modifier.size(IconSizeSm)
                         )
                         Text(
                             text = stringResource(R.string.settings_theme_change_button),
-                            color = TextPrimary,
+                            color = appColors.textPrimary,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -213,7 +206,7 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.settings_storage_cache_size),
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -221,11 +214,11 @@ fun SettingsScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(CornerRadiusPill))
-                            .background(GlassFillMedium)
+                            .background(appColors.glassFillMedium)
                             .glassBorder(
                                 shape = RoundedCornerShape(CornerRadiusPill),
                                 strokeWidth = StrokeWidthBorder,
-                                startColor = ToscaGlassBorder,
+                                startColor = appColors.accentLight.copy(alpha = 0.45f),
                                 endColor = Color.Transparent
                             )
                             .padding(horizontal = 10.dp, vertical = 4.dp),
@@ -233,7 +226,7 @@ fun SettingsScreen(
                     ) {
                         Text(
                             text = uiState.formattedCacheSize,
-                            color = ToscaPrimary,
+                            color = appColors.accent,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -244,7 +237,7 @@ fun SettingsScreen(
 
                 Text(
                     text = stringResource(R.string.settings_storage_desc),
-                    color = TextMuted,
+                    color = appColors.textMuted,
                     fontSize = 11.sp,
                     lineHeight = 15.sp
                 )
@@ -269,12 +262,12 @@ fun SettingsScreen(
                             }
                         )
                         .clip(RoundedCornerShape(CornerRadiusSm))
-                        .background(if (isClearEnabled) GlassFillLight else GlassFillMedium.copy(alpha = 0.5f))
+                        .background(if (isClearEnabled) appColors.glassFillLight else appColors.glassFillMedium.copy(alpha = 0.5f))
                         .glassBorder(
                             shape = RoundedCornerShape(CornerRadiusSm),
                             strokeWidth = StrokeWidthBorder,
-                            startColor = if (isClearEnabled) GlassBorderBright.copy(alpha = 0.35f) else Color.Transparent,
-                            endColor = GlassBorderSubtle
+                            startColor = if (isClearEnabled) appColors.glassBorderBright.copy(alpha = 0.35f) else Color.Transparent,
+                            endColor = appColors.glassBorderSubtle
                         )
                         .clickable(
                             interactionSource = clearSource,
@@ -290,13 +283,13 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(SpacingSm)
                         ) {
                             CircularProgressIndicator(
-                                color = ToscaPrimary,
+                                color = appColors.accent,
                                 strokeWidth = StrokeWidthThick,
                                 modifier = Modifier.size(IconSizeSm)
                             )
                             Text(
                                 text = stringResource(R.string.settings_storage_clearing),
-                                color = TextSecondary,
+                                color = appColors.textSecondary,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -309,12 +302,12 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Rounded.DeleteOutline,
                                 contentDescription = null,
-                                tint = if (isClearEnabled) ToscaPrimary else TextMuted,
+                                tint = if (isClearEnabled) appColors.accent else appColors.textMuted,
                                 modifier = Modifier.size(IconSizeSm)
                             )
                             Text(
                                 text = stringResource(R.string.settings_storage_clear),
-                                color = if (isClearEnabled) TextPrimary else TextMuted,
+                                color = if (isClearEnabled) appColors.textPrimary else appColors.textMuted,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -337,7 +330,7 @@ fun SettingsScreen(
                 ) {
                     Text(
                         text = stringResource(R.string.settings_update_current_version),
-                        color = TextSecondary,
+                        color = appColors.textSecondary,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -345,11 +338,11 @@ fun SettingsScreen(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(CornerRadiusPill))
-                            .background(GlassFillMedium)
+                            .background(appColors.glassFillMedium)
                             .glassBorder(
                                 shape = RoundedCornerShape(CornerRadiusPill),
                                 strokeWidth = StrokeWidthBorder,
-                                startColor = GlassBorderBright.copy(alpha = 0.25f),
+                                startColor = appColors.glassBorderBright.copy(alpha = 0.25f),
                                 endColor = Color.Transparent
                             )
                             .padding(horizontal = 10.dp, vertical = 4.dp),
@@ -357,7 +350,7 @@ fun SettingsScreen(
                     ) {
                         Text(
                             text = "v${uiState.currentVersion}",
-                            color = TextPrimary,
+                            color = appColors.textPrimary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -383,12 +376,12 @@ fun SettingsScreen(
                             }
                         )
                         .clip(RoundedCornerShape(CornerRadiusSm))
-                        .background(GlassFillLight)
+                        .background(appColors.glassFillLight)
                         .glassBorder(
                             shape = RoundedCornerShape(CornerRadiusSm),
                             strokeWidth = StrokeWidthBorder,
-                            startColor = GlassBorderBright.copy(alpha = 0.35f),
-                            endColor = GlassBorderSubtle
+                            startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
+                            endColor = appColors.glassBorderSubtle
                         )
                         .clickable(
                             interactionSource = updateSource,
@@ -404,13 +397,13 @@ fun SettingsScreen(
                             horizontalArrangement = Arrangement.spacedBy(SpacingSm)
                         ) {
                             CircularProgressIndicator(
-                                color = ToscaPrimary,
+                                color = appColors.accent,
                                 strokeWidth = StrokeWidthThick,
                                 modifier = Modifier.size(IconSizeSm)
                             )
                             Text(
                                 text = stringResource(R.string.settings_update_checking),
-                                color = TextSecondary,
+                                color = appColors.textSecondary,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -423,12 +416,12 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Rounded.Refresh,
                                 contentDescription = null,
-                                tint = ToscaPrimary,
+                                tint = appColors.accent,
                                 modifier = Modifier.size(IconSizeSm)
                             )
                             Text(
                                 text = stringResource(R.string.settings_update_check_button),
-                                color = TextPrimary,
+                                color = appColors.textPrimary,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -457,13 +450,13 @@ fun SettingsScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.settings_about_developer),
-                            color = TextSecondary,
+                            color = appColors.textSecondary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         )
                         Text(
                             text = stringResource(R.string.settings_about_developer_name),
-                            color = TextPrimary,
+                            color = appColors.textPrimary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -486,7 +479,7 @@ fun SettingsScreen(
                     ) {
                         Text(
                             text = stringResource(R.string.settings_about_github),
-                            color = TextSecondary,
+                            color = appColors.textSecondary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -496,14 +489,14 @@ fun SettingsScreen(
                         ) {
                             Text(
                                 text = "MuhammadKrisna18",
-                                color = ToscaPrimary,
+                                color = appColors.accent,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                             Icon(
                                 imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
                                 contentDescription = null,
-                                tint = ToscaPrimary,
+                                tint = appColors.accent,
                                 modifier = Modifier.size(14.dp)
                             )
                         }

@@ -37,27 +37,20 @@ import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.ArtworkTrackSize
 import com.example.p5.ui.theme.CornerRadiusCard
 import com.example.p5.ui.theme.CornerRadiusMd
 import com.example.p5.ui.theme.DurationFast
 import com.example.p5.ui.theme.DurationNormal
 import com.example.p5.ui.theme.GlassBorderMedium
-import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.IconSizeSm
-import com.example.p5.ui.theme.ObsidianSurfaceVariant
 import com.example.p5.ui.theme.ScalePressedButton
 import com.example.p5.ui.theme.ScalePressedSubtle
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.StrokeWidthHairline
 import com.example.p5.ui.theme.StrokeWidthStandard
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaContainer
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun SongItem(
@@ -69,12 +62,13 @@ fun SongItem(
     trailingContent: (@Composable () -> Unit)? = null,
     onMoreOptionsClick: ((Song) -> Unit)? = null
 ) {
+    val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val cardShape = remember { RoundedCornerShape(CornerRadiusCard) }
 
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) {
-            ToscaPrimary.copy(alpha = 0.12f)
+            appColors.accent.copy(alpha = 0.12f)
         } else {
             Color.Transparent
         },
@@ -83,7 +77,7 @@ fun SongItem(
     )
 
     val titleColor by animateColorAsState(
-        targetValue = if (isSelected) ToscaPrimary else TextPrimary,
+        targetValue = if (isSelected) appColors.accent else appColors.textPrimary,
         animationSpec = tween(durationMillis = DurationFast),
         label = "song_item_title_color"
     )
@@ -99,15 +93,15 @@ fun SongItem(
                     Modifier.glassBorder(
                         shape = cardShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = ToscaGlassBorder,
-                        endColor = GlassBorderSubtle,
-                        accentGlow = ToscaPrimary.copy(alpha = 0.5f)
+                        startColor = appColors.accentLight.copy(alpha = 0.5f),
+                        endColor = appColors.glassBorderSubtle,
+                        accentGlow = appColors.accent.copy(alpha = 0.5f)
                     )
                 } else {
                     Modifier.glassBorder(
                         shape = cardShape,
                         strokeWidth = StrokeWidthStandard,
-                        startColor = GlassBorderSubtle.copy(alpha = 0.35f),
+                        startColor = appColors.glassBorderSubtle.copy(alpha = 0.35f),
                         endColor = Color.Transparent
                     )
                 }
@@ -124,7 +118,7 @@ fun SongItem(
             modifier = Modifier
                 .size(ArtworkTrackSize)
                 .clip(RoundedCornerShape(CornerRadiusMd))
-                .background(ObsidianSurfaceVariant)
+                .background(appColors.surfaceVariant)
                 .glassBorder(
                     shape = RoundedCornerShape(CornerRadiusMd),
                     strokeWidth = StrokeWidthHairline,
@@ -145,7 +139,7 @@ fun SongItem(
                         .fillMaxSize()
                         .background(
                             if (isPlaying) {
-                                ToscaContainer.copy(alpha = 0.72f)
+                                appColors.accentDark.copy(alpha = 0.72f)
                             } else {
                                 Color.Black.copy(alpha = 0.55f)
                             }
@@ -153,7 +147,7 @@ fun SongItem(
                     contentAlignment = Alignment.Center
                 ) {
                     MiniEqualizer(
-                        barColor = if (isPlaying) ToscaPrimary else TextSecondary,
+                        barColor = if (isPlaying) appColors.accent else appColors.textSecondary,
                         isPlaying = isPlaying
                     )
                 }
@@ -190,7 +184,7 @@ fun SongItem(
 
             Text(
                 text = subtitleText,
-                color = TextSecondary,
+                color = appColors.textSecondary,
                 fontSize = 13.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -209,7 +203,7 @@ fun SongItem(
                 if (song.durationFormatted.isNotBlank()) {
                     Text(
                         text = song.durationFormatted,
-                        color = TextMuted,
+                        color = appColors.textMuted,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Normal
                     )
@@ -232,7 +226,7 @@ fun SongItem(
                         Icon(
                             imageVector = Icons.Rounded.MoreVert,
                             contentDescription = null,
-                            tint = TextSecondary,
+                            tint = appColors.textSecondary,
                             modifier = Modifier.size(IconSizeSm)
                         )
                     }

@@ -42,16 +42,15 @@ import com.example.p5.ui.components.player.PlayerControlsView
 import com.example.p5.ui.components.player.PlayerLyricsView
 import com.example.p5.ui.components.player.PlayerQueueView
 import com.example.p5.ui.components.player.PlayerTopBar
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.AuroraCyan
 import com.example.p5.ui.theme.AuroraDeepIndigo
 import com.example.p5.ui.theme.DurationAuroraFlow
 import com.example.p5.ui.theme.DurationFast
 import com.example.p5.ui.theme.DurationNormal
-import com.example.p5.ui.theme.ObsidianBlack
 import com.example.p5.ui.theme.SpacingLg
 import com.example.p5.ui.theme.SpacingMd
 import com.example.p5.ui.theme.SpacingXxl
-import com.example.p5.ui.theme.ToscaPrimary
 import com.example.p5.ui.theme.rememberDynamicPlayerPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,20 +102,24 @@ fun FullPlayerSheet(
         label = "aurora1"
     )
 
+    val appColors = AppTheme.colors
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = ObsidianBlack,
+        containerColor = appColors.background,
         dragHandle = null
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.bg_anime_midnight),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                alpha = 0.35f,
-                modifier = Modifier.fillMaxSize()
-            )
+            if (appColors.backgroundImageRes != null) {
+                Image(
+                    painter = painterResource(id = appColors.backgroundImageRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    alpha = 0.35f,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
             Box(
                 modifier = Modifier
@@ -125,8 +128,8 @@ fun FullPlayerSheet(
                         Brush.verticalGradient(
                             colors = listOf(
                                 palette.darkVibrant.copy(alpha = 0.70f),
-                                ObsidianBlack.copy(alpha = 0.88f),
-                                ObsidianBlack
+                                appColors.background.copy(alpha = 0.88f),
+                                appColors.background
                             ),
                             startY = auroraOffset1,
                             endY = 1600f

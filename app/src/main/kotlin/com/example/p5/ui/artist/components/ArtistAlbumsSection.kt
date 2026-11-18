@@ -24,8 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.p5.domain.model.Playlist
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
+import com.example.p5.ui.theme.AppTheme
 
 @Composable
 fun ArtistAlbumsSection(
@@ -35,6 +34,7 @@ fun ArtistAlbumsSection(
     modifier: Modifier = Modifier
 ) {
     if (playlists.isEmpty()) return
+    val appColors = AppTheme.colors
 
     Column(
         modifier = modifier
@@ -43,7 +43,7 @@ fun ArtistAlbumsSection(
     ) {
         Text(
             text = title,
-            color = TextPrimary,
+            color = appColors.textPrimary,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(horizontal = 20.dp)
@@ -75,7 +75,7 @@ fun ArtistAlbumsSection(
 
                     Text(
                         text = playlist.title,
-                        color = TextPrimary,
+                        color = appColors.textPrimary,
                         fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
@@ -86,7 +86,7 @@ fun ArtistAlbumsSection(
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = playlist.subtitle,
-                            color = TextMuted,
+                            color = appColors.textMuted,
                             fontSize = 11.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis

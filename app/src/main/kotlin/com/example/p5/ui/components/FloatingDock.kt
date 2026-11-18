@@ -39,21 +39,15 @@ import androidx.compose.ui.unit.sp
 import com.example.p5.R
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.CornerRadiusDock
 import com.example.p5.ui.theme.CornerRadiusHero
 import com.example.p5.ui.theme.DurationFast
-import com.example.p5.ui.theme.GlassBorderBright
-import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.IconSizeSm
 import com.example.p5.ui.theme.IconSizeStandard
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianFloating
 import com.example.p5.ui.theme.ScalePressedDockItem
 import com.example.p5.ui.theme.SpacingSm
 import com.example.p5.ui.theme.StrokeWidthBorder
-import com.example.p5.ui.theme.TextSecondary
-import com.example.p5.ui.theme.ToscaGlassBorder
-import com.example.p5.ui.theme.ToscaPrimary
 
 @Composable
 fun FloatingDock(
@@ -62,6 +56,7 @@ fun FloatingDock(
     favoriteCount: Int,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val dockShape = remember { RoundedCornerShape(CornerRadiusDock) }
 
     Box(
@@ -73,12 +68,12 @@ fun FloatingDock(
         Box(
             modifier = Modifier
                 .clip(dockShape)
-                .background(ObsidianFloating)
+                .background(appColors.floatingDock)
                 .glassBorder(
                     shape = dockShape,
                     strokeWidth = StrokeWidthBorder,
-                    startColor = GlassBorderBright.copy(alpha = 0.45f),
-                    endColor = GlassBorderSubtle
+                    startColor = appColors.glassBorderBright.copy(alpha = 0.45f),
+                    endColor = appColors.glassBorderSubtle
                 )
                 .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
@@ -123,17 +118,18 @@ private fun FloatingDockItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val itemShape = remember { RoundedCornerShape(CornerRadiusHero) }
 
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) ToscaPrimary else TextSecondary,
+        targetValue = if (isSelected) appColors.accent else appColors.textSecondary,
         animationSpec = tween(durationMillis = DurationFast),
         label = "dock_item_content_color"
     )
 
     val backgroundColor by animateColorAsState(
-        targetValue = if (isSelected) ToscaPrimary.copy(alpha = 0.15f) else Color.Transparent,
+        targetValue = if (isSelected) appColors.accent.copy(alpha = 0.15f) else Color.Transparent,
         animationSpec = tween(durationMillis = DurationFast),
         label = "dock_item_bg_color"
     )
@@ -154,8 +150,8 @@ private fun FloatingDockItem(
                     Modifier.glassBorder(
                         shape = itemShape,
                         strokeWidth = StrokeWidthBorder,
-                        startColor = ToscaGlassBorder,
-                        endColor = GlassBorderSubtle
+                        startColor = appColors.accentLight.copy(alpha = 0.5f),
+                        endColor = appColors.glassBorderSubtle
                     )
                 } else {
                     Modifier
@@ -174,8 +170,8 @@ private fun FloatingDockItem(
             badge = {
                 if (badgeCount > 0) {
                     Badge(
-                        containerColor = ToscaPrimary,
-                        contentColor = ObsidianBlack,
+                        containerColor = appColors.accent,
+                        contentColor = appColors.onAccent,
                         modifier = Modifier.size(IconSizeSm)
                     ) {
                         Text(

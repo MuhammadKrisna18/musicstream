@@ -62,12 +62,7 @@ import com.example.p5.ui.components.SongActionBottomSheet
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.library.LibraryViewModel
 import com.example.p5.ui.player.PlayerViewModel
-import com.example.p5.ui.theme.ObsidianBackground
-import com.example.p5.ui.theme.ObsidianBlack
-import com.example.p5.ui.theme.ObsidianSurface
-import com.example.p5.ui.theme.TextMuted
-import com.example.p5.ui.theme.TextPrimary
-import com.example.p5.ui.theme.VelvetPrimary
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.rememberDynamicPlayerPalette
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +78,7 @@ fun ArtistProfileScreen(
     libraryViewModel: LibraryViewModel = viewModel(factory = AppViewModelProvider.Factory),
     onNavigateToArtist: ((channelId: String, artistName: String) -> Unit)? = null
 ) {
+    val appColors = AppTheme.colors
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val playerState by playerViewModel.playerState.collectAsStateWithLifecycle()
     val libraryUiState by libraryViewModel.uiState.collectAsStateWithLifecycle()
@@ -98,8 +94,8 @@ fun ArtistProfileScreen(
     Scaffold(
         modifier = modifier
             .fillMaxSize()
-            .background(ObsidianBackground),
-        containerColor = ObsidianBackground,
+            .background(appColors.background),
+        containerColor = appColors.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -110,7 +106,7 @@ fun ArtistProfileScreen(
                     if (title.isNotBlank()) {
                         Text(
                             text = title,
-                            color = TextPrimary,
+                            color = appColors.textPrimary,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
@@ -123,12 +119,12 @@ fun ArtistProfileScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Kembali",
-                            tint = TextPrimary
+                            tint = appColors.textPrimary
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = ObsidianBackground.copy(alpha = 0.92f)
+                    containerColor = appColors.background.copy(alpha = 0.92f)
                 )
             )
         }
@@ -138,28 +134,30 @@ fun ArtistProfileScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.bg_anime_midnight),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0.20f)
-            )
+            if (appColors.backgroundImageRes != null) {
+                Image(
+                    painter = painterResource(id = appColors.backgroundImageRes),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .alpha(0.20f)
+                )
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                ObsidianBlack.copy(alpha = 0.70f),
-                                Color.Transparent,
-                                ObsidianBlack.copy(alpha = 0.90f)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    appColors.background.copy(alpha = 0.70f),
+                                    Color.Transparent,
+                                    appColors.background.copy(alpha = 0.90f)
+                                )
                             )
                         )
-                    )
-            )
+                )
+            }
 
             when (val state = uiState) {
                 is ArtistProfileUiState.Loading -> {
@@ -168,7 +166,7 @@ fun ArtistProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = VelvetPrimary,
+                            color = appColors.accent,
                             strokeWidth = 3.dp,
                             modifier = Modifier.size(40.dp)
                         )
@@ -187,7 +185,7 @@ fun ArtistProfileScreen(
                         ) {
                             Text(
                                 text = state.message,
-                                color = TextMuted,
+                                color = appColors.textMuted,
                                 fontSize = 14.sp,
                                 textAlign = TextAlign.Center
                             )
@@ -197,7 +195,8 @@ fun ArtistProfileScreen(
                             Button(
                                 onClick = { viewModel.loadArtist(channelId, artistNameFallback) },
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = VelvetPrimary
+                                    containerColor = appColors.accent,
+                                    contentColor = appColors.onAccent
                                 ),
                                 shape = RoundedCornerShape(20.dp)
                             ) {
@@ -272,7 +271,7 @@ fun ArtistProfileScreen(
                                 ) {
                                     Text(
                                         text = "Semua Rilisan",
-                                        color = TextPrimary,
+                                        color = appColors.textPrimary,
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -304,7 +303,7 @@ fun ArtistProfileScreen(
                                     ) {
                                         if (state.isLoadingAllSongs) {
                                             CircularProgressIndicator(
-                                                color = VelvetPrimary,
+                                                color = appColors.accent,
                                                 strokeWidth = 2.dp,
                                                 modifier = Modifier.size(28.dp)
                                             )
@@ -315,7 +314,7 @@ fun ArtistProfileScreen(
                                             ) {
                                                 Text(
                                                     text = "Muat Lebih Banyak Lagu",
-                                                    color = TextPrimary,
+                                                    color = appColors.textPrimary,
                                                     fontSize = 13.sp
                                                 )
                                             }
