@@ -43,6 +43,8 @@ import com.example.p5.ui.library.LibraryViewModel
 import com.example.p5.ui.player.PlayerViewModel
 import com.example.p5.ui.search.SearchScreen
 import com.example.p5.ui.search.SearchViewModel
+import com.example.p5.ui.settings.SettingsScreen
+import com.example.p5.ui.settings.SettingsViewModel
 import com.example.p5.ui.theme.ObsidianBackground
 import com.example.p5.ui.theme.ObsidianBlack
 import com.example.p5.ui.theme.rememberDynamicPlayerPalette
@@ -55,11 +57,13 @@ fun MainScreen(
     searchViewModel: SearchViewModel = viewModel(factory = AppViewModelProvider.Factory),
     playerViewModel: PlayerViewModel = viewModel(factory = AppViewModelProvider.Factory),
     libraryViewModel: LibraryViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    settingsViewModel: SettingsViewModel = viewModel(factory = AppViewModelProvider.Factory),
     updateViewModel: UpdateViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
 ) {
     val playerState by playerViewModel.playerState.collectAsStateWithLifecycle()
     val libraryUiState by libraryViewModel.uiState.collectAsStateWithLifecycle()
+    val settingsUiState by settingsViewModel.uiState.collectAsStateWithLifecycle()
     val updateUiState by updateViewModel.uiState.collectAsStateWithLifecycle()
 
     var selectedTab by remember { mutableIntStateOf(0) }
@@ -78,6 +82,13 @@ fun MainScreen(
         libraryUiState.message?.let { message ->
             snackbarHostState.showSnackbar(message)
             libraryViewModel.clearUserMessage()
+        }
+    }
+
+    LaunchedEffect(settingsUiState.userMessage) {
+        settingsUiState.userMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            settingsViewModel.clearUserMessage()
         }
     }
 
@@ -149,6 +160,14 @@ fun MainScreen(
                             onSongClick = { song -> playerViewModel.playSong(song) },
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
                             onMoreOptionsClick = { song -> selectedSongForMenu = song },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
+                    2 -> {
+                        SettingsScreen(
+                            settingsViewModel = settingsViewModel,
+                            isCheckingUpdate = updateUiState.isChecking,
+                            onCheckForUpdate = { updateViewModel.checkForUpdates(isManualCheck = true) },
                             modifier = Modifier.fillMaxSize()
                         )
                     }

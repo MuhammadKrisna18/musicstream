@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.LibraryMusic
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -66,7 +67,7 @@ fun FloatingDock(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 28.dp, vertical = 6.dp),
+            .padding(horizontal = 20.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -79,10 +80,10 @@ fun FloatingDock(
                     startColor = GlassBorderBright.copy(alpha = 0.45f),
                     endColor = GlassBorderSubtle
                 )
-                .padding(horizontal = 10.dp, vertical = 7.dp)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FloatingDockItem(
@@ -99,6 +100,14 @@ fun FloatingDock(
                     isSelected = selectedTab == 1,
                     badgeCount = favoriteCount,
                     onClick = { onTabSelected(1) }
+                )
+
+                FloatingDockItem(
+                    label = stringResource(R.string.nav_settings),
+                    icon = Icons.Rounded.Settings,
+                    isSelected = selectedTab == 2,
+                    badgeCount = 0,
+                    onClick = { onTabSelected(2) }
                 )
             }
         }
@@ -130,7 +139,7 @@ private fun FloatingDockItem(
     )
 
     val itemPaddingHorizontal by animateDpAsState(
-        targetValue = if (isSelected) 18.dp else 14.dp,
+        targetValue = if (isSelected) 16.dp else 12.dp,
         animationSpec = spring(dampingRatio = 0.8f, stiffness = 400f),
         label = "dock_item_padding"
     )
