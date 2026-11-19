@@ -157,7 +157,9 @@ class SearchViewModel(
         viewModelScope.launch {
             getCuratedPlaylistsUseCase()
                 .onSuccess { playlists ->
-                    _curatedPlaylists.value = playlists
+                    if (_curatedPlaylists.value.isEmpty()) {
+                        _curatedPlaylists.value = playlists
+                    }
                 }
         }
     }
@@ -249,8 +251,6 @@ class SearchViewModel(
             if (topArtists.isNotEmpty()) {
                 loadMultiArtistRecommendations(topArtists)
             }
-
-            loadCuratedPlaylists()
 
             getHomeFeedUseCase(refresh = true)
                 .onSuccess { feed ->
