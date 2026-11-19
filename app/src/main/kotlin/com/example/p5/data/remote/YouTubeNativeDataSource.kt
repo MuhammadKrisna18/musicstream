@@ -10,6 +10,7 @@ import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
+import com.example.p5.domain.model.HomeSectionStyle
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.Song
@@ -166,7 +167,10 @@ class YouTubeNativeDataSource(
         val selectedChartId = if (randomize) {
             MusicConfig.chartPlaylistIds.shuffled().first()
         } else {
-            MusicConfig.chartPlaylistIds.first()
+            val hourlyIndex = ((System.currentTimeMillis() / 3_600_000L) % MusicConfig.chartPlaylistIds.size)
+                .toInt()
+                .coerceAtLeast(0)
+            MusicConfig.chartPlaylistIds[hourlyIndex]
         }
 
         val homeDeferred = async { runCatching { fetchBrowse("FEmusic_home") }.getOrNull() }
@@ -329,12 +333,18 @@ class YouTubeNativeDataSource(
                 } catch (_: Exception) {
                     emptyList()
                 }
+                val sectionStyle = when {
+                    title.contains("Chart", ignoreCase = true) || title.contains("Trending", ignoreCase = true) -> HomeSectionStyle.RANKED_CHARTS
+                    title.contains("Rilisan", ignoreCase = true) -> HomeSectionStyle.QUICK_PICKS_GRID
+                    else -> HomeSectionStyle.STANDARD_CARDS
+                }
                 HomeSection(
                     id = title.lowercase(Locale.ROOT).replace("\\s+".toRegex(), "_"),
                     title = title,
                     subtitle = subtitle,
                     query = q,
-                    tracks = songs
+                    tracks = songs,
+                    style = sectionStyle
                 )
             }
         }.map { it.await() }.filter { it.tracks.isNotEmpty() }

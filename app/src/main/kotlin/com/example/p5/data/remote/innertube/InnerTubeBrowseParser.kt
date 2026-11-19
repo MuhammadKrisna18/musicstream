@@ -2,6 +2,7 @@ package com.example.p5.data.remote.innertube
 
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeSection
+import com.example.p5.domain.model.HomeSectionStyle
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.Song
@@ -45,7 +46,8 @@ class InnerTubeBrowseParser(
                             title = "Top Charts Indonesia",
                             subtitle = "Tangga lagu resmi paling populer di Indonesia",
                             query = "Top Hits Indonesia",
-                            tracks = tracks.take(20)
+                            tracks = tracks.take(20),
+                            style = HomeSectionStyle.RANKED_CHARTS
                         )
                     )
                 }
@@ -126,13 +128,31 @@ class InnerTubeBrowseParser(
                         title = title,
                         subtitle = subtitle,
                         query = title,
-                        tracks = tracks
+                        tracks = tracks,
+                        style = inferSectionStyle(title, prefixId)
                     )
                 )
             }
         }
 
         return ParsedBrowse(sections, parsedMoodTags, parsedCategories, parsedPlaylists)
+    }
+
+    private fun inferSectionStyle(title: String, prefixId: String): HomeSectionStyle {
+        val lower = title.lowercase(Locale.ROOT)
+        return when {
+            prefixId == "chart" ||
+                lower.contains("chart") ||
+                lower.contains("tangga") ||
+                lower.contains("top ") ||
+                lower.contains("trending") -> HomeSectionStyle.RANKED_CHARTS
+            lower.contains("cepat") ||
+                lower.contains("quick") ||
+                lower.contains("pilihan") ||
+                lower.contains("dengarkan lagi") ||
+                lower.contains("listen again") -> HomeSectionStyle.QUICK_PICKS_GRID
+            else -> HomeSectionStyle.STANDARD_CARDS
+        }
     }
 
     fun parsePlaylistTracks(jsonString: String): List<Song> {

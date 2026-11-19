@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
+import com.example.p5.domain.model.HomeTimeContextResolver
+import com.example.p5.domain.model.HomeTimeGreeting
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.SearchFilter
@@ -21,6 +23,9 @@ import com.example.p5.domain.usecase.SearchMusicUseCase
 import com.example.p5.domain.usecase.SearchPlaylistsUseCase
 import com.example.p5.domain.usecase.SearchSongsAndPlaylistsUseCase
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,6 +33,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -44,6 +51,9 @@ class SearchViewModel(
     private val searchPlaylistsUseCase: SearchPlaylistsUseCase,
     private val searchSongsAndPlaylistsUseCase: SearchSongsAndPlaylistsUseCase
 ) : ViewModel() {
+
+    private val _timeGreeting = MutableStateFlow(HomeTimeContextResolver.resolve())
+    val timeGreeting: StateFlow<HomeTimeGreeting> = _timeGreeting.asStateFlow()
 
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
@@ -66,7 +76,8 @@ class SearchViewModel(
         )
 
     private val _rawHomeSections = MutableStateFlow<List<HomeSection>>(emptyList())
-    private val _artistRecommendationSection = MutableStateFlow<HomeSection?>(null)
+    private val _artistRecommendationSections = MutableStateFlow<List<HomeSection>>(emptyList())
+    private val _timeMoodSection = MutableStateFlow<HomeSection?>(null)
     private val _selectedGenre = MutableStateFlow<Category?>(null)
     val selectedGenre: StateFlow<Category?> = _selectedGenre.asStateFlow()
 
@@ -74,18 +85,43 @@ class SearchViewModel(
     private val _isGenreLoading = MutableStateFlow(false)
     val isGenreLoading: StateFlow<Boolean> = _isGenreLoading.asStateFlow()
 
+    private val personalizedInputsFlow = combine(
+        historyRepository.getRecentlyPlayed(12).onStart { emit(emptyList()) },
+        historyRepository.getTopPlayedSongs(10).onStart { emit(emptyList()) },
+        _artistRecommendationSections,
+        _timeMoodSection
+    ) { recent, top, artists, timeMood ->
+        PersonalizedFeedInput(recent, top, artists, timeMood)
+    }
+
     val homeSections: StateFlow<List<HomeSection>> = combine(
-        historyRepository.getTopPlayedSongs(10),
-        _artistRecommendationSection,
+        personalizedInputsFlow,
         _rawHomeSections,
         _selectedGenre,
-        _genreSections,
-        HomeFeedBuilder::combineHomeSections
-    ).stateIn(
+        _genreSections
+    ) { personalized, rawSecs, selectedGenre, genreSecs ->
+        HomeFeedBuilder.combineHomeSections(
+            recentlyPlayed = personalized.recentlyPlayed,
+            topPlayed = personalized.topPlayed,
+            artistSections = personalized.artistSections,
+            timeMoodSection = personalized.timeMoodSection,
+            rawSections = rawSecs,
+            selectedGenre = selectedGenre,
+            genreSections = genreSecs
+        )
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
+
+    val heroSpotlightTracks: StateFlow<List<Song>> = homeSections
+        .map { sections -> HomeFeedBuilder.curateHeroSpotlightTracks(sections, maxCount = 5) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     private val _categories = MutableStateFlow<List<Category>>(emptyList())
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
@@ -116,12 +152,14 @@ class SearchViewModel(
 
     private var searchJob: Job? = null
     private var artistJob: Job? = null
+    private var timeMoodJob: Job? = null
     private var genreJob: Job? = null
     private var playlistJob: Job? = null
 
     init {
         loadDynamicContent()
         observeTopArtists()
+        loadTimeMoodSection()
         loadCuratedPlaylists()
     }
 
@@ -136,25 +174,43 @@ class SearchViewModel(
 
     private fun observeTopArtists() {
         viewModelScope.launch {
-            historyRepository.getTopArtists(1).collect { artists ->
-                val topArtist = artists.firstOrNull()
-                if (topArtist.isNullOrBlank()) {
-                    _artistRecommendationSection.value = null
+            historyRepository.getTopArtists(3).collect { artists ->
+                val validArtists = artists.filter { it.isNotBlank() }.take(3)
+                if (validArtists.isEmpty()) {
+                    _artistRecommendationSections.value = emptyList()
                 } else {
-                    loadArtistRecommendations(topArtist)
+                    loadMultiArtistRecommendations(validArtists)
                 }
             }
         }
     }
 
-    private fun loadArtistRecommendations(artist: String) {
+    private fun loadMultiArtistRecommendations(artists: List<String>) {
         artistJob?.cancel()
         artistJob = viewModelScope.launch {
-            searchMusicUseCase("$artist official hits")
-                .onSuccess { songs ->
-                    HomeFeedBuilder.buildArtistRecommendationSection(artist, songs)?.let {
-                        _artistRecommendationSection.value = it
+            val sections = coroutineScope {
+                artists.map { artist ->
+                    async {
+                        searchMusicUseCase("$artist official hits")
+                            .getOrNull()
+                            ?.let { songs -> HomeFeedBuilder.buildArtistRecommendationSection(artist, songs) }
                     }
+                }.awaitAll().filterNotNull()
+            }
+            if (sections.isNotEmpty()) {
+                _artistRecommendationSections.value = sections
+            }
+        }
+    }
+
+    private fun loadTimeMoodSection() {
+        timeMoodJob?.cancel()
+        val currentGreeting = HomeTimeContextResolver.resolve()
+        _timeGreeting.value = currentGreeting
+        timeMoodJob = viewModelScope.launch {
+            searchMusicUseCase(currentGreeting.moodQuery)
+                .onSuccess { songs ->
+                    _timeMoodSection.value = HomeFeedBuilder.buildTimeMoodSection(currentGreeting, songs)
                 }
         }
     }
@@ -211,11 +267,12 @@ class SearchViewModel(
                     .onSuccess { sections -> _genreSections.value = sections }
             }
 
-            val topArtist = historyRepository.getTopArtists(1).firstOrNull()?.firstOrNull()
-            if (!topArtist.isNullOrBlank()) {
-                loadArtistRecommendations(topArtist)
+            val topArtists = historyRepository.getTopArtists(3).firstOrNull()?.filter { it.isNotBlank() }.orEmpty()
+            if (topArtists.isNotEmpty()) {
+                loadMultiArtistRecommendations(topArtists)
             }
 
+            loadTimeMoodSection()
             loadCuratedPlaylists()
 
             getHomeFeedUseCase(refresh = true)
@@ -394,3 +451,10 @@ class SearchViewModel(
             }
     }
 }
+
+private data class PersonalizedFeedInput(
+    val recentlyPlayed: List<Song>,
+    val topPlayed: List<Song>,
+    val artistSections: List<HomeSection>,
+    val timeMoodSection: HomeSection?
+)
