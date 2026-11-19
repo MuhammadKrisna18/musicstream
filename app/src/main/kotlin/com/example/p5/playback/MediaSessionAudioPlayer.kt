@@ -180,6 +180,7 @@ class MediaSessionAudioPlayer(
         val mediaItem = MediaItem.Builder()
             .setMediaId(song.id)
             .setUri(Uri.parse(stream.streamUrl))
+            .setCustomCacheKey(song.id)
             .setMediaMetadata(mediaMetadata)
             .build()
 

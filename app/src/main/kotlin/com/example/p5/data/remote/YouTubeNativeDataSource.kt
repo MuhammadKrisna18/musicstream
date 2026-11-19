@@ -36,6 +36,7 @@ class YouTubeNativeDataSource(
 
     private var cachedHomeFeed: HomeFeed? = null
     private val genreFeedCache = ConcurrentHashMap<String, List<HomeSection>>()
+    private val audioStreamCache = ConcurrentHashMap<String, AudioStream>()
 
     suspend fun search(query: String, limit: Int = 20): List<Song> = withContext(ioDispatcher) {
         searchWithPlaylists(query, limit).first
@@ -107,30 +108,43 @@ class YouTubeNativeDataSource(
             if (response.isSuccessful) {
                 val jsonString = response.body?.string()
                 if (!jsonString.isNullOrEmpty()) {
-                    return@withContext parser.parsePlayerResponse(videoId, jsonString)
+                    val stream = parser.parsePlayerResponse(videoId, jsonString)
+                    audioStreamCache[videoId] = stream
+                    return@withContext stream
                 }
             }
         } catch (_: Exception) {
         }
 
-        val secondaryPayload = sessionManager.buildSecondaryPlayerPayload(videoId)
-        val secondaryRequest = Request.Builder()
-            .url(MusicConfig.YOUTUBE_PLAYER_URL)
-            .addHeader("Content-Type", "application/json")
-            .addHeader("X-YouTube-Client-Name", "5")
-            .addHeader("X-YouTube-Client-Version", "20.10.1")
-            .addHeader("Origin", MusicConfig.YOUTUBE_BASE_ORIGIN)
-            .addHeader("User-Agent", "com.google.ios.youtube/20.10.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
-            .post(secondaryPayload.toString().toRequestBody(jsonMediaType))
-            .build()
+        try {
+            val secondaryPayload = sessionManager.buildSecondaryPlayerPayload(videoId)
+            val secondaryRequest = Request.Builder()
+                .url(MusicConfig.YOUTUBE_PLAYER_URL)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("X-YouTube-Client-Name", "5")
+                .addHeader("X-YouTube-Client-Version", "20.10.1")
+                .addHeader("Origin", MusicConfig.YOUTUBE_BASE_ORIGIN)
+                .addHeader("User-Agent", "com.google.ios.youtube/20.10.1 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)")
+                .post(secondaryPayload.toString().toRequestBody(jsonMediaType))
+                .build()
 
-        val secondaryResponse = okHttpClient.newCall(secondaryRequest).execute()
-        if (!secondaryResponse.isSuccessful) {
-            throw IOException("Player request failed: ${secondaryResponse.code}")
+            val secondaryResponse = okHttpClient.newCall(secondaryRequest).execute()
+            if (secondaryResponse.isSuccessful) {
+                val jsonString = secondaryResponse.body?.string()
+                if (!jsonString.isNullOrEmpty()) {
+                    val stream = parser.parsePlayerResponse(videoId, jsonString)
+                    audioStreamCache[videoId] = stream
+                    return@withContext stream
+                }
+            }
+        } catch (_: Exception) {
         }
 
-        val jsonString = secondaryResponse.body?.string() ?: throw IOException("Empty player response")
-        parser.parsePlayerResponse(videoId, jsonString)
+        audioStreamCache[videoId]?.let {
+            return@withContext it
+        }
+
+        throw IOException("Failed to load audio stream and no cached stream available")
     }
 
     suspend fun getHomeFeed(refresh: Boolean = false): HomeFeed = withContext(ioDispatcher) {
