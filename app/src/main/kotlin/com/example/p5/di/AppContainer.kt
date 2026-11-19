@@ -3,6 +3,7 @@ package com.example.p5.di
 import android.content.Context
 import com.example.p5.data.local.MusicDatabaseHelper
 import com.example.p5.data.remote.YouTubeNativeDataSource
+import com.example.p5.data.remote.deezer.DeezerDataSource
 import com.example.p5.data.remote.playlist.PlaylistCurator
 import com.example.p5.data.repository.DownloadRepositoryImpl
 import com.example.p5.data.repository.FavoriteRepositoryImpl
@@ -66,6 +67,7 @@ interface AppContainer {
     val searchHistoryRepository: SearchHistoryRepository
     val themeRepository: ThemeRepository
     val okHttpClient: OkHttpClient
+    val deezerDataSource: DeezerDataSource
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -87,12 +89,16 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         YouTubeNativeDataSource(okHttpClient)
     }
 
+    override val deezerDataSource: DeezerDataSource by lazy {
+        DeezerDataSource(okHttpClient)
+    }
+
     private val playlistCurator: PlaylistCurator by lazy {
         PlaylistCurator(youTubeDataSource)
     }
 
     override val musicRepository: MusicRepository by lazy {
-        MusicRepositoryImpl(youTubeDataSource, playlistCurator)
+        MusicRepositoryImpl(youTubeDataSource, playlistCurator, deezerDataSource)
     }
 
     override val searchMusicUseCase: SearchMusicUseCase by lazy {
