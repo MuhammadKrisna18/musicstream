@@ -1,5 +1,10 @@
 package com.example.p5.ui.theme
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 val SpacingXxs = 2.dp
@@ -59,3 +64,7 @@ val StrokeWidthProgress = 3.dp
 
 val ProgressBarHeightMini = 2.5.dp
 val BottomScrollPadding = 140.dp
+
+val bottomScrollPaddingWithInsets: Dp
+    @Composable
+    get() = BottomScrollPadding + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()

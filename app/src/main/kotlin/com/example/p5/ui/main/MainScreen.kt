@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -102,12 +103,16 @@ fun MainScreen(
     val appColors = AppTheme.colors
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.navigationBarsPadding()
+            )
+        },
         containerColor = appColors.background,
-        modifier = modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-    ) { innerPadding ->
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        modifier = modifier.fillMaxSize()
+    ) { _ ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -153,7 +158,9 @@ fun MainScreen(
                             onSongClick = { song -> playerViewModel.playSong(song) },
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
                             onMoreOptionsClick = { song -> selectedSongForMenu = song },
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .statusBarsPadding()
                         )
                     }
                     1 -> {
@@ -164,7 +171,9 @@ fun MainScreen(
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
                             onMoreOptionsClick = { song -> selectedSongForMenu = song },
                             onArtistClick = onNavigateToArtist,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .statusBarsPadding()
                         )
                     }
                     2 -> {
@@ -174,7 +183,9 @@ fun MainScreen(
                             onSongClick = { song -> playerViewModel.playSong(song) },
                             onPlayQueue = { songs, index -> playerViewModel.playQueue(songs, index) },
                             onMoreOptionsClick = { song -> selectedSongForMenu = song },
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .statusBarsPadding()
                         )
                     }
                     3 -> {
@@ -182,7 +193,9 @@ fun MainScreen(
                             settingsViewModel = settingsViewModel,
                             isCheckingUpdate = updateUiState.isChecking,
                             onCheckForUpdate = { updateViewModel.checkForUpdates(isManualCheck = true) },
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .statusBarsPadding()
                         )
                     }
                 }

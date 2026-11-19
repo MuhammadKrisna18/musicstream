@@ -18,7 +18,7 @@ import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.SearchFilter
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
-import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 import java.util.Locale
 
 @Composable
@@ -49,7 +49,7 @@ fun SearchResultsContent(
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = BottomScrollPadding),
+        contentPadding = PaddingValues(bottom = bottomScrollPaddingWithInsets),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         item(key = "search_filter_bar") {

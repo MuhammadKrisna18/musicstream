@@ -23,7 +23,7 @@ import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.theme.AppTheme
-import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 
 @Composable
 fun PlaylistDetailContent(
@@ -73,7 +73,7 @@ fun PlaylistDetailContent(
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(top = 4.dp, bottom = BottomScrollPadding),
+                contentPadding = PaddingValues(top = 4.dp, bottom = bottomScrollPaddingWithInsets),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 itemsIndexed(

@@ -24,7 +24,7 @@ import com.example.p5.ui.settings.components.SettingsThemeCard
 import com.example.p5.ui.settings.components.SettingsTopHeader
 import com.example.p5.ui.settings.components.SettingsUpdateCard
 import com.example.p5.ui.settings.components.ThemeSelectorBottomSheet
-import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 import com.example.p5.ui.theme.SpacingLg
 
 @Composable
@@ -48,7 +48,7 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(Color.Transparent)
             .padding(horizontal = SpacingLg),
-        contentPadding = PaddingValues(top = 14.dp, bottom = BottomScrollPadding),
+        contentPadding = PaddingValues(top = 14.dp, bottom = bottomScrollPaddingWithInsets),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item {

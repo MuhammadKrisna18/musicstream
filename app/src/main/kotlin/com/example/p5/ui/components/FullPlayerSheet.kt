@@ -18,7 +18,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -108,7 +111,8 @@ fun FullPlayerSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = appColors.background,
-        dragHandle = null
+        dragHandle = null,
+        contentWindowInsets = { WindowInsets(0, 0, 0, 0) }
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             if (appColors.backgroundImageRes != null) {
@@ -156,6 +160,8 @@ fun FullPlayerSheet(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .statusBarsPadding()
+                    .navigationBarsPadding()
                     .padding(horizontal = SpacingXxl)
                     .padding(top = SpacingMd, bottom = 28.dp),
                 horizontalAlignment = Alignment.CenterHorizontally

@@ -44,7 +44,7 @@ import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.AppTheme
-import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 import com.example.p5.ui.theme.CornerRadiusCard
 import com.example.p5.ui.theme.IconSizeMd
 import com.example.p5.ui.theme.IconSizeStandard
@@ -217,7 +217,7 @@ fun SectionDetailContent(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(top = 4.dp, bottom = BottomScrollPadding),
+            contentPadding = PaddingValues(top = 4.dp, bottom = bottomScrollPaddingWithInsets),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             itemsIndexed(

@@ -35,7 +35,7 @@ import com.example.p5.ui.search.components.SearchErrorState
 import com.example.p5.ui.search.components.SearchHistorySection
 import com.example.p5.ui.search.components.SearchResultsContent
 import com.example.p5.ui.theme.AppTheme
-import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 
 @Composable
 fun SearchScreen(
@@ -109,7 +109,7 @@ fun SearchScreen(
                             SearchUiState.Idle -> {
                                 LazyColumn(
                                     modifier = Modifier.fillMaxSize(),
-                                    contentPadding = PaddingValues(bottom = BottomScrollPadding),
+                                    contentPadding = PaddingValues(bottom = bottomScrollPaddingWithInsets),
                                     verticalArrangement = Arrangement.spacedBy(16.dp)
                                 ) {
                                     if (searchHistory.isNotEmpty()) {

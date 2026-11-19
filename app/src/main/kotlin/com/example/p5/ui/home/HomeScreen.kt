@@ -39,7 +39,7 @@ import com.example.p5.ui.search.components.SearchTopHeader
 import com.example.p5.ui.search.components.SectionDetailContent
 import com.example.p5.ui.search.components.rememberShimmerBrush
 import com.example.p5.ui.search.components.searchShimmerSkeleton
-import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -124,7 +124,7 @@ fun HomeScreen(
                     ) {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = BottomScrollPadding),
+                            contentPadding = PaddingValues(bottom = bottomScrollPaddingWithInsets),
                             verticalArrangement = Arrangement.spacedBy(18.dp)
                         ) {
                             if (categories.isNotEmpty()) {

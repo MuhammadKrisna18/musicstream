@@ -24,7 +24,7 @@ import com.example.p5.R
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.theme.AppTheme
-import com.example.p5.ui.theme.BottomScrollPadding
+import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 import com.example.p5.ui.theme.CornerRadiusXs
 import com.example.p5.ui.theme.SpacingSm
 
@@ -43,7 +43,7 @@ fun LibrarySongList(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = BottomScrollPadding),
+            contentPadding = PaddingValues(bottom = bottomScrollPaddingWithInsets),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             itemsIndexed(
