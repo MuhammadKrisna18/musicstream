@@ -5,8 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
-import com.example.p5.domain.model.HomeTimeContextResolver
-import com.example.p5.domain.model.HomeTimeGreeting
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.SearchFilter
@@ -52,9 +50,6 @@ class SearchViewModel(
     private val searchSongsAndPlaylistsUseCase: SearchSongsAndPlaylistsUseCase
 ) : ViewModel() {
 
-    private val _timeGreeting = MutableStateFlow(HomeTimeContextResolver.resolve())
-    val timeGreeting: StateFlow<HomeTimeGreeting> = _timeGreeting.asStateFlow()
-
     private val _query = MutableStateFlow("")
     val query: StateFlow<String> = _query.asStateFlow()
 
@@ -77,7 +72,6 @@ class SearchViewModel(
 
     private val _rawHomeSections = MutableStateFlow<List<HomeSection>>(emptyList())
     private val _artistRecommendationSections = MutableStateFlow<List<HomeSection>>(emptyList())
-    private val _timeMoodSection = MutableStateFlow<HomeSection?>(null)
     private val _selectedGenre = MutableStateFlow<Category?>(null)
     val selectedGenre: StateFlow<Category?> = _selectedGenre.asStateFlow()
 
@@ -88,10 +82,9 @@ class SearchViewModel(
     private val personalizedInputsFlow = combine(
         historyRepository.getRecentlyPlayed(12).onStart { emit(emptyList()) },
         historyRepository.getTopPlayedSongs(10).onStart { emit(emptyList()) },
-        _artistRecommendationSections,
-        _timeMoodSection
-    ) { recent, top, artists, timeMood ->
-        PersonalizedFeedInput(recent, top, artists, timeMood)
+        _artistRecommendationSections
+    ) { recent, top, artists ->
+        PersonalizedFeedInput(recent, top, artists)
     }
 
     val homeSections: StateFlow<List<HomeSection>> = combine(
@@ -104,7 +97,6 @@ class SearchViewModel(
             recentlyPlayed = personalized.recentlyPlayed,
             topPlayed = personalized.topPlayed,
             artistSections = personalized.artistSections,
-            timeMoodSection = personalized.timeMoodSection,
             rawSections = rawSecs,
             selectedGenre = selectedGenre,
             genreSections = genreSecs
@@ -152,14 +144,12 @@ class SearchViewModel(
 
     private var searchJob: Job? = null
     private var artistJob: Job? = null
-    private var timeMoodJob: Job? = null
     private var genreJob: Job? = null
     private var playlistJob: Job? = null
 
     init {
         loadDynamicContent()
         observeTopArtists()
-        loadTimeMoodSection()
         loadCuratedPlaylists()
     }
 
@@ -200,18 +190,6 @@ class SearchViewModel(
             if (sections.isNotEmpty()) {
                 _artistRecommendationSections.value = sections
             }
-        }
-    }
-
-    private fun loadTimeMoodSection() {
-        timeMoodJob?.cancel()
-        val currentGreeting = HomeTimeContextResolver.resolve()
-        _timeGreeting.value = currentGreeting
-        timeMoodJob = viewModelScope.launch {
-            searchMusicUseCase(currentGreeting.moodQuery)
-                .onSuccess { songs ->
-                    _timeMoodSection.value = HomeFeedBuilder.buildTimeMoodSection(currentGreeting, songs)
-                }
         }
     }
 
@@ -272,7 +250,6 @@ class SearchViewModel(
                 loadMultiArtistRecommendations(topArtists)
             }
 
-            loadTimeMoodSection()
             loadCuratedPlaylists()
 
             getHomeFeedUseCase(refresh = true)
@@ -455,6 +432,5 @@ class SearchViewModel(
 private data class PersonalizedFeedInput(
     val recentlyPlayed: List<Song>,
     val topPlayed: List<Song>,
-    val artistSections: List<HomeSection>,
-    val timeMoodSection: HomeSection?
+    val artistSections: List<HomeSection>
 )

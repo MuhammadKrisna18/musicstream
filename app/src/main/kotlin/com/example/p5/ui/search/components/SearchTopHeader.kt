@@ -12,15 +12,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -45,9 +42,7 @@ fun SearchTopHeader(
     isRefreshing: Boolean,
     isPlaying: Boolean,
     onRefresh: () -> Unit,
-    modifier: Modifier = Modifier,
-    greetingTitle: String? = null,
-    greetingSubtitle: String? = null
+    modifier: Modifier = Modifier
 ) {
     val appColors = AppTheme.colors
     val refreshTransition = rememberInfiniteTransition(label = "refresh_angle")
@@ -82,45 +77,10 @@ fun SearchTopHeader(
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = (-0.5).sp
                 )
-
-                if (!greetingTitle.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .background(appColors.accent.copy(alpha = 0.14f))
-                            .glassBorder(
-                                shape = RoundedCornerShape(50),
-                                strokeWidth = 1.dp,
-                                startColor = appColors.accent.copy(alpha = 0.4f),
-                                endColor = appColors.glassBorderSubtle
-                            )
-                            .padding(horizontal = 9.dp, vertical = 3.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.AutoAwesome,
-                            contentDescription = null,
-                            tint = appColors.accent,
-                            modifier = Modifier.size(11.dp)
-                        )
-                        Text(
-                            text = greetingTitle,
-                            color = appColors.accent,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
             }
 
             Text(
-                text = if (!greetingSubtitle.isNullOrBlank()) {
-                    greetingSubtitle
-                } else {
-                    stringResource(R.string.home_subtitle)
-                },
+                text = stringResource(R.string.home_subtitle),
                 color = appColors.textSecondary,
                 fontSize = 12.sp,
                 maxLines = 1,

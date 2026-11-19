@@ -53,7 +53,6 @@ fun HomeScreen(
 ) {
     val homeSections by searchViewModel.homeSections.collectAsStateWithLifecycle()
     val heroSpotlightTracks by searchViewModel.heroSpotlightTracks.collectAsStateWithLifecycle()
-    val timeGreeting by searchViewModel.timeGreeting.collectAsStateWithLifecycle()
     val categories by searchViewModel.categories.collectAsStateWithLifecycle()
     val selectedGenre by searchViewModel.selectedGenre.collectAsStateWithLifecycle()
     val selectedSection by searchViewModel.selectedSection.collectAsStateWithLifecycle()
@@ -78,7 +77,6 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Transparent)
-            .padding(horizontal = 16.dp)
     ) {
         AnimatedContent(
             targetState = Pair(selectedSection, selectedPlaylist),
@@ -94,7 +92,8 @@ fun HomeScreen(
                     playerState = playerState,
                     onBackClick = searchViewModel::closePlaylistDetail,
                     onPlayQueue = onPlayQueue,
-                    onMoreOptionsClick = onMoreOptionsClick
+                    onMoreOptionsClick = onMoreOptionsClick,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             } else if (currentSection != null) {
                 SectionDetailContent(
@@ -102,7 +101,8 @@ fun HomeScreen(
                     playerState = playerState,
                     onBackClick = searchViewModel::closeSectionDetail,
                     onPlayQueue = onPlayQueue,
-                    onMoreOptionsClick = onMoreOptionsClick
+                    onMoreOptionsClick = onMoreOptionsClick,
+                    modifier = Modifier.padding(horizontal = 16.dp)
                 )
             } else {
                 Column(modifier = Modifier.fillMaxSize()) {
@@ -112,8 +112,7 @@ fun HomeScreen(
                         isRefreshing = isRefreshing,
                         isPlaying = playerState.isPlaying,
                         onRefresh = searchViewModel::refreshHomeFeed,
-                        greetingTitle = timeGreeting.greetingTitle,
-                        greetingSubtitle = timeGreeting.greetingSubtitle
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -199,7 +198,7 @@ fun HomeScreen(
                                 item {
                                     SearchEmptyState(
                                         query = selectedGenre?.title.orEmpty(),
-                                        modifier = Modifier.padding(vertical = 32.dp)
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp)
                                     )
                                 }
                             }

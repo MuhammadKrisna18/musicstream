@@ -3,7 +3,6 @@ package com.example.p5.ui.search
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.HomeSectionStyle
-import com.example.p5.domain.model.HomeTimeGreeting
 import com.example.p5.domain.model.Song
 
 object HomeFeedBuilder {
@@ -12,7 +11,6 @@ object HomeFeedBuilder {
         recentlyPlayed: List<Song>,
         topPlayed: List<Song>,
         artistSections: List<HomeSection>,
-        timeMoodSection: HomeSection?,
         rawSections: List<HomeSection>,
         selectedGenre: Category?,
         genreSections: List<HomeSection>
@@ -39,10 +37,6 @@ object HomeFeedBuilder {
         val firstChartSection = rawSections.firstOrNull { it.style == HomeSectionStyle.RANKED_CHARTS }
         if (firstChartSection != null) {
             result.add(firstChartSection)
-        }
-
-        if (timeMoodSection != null && timeMoodSection.tracks.isNotEmpty()) {
-            result.add(timeMoodSection)
         }
 
         if (topPlayed.isNotEmpty()) {
@@ -131,18 +125,6 @@ object HomeFeedBuilder {
             title = "Spesial Untukmu: $artist",
             subtitle = "Koleksi lagu pilihan berdasarkan artis favoritmu",
             query = "$artist hits",
-            tracks = songs.take(12),
-            style = HomeSectionStyle.STANDARD_CARDS
-        )
-    }
-
-    fun buildTimeMoodSection(greeting: HomeTimeGreeting, songs: List<Song>): HomeSection? {
-        if (songs.isEmpty()) return null
-        return HomeSection(
-            id = "time_mood_${greeting.period.name.lowercase()}",
-            title = greeting.moodSectionTitle,
-            subtitle = greeting.moodSectionSubtitle,
-            query = greeting.moodQuery,
             tracks = songs.take(12),
             style = HomeSectionStyle.STANDARD_CARDS
         )

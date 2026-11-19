@@ -84,6 +84,7 @@ fun EditorialHeroCarousel(
         HorizontalPager(
             state = pagerState,
             pageSpacing = 12.dp,
+            contentPadding = PaddingValues(horizontal = 16.dp),
             modifier = Modifier.fillMaxWidth()
         ) { pageIndex ->
             val song = songs[pageIndex]

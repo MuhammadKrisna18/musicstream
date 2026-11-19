@@ -10,8 +10,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
@@ -61,13 +63,15 @@ fun LazyListScope.searchShimmerSkeleton(shimmerBrush: Brush) {
         ) {
             Box(
                 modifier = Modifier
+                    .padding(horizontal = 16.dp)
                     .width(160.dp)
                     .height(20.dp)
                     .clip(RoundedCornerShape(6.dp))
                     .background(shimmerBrush)
             )
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp)
             ) {
                 items(4) {
                     Box(

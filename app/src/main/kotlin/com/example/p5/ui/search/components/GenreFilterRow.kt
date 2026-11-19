@@ -38,7 +38,7 @@ fun GenreFilterRow(
     LazyRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(vertical = 4.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp)
     ) {
         item(key = "genre_chip_all") {
             val isAllSelected = selectedGenre == null
