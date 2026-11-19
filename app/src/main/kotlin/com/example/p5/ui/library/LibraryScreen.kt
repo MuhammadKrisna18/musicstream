@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.BookmarkBorder
+import androidx.compose.material.icons.rounded.FileDownload
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +46,7 @@ fun LibraryScreen(
 ) {
     val uiState by libraryViewModel.uiState.collectAsStateWithLifecycle()
     val favoriteSongs = uiState.favoriteSongs
+    val downloadedSongs = uiState.downloadedSongs
     val savedSongs = uiState.savedSongs
     val historySongs = uiState.historySongs
     val sortOrder by libraryViewModel.sortOrder.collectAsStateWithLifecycle()
@@ -61,6 +62,24 @@ fun LibraryScreen(
             favoriteSongs
         } else {
             favoriteSongs.filter { it.artist.equals(selectedArtist, ignoreCase = true) }
+        }
+        when (sortOrder) {
+            LibrarySortOrder.LATEST_ADDED -> filtered
+            LibrarySortOrder.TITLE_AZ -> filtered.sortedBy { it.title.lowercase(Locale.ROOT) }
+            LibrarySortOrder.ARTIST_AZ -> filtered.sortedBy { it.artist.lowercase(Locale.ROOT) }
+            LibrarySortOrder.DURATION -> filtered.sortedByDescending { it.durationSeconds }
+        }
+    }
+
+    val downloadedArtists = remember(downloadedSongs) {
+        downloadedSongs.map { it.artist }.distinct().filter { it.isNotBlank() }.sorted()
+    }
+
+    val displayDownloadedSongs = remember(downloadedSongs, sortOrder, selectedArtist) {
+        val filtered = if (selectedArtist.isNullOrBlank()) {
+            downloadedSongs
+        } else {
+            downloadedSongs.filter { it.artist.equals(selectedArtist, ignoreCase = true) }
         }
         when (sortOrder) {
             LibrarySortOrder.LATEST_ADDED -> filtered
@@ -99,6 +118,7 @@ fun LibraryScreen(
         LibraryTopHeader(
             selectedTab = selectedTab,
             favoriteCount = favoriteSongs.size,
+            downloadedCount = downloadedSongs.size,
             savedCount = savedSongs.size,
             historyCount = historySongs.size
         )
@@ -108,6 +128,7 @@ fun LibraryScreen(
         LibraryTabBar(
             selectedTab = selectedTab,
             favoriteCount = favoriteSongs.size,
+            downloadedCount = downloadedSongs.size,
             savedCount = savedSongs.size,
             historyCount = historySongs.size,
             onTabSelected = {
@@ -148,6 +169,34 @@ fun LibraryScreen(
             }
 
             1 -> {
+                if (downloadedSongs.isEmpty()) {
+                    LibraryEmptyState(
+                        icon = Icons.Rounded.FileDownload,
+                        title = stringResource(R.string.library_empty_downloaded_title),
+                        description = stringResource(R.string.library_empty_downloaded_desc)
+                    )
+                } else {
+                    LibrarySongList(
+                        songs = displayDownloadedSongs,
+                        currentSongId = playerState.currentSong?.id,
+                        isPlaying = playerState.isPlaying,
+                        onPlayQueue = onPlayQueue,
+                        onMoreOptionsClick = onMoreOptionsClick,
+                        headerContent = {
+                            LibraryFilterBar(
+                                sortOrder = sortOrder,
+                                onSortOrderSelected = libraryViewModel::setSortOrder,
+                                artists = downloadedArtists,
+                                selectedArtist = selectedArtist,
+                                onArtistSelected = libraryViewModel::selectArtist,
+                                modifier = Modifier.padding(bottom = 10.dp)
+                            )
+                        }
+                    )
+                }
+            }
+
+            2 -> {
                 if (savedSongs.isEmpty()) {
                     LibraryEmptyState(
                         icon = Icons.Rounded.BookmarkBorder,

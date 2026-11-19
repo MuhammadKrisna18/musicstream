@@ -20,8 +20,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Bookmark
 import androidx.compose.material.icons.rounded.BookmarkBorder
+import androidx.compose.material.icons.rounded.Downloading
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material.icons.rounded.FileDownload
+import androidx.compose.material.icons.rounded.FileDownloadDone
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -64,9 +67,12 @@ fun SongActionBottomSheet(
     song: Song?,
     isSaved: Boolean,
     isFavorite: Boolean,
+    isDownloaded: Boolean = false,
+    isDownloading: Boolean = false,
     onDismiss: () -> Unit,
     onToggleSave: (Song) -> Unit,
     onToggleFavorite: (Song) -> Unit,
+    onToggleDownload: ((Song) -> Unit)? = null,
     onAddToQueueNext: (Song) -> Unit,
     onViewArtist: ((channelId: String?, artistName: String) -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -186,6 +192,42 @@ fun SongActionBottomSheet(
                     onDismiss()
                 }
             )
+
+            if (onToggleDownload != null) {
+                val downloadIcon = when {
+                    isDownloading -> Icons.Rounded.Downloading
+                    isDownloaded -> Icons.Rounded.FileDownloadDone
+                    else -> Icons.Rounded.FileDownload
+                }
+                val downloadTitle = when {
+                    isDownloading -> "Sedang Mengunduh..."
+                    isDownloaded -> "Hapus dari Unduhan"
+                    else -> "Unduh Lagu Offline"
+                }
+                val downloadSubtitle = when {
+                    isDownloading -> "Proses unduhan audio sedang berjalan"
+                    isDownloaded -> "Hapus file musik offline dari perangkat"
+                    else -> "Simpan untuk didengarkan tanpa koneksi internet"
+                }
+                val downloadTint = when {
+                    isDownloaded -> appColors.accent
+                    isDownloading -> appColors.accentSecondary
+                    else -> appColors.textPrimary
+                }
+
+                ActionSheetRow(
+                    icon = downloadIcon,
+                    iconTint = downloadTint,
+                    title = downloadTitle,
+                    subtitle = downloadSubtitle,
+                    onClick = {
+                        if (!isDownloading) {
+                            onToggleDownload(song)
+                            onDismiss()
+                        }
+                    }
+                )
+            }
 
             ActionSheetRow(
                 icon = Icons.AutoMirrored.Rounded.QueueMusic,

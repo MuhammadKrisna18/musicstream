@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.p5.data.local.MusicDatabaseHelper
 import com.example.p5.data.remote.YouTubeNativeDataSource
 import com.example.p5.data.remote.playlist.PlaylistCurator
+import com.example.p5.data.repository.DownloadRepositoryImpl
 import com.example.p5.data.repository.FavoriteRepositoryImpl
 import com.example.p5.data.repository.HistoryRepositoryImpl
 import com.example.p5.data.repository.LyricsRepositoryImpl
@@ -13,6 +14,7 @@ import com.example.p5.data.repository.SearchHistoryRepositoryImpl
 import com.example.p5.data.repository.ThemeRepositoryImpl
 import com.example.p5.data.repository.UpdateRepositoryImpl
 import com.example.p5.domain.player.AudioPlayer
+import com.example.p5.domain.repository.DownloadRepository
 import com.example.p5.domain.repository.FavoriteRepository
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.LyricsRepository
@@ -59,9 +61,11 @@ interface AppContainer {
     val lyricsRepository: LyricsRepository
     val favoriteRepository: FavoriteRepository
     val savedSongRepository: SavedSongRepository
+    val downloadRepository: DownloadRepository
     val historyRepository: HistoryRepository
     val searchHistoryRepository: SearchHistoryRepository
     val themeRepository: ThemeRepository
+    val okHttpClient: OkHttpClient
 }
 
 class DefaultAppContainer(private val context: Context) : AppContainer {
@@ -70,7 +74,7 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         MusicDatabaseHelper(context)
     }
 
-    private val okHttpClient: OkHttpClient by lazy {
+    override val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(120, TimeUnit.SECONDS)
@@ -96,7 +100,7 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
     }
 
     override val getStreamAudioUseCase: GetStreamAudioUseCase by lazy {
-        GetStreamAudioUseCase(musicRepository)
+        GetStreamAudioUseCase(musicRepository, downloadRepository)
     }
 
     override val getTrendingMusicUseCase: GetTrendingMusicUseCase by lazy {
@@ -153,6 +157,10 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
 
     override val savedSongRepository: SavedSongRepository by lazy {
         SavedSongRepositoryImpl(dbHelper)
+    }
+
+    override val downloadRepository: DownloadRepository by lazy {
+        DownloadRepositoryImpl(context, dbHelper)
     }
 
     override val historyRepository: HistoryRepository by lazy {

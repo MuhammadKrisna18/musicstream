@@ -376,11 +376,15 @@ fun ArtistProfileScreen(
             if (selectedSongForMenu != null) {
                 val isSongFavorite = libraryUiState.favoriteSongs.any { it.id == selectedSongForMenu?.id }
                 val isSongSaved = libraryUiState.savedSongs.any { it.id == selectedSongForMenu?.id }
+                val isSongDownloaded = libraryUiState.downloadedSongs.any { it.id == selectedSongForMenu?.id }
+                val isSongDownloading = selectedSongForMenu?.id in libraryUiState.activeDownloadIds
 
                 SongActionBottomSheet(
                     song = selectedSongForMenu,
                     isSaved = isSongSaved,
                     isFavorite = isSongFavorite,
+                    isDownloaded = isSongDownloaded,
+                    isDownloading = isSongDownloading,
                     onDismiss = { selectedSongForMenu = null },
                     onToggleSave = { song -> libraryViewModel.toggleSaveSong(song) },
                     onToggleFavorite = { song ->
@@ -389,6 +393,7 @@ fun ArtistProfileScreen(
                             playerViewModel.toggleFavoriteCurrentSong()
                         }
                     },
+                    onToggleDownload = { song -> libraryViewModel.toggleDownload(song) },
                     onAddToQueueNext = { song ->
                         playerViewModel.addToQueueNext(song)
                     },

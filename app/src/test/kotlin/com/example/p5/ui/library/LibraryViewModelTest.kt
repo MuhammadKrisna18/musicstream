@@ -2,6 +2,7 @@ package com.example.p5.ui.library
 
 import com.example.p5.domain.model.LibrarySortOrder
 import com.example.p5.domain.model.Song
+import com.example.p5.domain.repository.DownloadRepository
 import com.example.p5.domain.repository.FavoriteRepository
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.SavedSongRepository
@@ -17,6 +18,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -87,6 +89,31 @@ class LibraryViewModelTest {
         }
     }
 
+    private class FakeDownloadRepository : DownloadRepository {
+        val downloadedFlow = MutableStateFlow<List<Song>>(emptyList())
+        val activeDownloadsFlow = MutableStateFlow<Set<String>>(emptySet())
+
+        override fun getAllDownloadedSongs(): Flow<List<Song>> = downloadedFlow
+        override suspend fun isDownloaded(songId: String): Boolean = downloadedFlow.value.any { it.id == songId }
+        override fun getActiveDownloadIds(): Flow<Set<String>> = activeDownloadsFlow
+        override fun enqueueDownload(song: Song) {
+            val current = downloadedFlow.value.toMutableList()
+            if (current.none { it.id == song.id }) {
+                current.add(song)
+                downloadedFlow.value = current
+            }
+        }
+        override suspend fun deleteDownload(songId: String): Result<Unit> {
+            val current = downloadedFlow.value.toMutableList()
+            current.removeAll { it.id == songId }
+            downloadedFlow.value = current
+            return Result.success(Unit)
+        }
+        override suspend fun getDownloadedFilePath(songId: String): String? {
+            return downloadedFlow.value.firstOrNull { it.id == songId }?.localFilePath
+        }
+    }
+
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
@@ -102,7 +129,8 @@ class LibraryViewModelTest {
         val viewModel = LibraryViewModel(
             favoriteRepository = FakeFavoriteRepository(),
             historyRepository = FakeHistoryRepository(),
-            savedSongRepository = FakeSavedSongRepository()
+            savedSongRepository = FakeSavedSongRepository(),
+            downloadRepository = FakeDownloadRepository()
         )
 
         assertEquals(LibrarySortOrder.LATEST_ADDED, viewModel.sortOrder.value)
@@ -115,7 +143,8 @@ class LibraryViewModelTest {
         val viewModel = LibraryViewModel(
             favoriteRepository = FakeFavoriteRepository(),
             historyRepository = FakeHistoryRepository(),
-            savedSongRepository = FakeSavedSongRepository()
+            savedSongRepository = FakeSavedSongRepository(),
+            downloadRepository = FakeDownloadRepository()
         )
 
         assertNull(viewModel.selectedArtist.value)
@@ -132,7 +161,8 @@ class LibraryViewModelTest {
         val viewModel = LibraryViewModel(
             favoriteRepository = favRepo,
             historyRepository = FakeHistoryRepository(),
-            savedSongRepository = FakeSavedSongRepository()
+            savedSongRepository = FakeSavedSongRepository(),
+            downloadRepository = FakeDownloadRepository()
         )
 
         val testSong = Song(
@@ -160,12 +190,48 @@ class LibraryViewModelTest {
     }
 
     @Test
+    fun toggleDownload_enqueuesOrDeletesDownload() = runTest {
+        val downloadRepo = FakeDownloadRepository()
+        val viewModel = LibraryViewModel(
+            favoriteRepository = FakeFavoriteRepository(),
+            historyRepository = FakeHistoryRepository(),
+            savedSongRepository = FakeSavedSongRepository(),
+            downloadRepository = downloadRepo
+        )
+
+        val testSong = Song(
+            id = "s_dl_1",
+            title = "Gurenge",
+            artist = "LiSA",
+            thumbnailUrl = "",
+            webUrl = "",
+            durationSeconds = 240,
+            durationFormatted = "4:00"
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.toggleDownload(testSong)
+        assertEquals(1, downloadRepo.downloadedFlow.value.size)
+        assertEquals("Mengunduh lagu untuk pemutaran offline...", viewModel.uiState.value.message)
+
+        viewModel.toggleDownload(testSong)
+        assertEquals(0, downloadRepo.downloadedFlow.value.size)
+        assertEquals("Unduhan lagu dihapus", viewModel.uiState.value.message)
+
+        collectJob.cancel()
+    }
+
+    @Test
     fun clearHistory_clearsHistoryAndEmitsUserMessage() = runTest {
         val histRepo = FakeHistoryRepository()
         val viewModel = LibraryViewModel(
             favoriteRepository = FakeFavoriteRepository(),
             historyRepository = histRepo,
-            savedSongRepository = FakeSavedSongRepository()
+            savedSongRepository = FakeSavedSongRepository(),
+            downloadRepository = FakeDownloadRepository()
         )
 
         val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {

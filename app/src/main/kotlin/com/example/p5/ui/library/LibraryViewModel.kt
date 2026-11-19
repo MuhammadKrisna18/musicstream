@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.LibrarySortOrder
 import com.example.p5.domain.model.Song
+import com.example.p5.domain.repository.DownloadRepository
 import com.example.p5.domain.repository.FavoriteRepository
 import com.example.p5.domain.repository.HistoryRepository
 import com.example.p5.domain.repository.SavedSongRepository
@@ -18,7 +19,8 @@ import kotlinx.coroutines.launch
 class LibraryViewModel(
     private val favoriteRepository: FavoriteRepository,
     private val historyRepository: HistoryRepository,
-    private val savedSongRepository: SavedSongRepository
+    private val savedSongRepository: SavedSongRepository,
+    private val downloadRepository: DownloadRepository
 ) : ViewModel() {
 
     private val messageFlow = MutableStateFlow<String?>(null)
@@ -39,16 +41,30 @@ class LibraryViewModel(
         }
     }
 
+    private data class StoredLists(
+        val favorites: List<Song>,
+        val saved: List<Song>,
+        val downloaded: List<Song>
+    )
+
     val uiState: StateFlow<LibraryUiState> = combine(
-        favoriteRepository.getAllFavoriteSongs(),
-        savedSongRepository.getAllSavedSongs(),
+        combine(
+            favoriteRepository.getAllFavoriteSongs(),
+            savedSongRepository.getAllSavedSongs(),
+            downloadRepository.getAllDownloadedSongs()
+        ) { favorites, saved, downloaded ->
+            StoredLists(favorites, saved, downloaded)
+        },
         historyRepository.getRecentlyPlayed(50),
+        downloadRepository.getActiveDownloadIds(),
         messageFlow
-    ) { favorites, saved, history, message ->
+    ) { stored, history, activeDownloads, message ->
         LibraryUiState(
-            favoriteSongs = favorites,
-            savedSongs = saved,
+            favoriteSongs = stored.favorites,
+            savedSongs = stored.saved,
+            downloadedSongs = stored.downloaded,
             historySongs = history,
+            activeDownloadIds = activeDownloads,
             message = message
         )
     }.stateIn(
@@ -86,6 +102,29 @@ class LibraryViewModel(
         viewModelScope.launch {
             val isSaved = savedSongRepository.toggleSaveSong(song)
             messageFlow.value = if (isSaved) "Lagu disimpan" else "Dihapus dari lagu tersimpan"
+        }
+    }
+
+    fun toggleDownload(song: Song) {
+        viewModelScope.launch {
+            if (downloadRepository.isDownloaded(song.id)) {
+                downloadRepository.deleteDownload(song.id)
+                    .onSuccess {
+                        messageFlow.value = "Unduhan lagu dihapus"
+                    }
+            } else {
+                downloadRepository.enqueueDownload(song)
+                messageFlow.value = "Mengunduh lagu untuk pemutaran offline..."
+            }
+        }
+    }
+
+    fun deleteDownload(songId: String) {
+        viewModelScope.launch {
+            downloadRepository.deleteDownload(songId)
+                .onSuccess {
+                    messageFlow.value = "Unduhan lagu dihapus"
+                }
         }
     }
 

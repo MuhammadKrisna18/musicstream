@@ -28,13 +28,17 @@
 
     <string name="library_title">Koleksi Saya</string>
     <string name="library_subtitle_favorites">%1$d lagu disukai</string>
+    <string name="library_subtitle_downloaded">%1$d lagu siap offline</string>
     <string name="library_subtitle_saved">%1$d lagu tersimpan</string>
     <string name="library_subtitle_history">%1$d trek pernah diputar</string>
     <string name="library_tab_favorites">Favorit (%1$d)</string>
+    <string name="library_tab_downloaded">Diunduh (%1$d)</string>
     <string name="library_tab_saved">Tersimpan (%1$d)</string>
     <string name="library_tab_history">Riwayat (%1$d)</string>
     <string name="library_empty_favorites_title">Belum Ada Lagu Favorit</string>
     <string name="library_empty_favorites_desc">Ketuk ikon hati pada lagu yang sedang diputar untuk menyimpannya ke koleksi favorit Anda.</string>
+    <string name="library_empty_downloaded_title">Belum Ada Lagu Diunduh</string>
+    <string name="library_empty_downloaded_desc">Unduh lagu dari menu opsi lagu untuk mendengarkannya tanpa koneksi internet.</string>
     <string name="library_empty_saved_title">Belum Ada Lagu Tersimpan</string>
     <string name="library_empty_saved_desc">Gunakan menu titik tiga pada lagu untuk menyimpannya ke koleksi tersimpan Anda.</string>
     <string name="library_empty_history_title">Belum Ada Riwayat Pemutaran</string>

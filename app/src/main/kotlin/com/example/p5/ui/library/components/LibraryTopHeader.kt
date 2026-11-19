@@ -15,6 +15,7 @@ import com.example.p5.ui.theme.AppTheme
 fun LibraryTopHeader(
     selectedTab: Int,
     favoriteCount: Int,
+    downloadedCount: Int,
     savedCount: Int,
     historyCount: Int,
     modifier: Modifier = Modifier
@@ -32,7 +33,8 @@ fun LibraryTopHeader(
         Text(
             text = when (selectedTab) {
                 0 -> stringResource(R.string.library_subtitle_favorites, favoriteCount)
-                1 -> stringResource(R.string.library_subtitle_saved, savedCount)
+                1 -> stringResource(R.string.library_subtitle_downloaded, downloadedCount)
+                2 -> stringResource(R.string.library_subtitle_saved, savedCount)
                 else -> stringResource(R.string.library_subtitle_history, historyCount)
             },
             color = appColors.textSecondary,

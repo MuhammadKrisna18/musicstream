@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.p5.R
@@ -38,6 +39,7 @@ import com.example.p5.ui.theme.StrokeWidthBorder
 fun LibraryTabBar(
     selectedTab: Int,
     favoriteCount: Int,
+    downloadedCount: Int,
     savedCount: Int,
     historyCount: Int,
     onTabSelected: (Int) -> Unit,
@@ -58,10 +60,11 @@ fun LibraryTabBar(
                 endColor = appColors.glassBorderSubtle
             )
             .padding(SpacingXs),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         val tabs = listOf(
             stringResource(R.string.library_tab_favorites, favoriteCount),
+            stringResource(R.string.library_tab_downloaded, downloadedCount),
             stringResource(R.string.library_tab_saved, savedCount),
             stringResource(R.string.library_tab_history, historyCount)
         )
@@ -111,8 +114,10 @@ fun LibraryTabBar(
                 Text(
                     text = title,
                     color = textColor,
-                    fontSize = 13.sp,
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
+                    fontSize = 11.5.sp,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

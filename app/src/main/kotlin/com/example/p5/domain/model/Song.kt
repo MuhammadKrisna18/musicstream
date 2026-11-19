@@ -9,5 +9,6 @@ data class Song(
     val thumbnailUrl: String,
     val webUrl: String,
     val viewCount: Long = 0L,
-    val channelId: String? = null
+    val channelId: String? = null,
+    val localFilePath: String? = null
 )
