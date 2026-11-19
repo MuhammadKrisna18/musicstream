@@ -175,13 +175,14 @@ fun SearchScreen(
                                     searchFilter = searchFilter,
                                     playerState = playerState,
                                     onSelectFilter = searchViewModel::setSearchFilter,
-                                    onSongSelected = { song, index ->
+                                    onSongSelected = { song, queue, index ->
                                         searchViewModel.onSongSelectedFromSearch(song)
-                                        onPlayQueue(state.songs, index)
+                                        onPlayQueue(queue, index)
                                     },
                                     onPlaylistSelected = searchViewModel::onPlaylistSelectedFromSearch,
                                     onMoreOptionsClick = onMoreOptionsClick,
-                                    onArtistClick = onArtistClick
+                                    onArtistClick = onArtistClick,
+                                    songsPagingFlow = searchViewModel.searchSongsPagingFlow
                                 )
                             }
 

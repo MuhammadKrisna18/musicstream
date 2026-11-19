@@ -1,24 +1,38 @@
 package com.example.p5.ui.search.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.paging.LoadState
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.SearchFilter
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.SongItem
+import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
+import kotlinx.coroutines.flow.Flow
 import java.util.Locale
 
 @Composable
@@ -29,12 +43,15 @@ fun SearchResultsContent(
     searchFilter: SearchFilter,
     playerState: PlayerState,
     onSelectFilter: (SearchFilter) -> Unit,
-    onSongSelected: (Song, Int) -> Unit,
+    onSongSelected: (Song, List<Song>, Int) -> Unit,
     onPlaylistSelected: (Playlist) -> Unit,
     onMoreOptionsClick: (Song) -> Unit,
     onArtistClick: (channelId: String, artistName: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    songsPagingFlow: Flow<PagingData<Song>>? = null
 ) {
+    val pagedSongs = songsPagingFlow?.collectAsLazyPagingItems()
+
     val albums = remember(playlists) {
         playlists.filter { isAlbumPlaylist(it) }
     }
@@ -83,14 +100,117 @@ fun SearchResultsContent(
                         song = song,
                         isPlaying = playerState.isPlaying,
                         isSelected = isSelected,
-                        onClick = { onSongSelected(song, index) },
+                        onClick = { onSongSelected(song, songs, index) },
                         onMoreOptionsClick = onMoreOptionsClick
                     )
                 }
             }
 
             SearchFilter.SONGS -> {
-                if (songs.isNotEmpty()) {
+                if (pagedSongs != null) {
+                    when (val refreshState = pagedSongs.loadState.refresh) {
+                        is LoadState.Loading -> {
+                            if (pagedSongs.itemCount == 0) {
+                                item(key = "paging_songs_refresh_loading") {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 32.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        CircularProgressIndicator(
+                                            color = AppTheme.colors.accent,
+                                            strokeWidth = 3.dp,
+                                            modifier = Modifier.size(36.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        is LoadState.Error -> {
+                            if (pagedSongs.itemCount == 0) {
+                                item(key = "paging_songs_refresh_error") {
+                                    SearchErrorState(
+                                        message = refreshState.error.localizedMessage ?: "",
+                                        onRetry = { pagedSongs.retry() },
+                                        modifier = Modifier.padding(vertical = 32.dp)
+                                    )
+                                }
+                            }
+                        }
+                        is LoadState.NotLoading -> {
+                            if (pagedSongs.itemCount == 0) {
+                                item(key = "paging_songs_empty") {
+                                    SearchEmptyState(
+                                        query = "Lagu untuk \"$query\"",
+                                        modifier = Modifier.padding(vertical = 32.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    items(
+                        count = pagedSongs.itemCount,
+                        key = { index ->
+                            pagedSongs[index]?.id ?: "paged_song_$index"
+                        }
+                    ) { index ->
+                        val song = pagedSongs[index]
+                        if (song != null) {
+                            val isSelected = playerState.currentSong?.id == song.id
+                            SongItem(
+                                song = song,
+                                isPlaying = playerState.isPlaying,
+                                isSelected = isSelected,
+                                onClick = {
+                                    val currentLoadedList = (0 until pagedSongs.itemCount).mapNotNull { pagedSongs[it] }
+                                    val effectiveIndex = currentLoadedList.indexOfFirst { it.id == song.id }.takeIf { it >= 0 } ?: index
+                                    onSongSelected(song, currentLoadedList, effectiveIndex)
+                                },
+                                onMoreOptionsClick = onMoreOptionsClick
+                            )
+                        }
+                    }
+
+                    when (pagedSongs.loadState.append) {
+                        is LoadState.Loading -> {
+                            item(key = "paging_songs_append_loading") {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = AppTheme.colors.accent,
+                                        strokeWidth = 2.5.dp,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                            }
+                        }
+                        is LoadState.Error -> {
+                            item(key = "paging_songs_append_error") {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { pagedSongs.retry() }
+                                        .padding(vertical = 12.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.action_retry),
+                                        color = AppTheme.colors.accent,
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+                        }
+                        is LoadState.NotLoading -> Unit
+                    }
+                } else if (songs.isNotEmpty()) {
                     itemsIndexed(
                         items = songs,
                         key = { _, item -> item.id }
@@ -100,7 +220,7 @@ fun SearchResultsContent(
                             song = song,
                             isPlaying = playerState.isPlaying,
                             isSelected = isSelected,
-                            onClick = { onSongSelected(song, index) },
+                            onClick = { onSongSelected(song, songs, index) },
                             onMoreOptionsClick = onMoreOptionsClick
                         )
                     }

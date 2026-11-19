@@ -20,17 +20,28 @@ import com.example.p5.domain.usecase.GetTrendingMusicUseCase
 import com.example.p5.domain.usecase.SearchMusicUseCase
 import com.example.p5.domain.usecase.SearchPlaylistsUseCase
 import com.example.p5.domain.usecase.SearchSongsAndPlaylistsUseCase
+import com.example.p5.ui.search.paging.SongSearchPagingSource
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -62,6 +73,26 @@ class SearchViewModel(
 
     private val _uiState = MutableStateFlow<SearchUiState>(SearchUiState.Idle)
     val uiState: StateFlow<SearchUiState> = _uiState.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val searchSongsPagingFlow: Flow<PagingData<Song>> = _query
+        .debounce(400)
+        .flatMapLatest { query ->
+            val trimmed = query.trim()
+            if (trimmed.isBlank()) {
+                flowOf(PagingData.empty())
+            } else {
+                Pager(
+                    config = PagingConfig(
+                        pageSize = 20,
+                        prefetchDistance = 4,
+                        enablePlaceholders = false
+                    ),
+                    pagingSourceFactory = { SongSearchPagingSource(searchMusicUseCase, trimmed) }
+                ).flow
+            }
+        }
+        .cachedIn(viewModelScope)
 
     val searchHistory: StateFlow<List<String>> = searchHistoryRepository.getSearchHistory(15)
         .stateIn(
