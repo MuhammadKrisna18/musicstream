@@ -1,5 +1,6 @@
 package com.example.p5.data.repository
 
+import android.app.NotificationManager
 import android.content.Context
 import android.database.Cursor
 import androidx.work.Constraints
@@ -110,6 +111,24 @@ class DownloadRepositoryImpl(
             .distinctUntilChanged()
     }
 
+    override fun getDownloadProgress(): Flow<Map<String, Int>> {
+        return workManager.getWorkInfosByTagFlow(SongDownloadWorker.TAG_DOWNLOAD)
+            .map { workInfos ->
+                val map = mutableMapOf<String, Int>()
+                workInfos.forEach { workInfo ->
+                    if (workInfo.state == WorkInfo.State.RUNNING || workInfo.state == WorkInfo.State.ENQUEUED) {
+                        val songId = workInfo.tags.firstOrNull { it.startsWith("song_") }?.removePrefix("song_")
+                        if (songId != null) {
+                            val progress = workInfo.progress.getInt(SongDownloadWorker.KEY_PROGRESS, 0)
+                            map[songId] = progress
+                        }
+                    }
+                }
+                map
+            }
+            .distinctUntilChanged()
+    }
+
     override fun enqueueDownload(song: Song) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -134,7 +153,7 @@ class DownloadRepositoryImpl(
 
         workManager.enqueueUniqueWork(
             SongDownloadWorker.workName(song.id),
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.REPLACE,
             workRequest
         )
     }
@@ -142,6 +161,9 @@ class DownloadRepositoryImpl(
     override suspend fun deleteDownload(songId: String): Result<Unit> = withContext(ioDispatcher) {
         runCatching {
             workManager.cancelUniqueWork(SongDownloadWorker.workName(songId))
+
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+            notificationManager?.cancel(songId.hashCode())
 
             val path = getDownloadedFilePath(songId)
             if (!path.isNullOrBlank()) {

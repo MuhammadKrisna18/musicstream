@@ -96,6 +96,7 @@ class LibraryViewModelTest {
         override fun getAllDownloadedSongs(): Flow<List<Song>> = downloadedFlow
         override suspend fun isDownloaded(songId: String): Boolean = downloadedFlow.value.any { it.id == songId }
         override fun getActiveDownloadIds(): Flow<Set<String>> = activeDownloadsFlow
+        override fun getDownloadProgress(): Flow<Map<String, Int>> = MutableStateFlow(emptyMap())
         override fun enqueueDownload(song: Song) {
             val current = downloadedFlow.value.toMutableList()
             if (current.none { it.id == song.id }) {
