@@ -18,21 +18,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.p5.R
+import com.example.p5.domain.model.HomeSectionStyle
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.search.SearchViewModel
-import com.example.p5.ui.search.components.EditorialHeroCard
+import com.example.p5.ui.search.components.EditorialHeroCarousel
 import com.example.p5.ui.search.components.GenreFilterRow
 import com.example.p5.ui.search.components.HomeTrackSection
 import com.example.p5.ui.search.components.PlaylistDetailContent
 import com.example.p5.ui.search.components.PlaylistRowSection
+import com.example.p5.ui.search.components.QuickPicksGridSection
 import com.example.p5.ui.search.components.SearchEmptyState
 import com.example.p5.ui.search.components.SearchTopHeader
 import com.example.p5.ui.search.components.SectionDetailContent
@@ -51,6 +52,8 @@ fun HomeScreen(
     onMoreOptionsClick: (Song) -> Unit = {}
 ) {
     val homeSections by searchViewModel.homeSections.collectAsStateWithLifecycle()
+    val heroSpotlightTracks by searchViewModel.heroSpotlightTracks.collectAsStateWithLifecycle()
+    val timeGreeting by searchViewModel.timeGreeting.collectAsStateWithLifecycle()
     val categories by searchViewModel.categories.collectAsStateWithLifecycle()
     val selectedGenre by searchViewModel.selectedGenre.collectAsStateWithLifecycle()
     val selectedSection by searchViewModel.selectedSection.collectAsStateWithLifecycle()
@@ -62,10 +65,6 @@ fun HomeScreen(
     val isHomeLoading by searchViewModel.isHomeLoading.collectAsStateWithLifecycle()
     val isRefreshing by searchViewModel.isRefreshing.collectAsStateWithLifecycle()
     val shimmerBrush = rememberShimmerBrush()
-
-    val editorialFeaturedTrack = remember(homeSections) {
-        homeSections.firstOrNull { it.tracks.isNotEmpty() }?.tracks?.firstOrNull()
-    }
 
     BackHandler(enabled = selectedSection != null || selectedPlaylist != null) {
         if (selectedPlaylist != null) {
@@ -112,7 +111,9 @@ fun HomeScreen(
                     SearchTopHeader(
                         isRefreshing = isRefreshing,
                         isPlaying = playerState.isPlaying,
-                        onRefresh = searchViewModel::refreshHomeFeed
+                        onRefresh = searchViewModel::refreshHomeFeed,
+                        greetingTitle = timeGreeting.greetingTitle,
+                        greetingSubtitle = timeGreeting.greetingSubtitle
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -137,13 +138,13 @@ fun HomeScreen(
                                 }
                             }
 
-                            if (selectedGenre == null && editorialFeaturedTrack != null) {
+                            if (selectedGenre == null && heroSpotlightTracks.isNotEmpty()) {
                                 item(key = "home_editorial_hero") {
-                                    EditorialHeroCard(
-                                        song = editorialFeaturedTrack,
+                                    EditorialHeroCarousel(
+                                        songs = heroSpotlightTracks,
                                         isPlaying = playerState.isPlaying,
-                                        isSelected = playerState.currentSong?.id == editorialFeaturedTrack.id,
-                                        onClick = { onSongClick(editorialFeaturedTrack) }
+                                        currentSongId = playerState.currentSong?.id,
+                                        onPlayQueue = onPlayQueue
                                     )
                                 }
                             }
@@ -165,14 +166,30 @@ fun HomeScreen(
                                 homeSections.forEach { section ->
                                     if (section.tracks.isNotEmpty()) {
                                         item(key = section.id) {
-                                            HomeTrackSection(
-                                                section = section,
-                                                isPlaying = playerState.isPlaying,
-                                                currentSongId = playerState.currentSong?.id,
-                                                onPlayQueue = onPlayQueue,
-                                                onSeeAllClick = searchViewModel::openSectionDetail,
-                                                onMoreOptionsClick = onMoreOptionsClick
-                                            )
+                                            when (section.style) {
+                                                HomeSectionStyle.QUICK_PICKS_GRID -> {
+                                                    QuickPicksGridSection(
+                                                        section = section,
+                                                        isPlaying = playerState.isPlaying,
+                                                        currentSongId = playerState.currentSong?.id,
+                                                        onPlayQueue = onPlayQueue,
+                                                        onSeeAllClick = searchViewModel::openSectionDetail,
+                                                        onMoreOptionsClick = onMoreOptionsClick
+                                                    )
+                                                }
+
+                                                HomeSectionStyle.RANKED_CHARTS,
+                                                HomeSectionStyle.STANDARD_CARDS -> {
+                                                    HomeTrackSection(
+                                                        section = section,
+                                                        isPlaying = playerState.isPlaying,
+                                                        currentSongId = playerState.currentSong?.id,
+                                                        onPlayQueue = onPlayQueue,
+                                                        onSeeAllClick = searchViewModel::openSectionDetail,
+                                                        onMoreOptionsClick = onMoreOptionsClick
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }

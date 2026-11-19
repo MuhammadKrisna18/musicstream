@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.p5.R
 import com.example.p5.domain.model.HomeSection
+import com.example.p5.domain.model.HomeSectionStyle
 import com.example.p5.domain.model.Song
 import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
@@ -65,6 +66,7 @@ fun HomeTrackSection(
     if (section.tracks.isEmpty()) return
 
     val appColors = AppTheme.colors
+    val isRankedSection = section.style == HomeSectionStyle.RANKED_CHARTS
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -115,7 +117,8 @@ fun HomeTrackSection(
                     isPlaying = isPlaying,
                     isSelected = currentSongId == song.id,
                     onSongClick = { onPlayQueue(section.tracks, index) },
-                    onMoreOptionsClick = onMoreOptionsClick
+                    onMoreOptionsClick = onMoreOptionsClick,
+                    rankNumber = if (isRankedSection) index + 1 else null
                 )
             }
         }
@@ -129,7 +132,8 @@ fun TrendingTrackCard(
     isSelected: Boolean,
     onSongClick: (Song) -> Unit,
     modifier: Modifier = Modifier,
-    onMoreOptionsClick: ((Song) -> Unit)? = null
+    onMoreOptionsClick: ((Song) -> Unit)? = null,
+    rankNumber: Int? = null
 ) {
     val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
@@ -187,7 +191,41 @@ fun TrendingTrackCard(
                 )
         )
 
-        if (isSelected && isPlaying) {
+        if (rankNumber != null) {
+            val isTopThree = rankNumber in 1..3
+            val badgeBg = if (isTopThree) appColors.accent else Color.Black.copy(alpha = 0.68f)
+            val badgeTextColor = if (isTopThree) appColors.onAccent else Color.White
+
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(badgeBg)
+                    .glassBorder(
+                        shape = RoundedCornerShape(10.dp),
+                        strokeWidth = 1.dp,
+                        startColor = if (isTopThree) appColors.accentLight else appColors.glassBorderBright.copy(alpha = 0.4f),
+                        endColor = Color.Transparent
+                    )
+                    .padding(horizontal = 7.dp, vertical = 3.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = "#$rankNumber",
+                    color = badgeTextColor,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                if (isSelected && isPlaying) {
+                    MiniEqualizer(
+                        barColor = badgeTextColor,
+                        isPlaying = true
+                    )
+                }
+            }
+        } else if (isSelected && isPlaying) {
             Box(
                 modifier = Modifier
                     .align(Alignment.TopStart)
