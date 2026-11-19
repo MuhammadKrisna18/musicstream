@@ -7,8 +7,6 @@ import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.HomeSectionStyle
-import com.example.p5.domain.model.HomeTimeContextResolver
-import com.example.p5.domain.model.TimePeriod
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.SearchFilter
 import com.example.p5.domain.model.SearchResult
@@ -142,25 +140,6 @@ class SearchViewModelTest {
     }
 
     @Test
-    fun homeTimeContextResolver_resolvesCorrectPeriodAndGreeting() {
-        val morning = HomeTimeContextResolver.resolve(8)
-        assertEquals(TimePeriod.MORNING, morning.period)
-        assertEquals("Selamat Pagi", morning.greetingTitle)
-
-        val afternoon = HomeTimeContextResolver.resolve(13)
-        assertEquals(TimePeriod.AFTERNOON, afternoon.period)
-        assertEquals("Selamat Siang", afternoon.greetingTitle)
-
-        val evening = HomeTimeContextResolver.resolve(17)
-        assertEquals(TimePeriod.EVENING, evening.period)
-        assertEquals("Selamat Sore", evening.greetingTitle)
-
-        val night = HomeTimeContextResolver.resolve(22)
-        assertEquals(TimePeriod.NIGHT, night.period)
-        assertEquals("Selamat Malam", night.greetingTitle)
-    }
-
-    @Test
     fun homeFeedBuilder_curateHeroSpotlightTracks_prioritizesNonHistorySections() {
         val songHistory = Song("h1", "History 1", "Artist H", 200, "3:20", "", "")
         val songChart = Song("c1", "Chart 1", "Artist C", 210, "3:30", "", "")
@@ -169,7 +148,7 @@ class SearchViewModelTest {
         val sections = listOf(
             HomeSection("personalized_quick_picks", "Pilihan Cepat", null, null, listOf(songHistory), HomeSectionStyle.QUICK_PICKS_GRID),
             HomeSection("chart_0", "Top Charts", null, null, listOf(songChart), HomeSectionStyle.RANKED_CHARTS),
-            HomeSection("time_mood_morning", "Semangat Pagi", null, null, listOf(songMood), HomeSectionStyle.STANDARD_CARDS)
+            HomeSection("thematic_indie", "Indie Hangat", null, null, listOf(songMood), HomeSectionStyle.STANDARD_CARDS)
         )
 
         val spotlight = HomeFeedBuilder.curateHeroSpotlightTracks(sections, maxCount = 2)
