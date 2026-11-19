@@ -54,17 +54,13 @@ import com.example.p5.R
 import com.example.p5.domain.model.LyricsData
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.theme.ActionButtonSizeSm
-import com.example.p5.ui.theme.CornerRadiusMd
 import com.example.p5.ui.theme.CornerRadiusPill
 import com.example.p5.ui.theme.GlassBorderBright
 import com.example.p5.ui.theme.GlassBorderSubtle
 import com.example.p5.ui.theme.GlassFillLight
-import com.example.p5.ui.theme.IconSizeDisplay
-import com.example.p5.ui.theme.IconSizeHero
 import com.example.p5.ui.theme.IconSizeSm
 import com.example.p5.ui.theme.SpacingLg
 import com.example.p5.ui.theme.SpacingSm
-import com.example.p5.ui.theme.SpacingXs
 import com.example.p5.ui.theme.SpacingXxl
 import com.example.p5.ui.theme.StrokeWidthBorder
 import com.example.p5.ui.theme.StrokeWidthProgress
@@ -122,34 +118,44 @@ fun PlayerLyricsView(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Lyrics,
-                    contentDescription = null,
-                    tint = TextMuted,
-                    modifier = Modifier.size(IconSizeDisplay)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
+                        .background(accentColor.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Lyrics,
+                        contentDescription = null,
+                        tint = accentColor,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(14.dp))
                 Text(
                     text = stringResource(R.string.player_lyrics_not_found_title),
                     color = TextPrimary,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = stringResource(R.string.player_lyrics_not_found_desc),
                     color = TextSecondary,
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
+                    lineHeight = 19.sp,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = SpacingXxl, vertical = SpacingXs)
+                    modifier = Modifier.padding(horizontal = SpacingXxl)
                 )
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = onRetryFetchLyrics,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = accentColor.copy(alpha = 0.16f),
+                        containerColor = accentColor.copy(alpha = 0.14f),
                         contentColor = accentColor
                     ),
-                    shape = RoundedCornerShape(CornerRadiusMd)
+                    shape = RoundedCornerShape(CornerRadiusPill)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Refresh,
@@ -170,23 +176,35 @@ fun PlayerLyricsView(
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        imageVector = Icons.Rounded.MusicNote,
-                        contentDescription = null,
-                        tint = accentColor,
-                        modifier = Modifier.size(IconSizeHero)
-                    )
-                    Spacer(modifier = Modifier.height(SpacingSm))
+                    Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .clip(CircleShape)
+                            .background(accentColor.copy(alpha = 0.12f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.MusicNote,
+                            contentDescription = null,
+                            tint = accentColor,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(14.dp))
                     Text(
                         text = stringResource(R.string.player_instrumental_title),
                         color = TextPrimary,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.SemiBold
                     )
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = stringResource(R.string.player_instrumental_desc),
                         color = TextSecondary,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
+                        lineHeight = 19.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = SpacingXxl)
                     )
                 }
             }

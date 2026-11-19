@@ -46,12 +46,12 @@
     <string name="player_dismiss_desc">Dismiss</string>
     <string name="player_queue_title">Next Songs (%1$d)</string>
     <string name="player_queue_empty">No tracks in queue</string>
-    <string name="player_lyrics_loading">Syncing lyrics...</string>
+    <string name="player_lyrics_loading">Preparing lyrics...</string>
     <string name="player_lyrics_not_found_title">Lyrics Unavailable</string>
-    <string name="player_lyrics_not_found_desc">Lyrics for this track are not yet available in the database</string>
-    <string name="player_lyrics_retry">Retry Fetching</string>
-    <string name="player_instrumental_title">Instrumental Track</string>
-    <string name="player_instrumental_desc">This track has no vocal performance</string>
+    <string name="player_lyrics_not_found_desc">Lyrics are not available for this track right now. Enjoy the music and happy listening! 🎵</string>
+    <string name="player_lyrics_retry">Check Again</string>
+    <string name="player_instrumental_title">Instrumental Melody</string>
+    <string name="player_instrumental_desc">This track is a beautiful instrumental melody without vocals</string>
     <string name="player_shuffle_desc">Shuffle</string>
     <string name="player_previous_desc">Previous</string>
     <string name="player_repeat_desc">Repeat</string>
