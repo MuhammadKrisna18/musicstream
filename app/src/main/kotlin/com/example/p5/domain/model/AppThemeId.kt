@@ -40,6 +40,56 @@ enum class AppThemeId(
         category = ThemeCategory.ANIME,
         isDark = true
     ),
+    ANIME_SHADOW_MONARCH(
+        title = "Shadow Monarch",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_SUN_BREATH(
+        title = "Sun Breathing",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_CURSE_KING(
+        title = "Curse King",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_FREEDOM_WINGS(
+        title = "Freedom Wings",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_MOONLESS_SKY(
+        title = "Moonless Sky",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_STARLIGHT_SPY(
+        title = "Starlight Twilight",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_SUN_GOD(
+        title = "Sun God Nika",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_BLOOD_DEVIL(
+        title = "Blood Fiend",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_AUTO_MEMORY(
+        title = "Auto Memory",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
+    ANIME_PSY_SCIENTIST(
+        title = "Divergence Line",
+        category = ThemeCategory.ANIME,
+        isDark = true
+    ),
     MINIMAL_OLED(
         title = "OLED Pitch Black",
         category = ThemeCategory.MINIMALIST,

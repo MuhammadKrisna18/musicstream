@@ -14,7 +14,7 @@ class AppThemePaletteTest {
     @Test
     fun allThemeIds_haveValidPalettes() {
         val allThemes = AppThemeId.entries
-        assertEquals(25, allThemes.size)
+        assertEquals(35, allThemes.size)
 
         for (theme in allThemes) {
             val palette = AppThemePalette.getPalette(theme)
@@ -44,14 +44,24 @@ class AppThemePaletteTest {
     @Test
     fun animeThemes_countAndCategoryMatch() {
         val animeThemes = AppThemeId.entries.filter { it.category == ThemeCategory.ANIME }
-        assertEquals(5, animeThemes.size)
+        assertEquals(15, animeThemes.size)
 
         val expectedIds = listOf(
             AppThemeId.ANIME_CYBERPUNK,
             AppThemeId.ANIME_INFINITY_BLUE,
             AppThemeId.ANIME_CRIMSON_FLAME,
             AppThemeId.ANIME_SAKURA_TWILIGHT,
-            AppThemeId.ANIME_EVA_UNIT01
+            AppThemeId.ANIME_EVA_UNIT01,
+            AppThemeId.ANIME_SHADOW_MONARCH,
+            AppThemeId.ANIME_SUN_BREATH,
+            AppThemeId.ANIME_CURSE_KING,
+            AppThemeId.ANIME_FREEDOM_WINGS,
+            AppThemeId.ANIME_MOONLESS_SKY,
+            AppThemeId.ANIME_STARLIGHT_SPY,
+            AppThemeId.ANIME_SUN_GOD,
+            AppThemeId.ANIME_BLOOD_DEVIL,
+            AppThemeId.ANIME_AUTO_MEMORY,
+            AppThemeId.ANIME_PSY_SCIENTIST
         )
         assertEquals(expectedIds, animeThemes)
 
@@ -61,7 +71,7 @@ class AppThemePaletteTest {
         }
 
         val backgroundResIds = animeThemes.map { AppThemePalette.getPalette(it).backgroundImageRes }
-        assertEquals(5, backgroundResIds.toSet().size)
+        assertEquals(15, backgroundResIds.toSet().size)
     }
 
     @Test

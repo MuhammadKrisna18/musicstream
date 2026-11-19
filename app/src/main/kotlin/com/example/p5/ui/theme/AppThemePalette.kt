@@ -188,6 +188,266 @@ object AppThemePalette {
         backgroundImageRes = R.drawable.bg_anime_mecha
     )
 
+    val animeShadowMonarch = AppColorScheme(
+        id = AppThemeId.ANIME_SHADOW_MONARCH,
+        isDark = true,
+        background = Color(0xFF090812),
+        surface = Color(0xFF131024),
+        surfaceVariant = Color(0xFF1C1736),
+        card = Color(0xFF161229),
+        cardHigh = Color(0xFF241E45),
+        floatingDock = Color(0xEB100D1E),
+        accent = Color(0xFF8B5CF6),
+        accentSecondary = Color(0xFF06B6D4),
+        accentLight = Color(0xFFA78BFA),
+        accentDark = Color(0xFF6D28D9),
+        accentGlow = Color(0x4D8B5CF6),
+        glassFillSubtle = Color(0x0A8B5CF6),
+        glassFillLight = Color(0x148B5CF6),
+        glassFillMedium = Color(0x1F8B5CF6),
+        glassBorderSubtle = Color(0x268B5CF6),
+        glassBorderBright = Color(0x668B5CF6),
+        textPrimary = Color(0xFFF5F3FF),
+        textSecondary = Color(0xFFC4B5FD),
+        textTertiary = Color(0xFF8B5CF6),
+        textMuted = Color(0xFF5B527E),
+        backgroundImageRes = R.drawable.bg_anime_shadow
+    )
+
+    val animeSunBreath = AppColorScheme(
+        id = AppThemeId.ANIME_SUN_BREATH,
+        isDark = true,
+        background = Color(0xFF140808),
+        surface = Color(0xFF200F0F),
+        surfaceVariant = Color(0xFF311717),
+        card = Color(0xFF261212),
+        cardHigh = Color(0xFF3D1D1D),
+        floatingDock = Color(0xEB1A0B0B),
+        accent = Color(0xFFF97316),
+        accentSecondary = Color(0xFFEAB308),
+        accentLight = Color(0xFFFDBA74),
+        accentDark = Color(0xFFC2410C),
+        accentGlow = Color(0x4DF97316),
+        glassFillSubtle = Color(0x0AF97316),
+        glassFillLight = Color(0x14F97316),
+        glassFillMedium = Color(0x1FF97316),
+        glassBorderSubtle = Color(0x26F97316),
+        glassBorderBright = Color(0x66F97316),
+        textPrimary = Color(0xFFFFF7ED),
+        textSecondary = Color(0xFFFED7AA),
+        textTertiary = Color(0xFFF97316),
+        textMuted = Color(0xFF7C4B4B),
+        backgroundImageRes = R.drawable.bg_anime_sun
+    )
+
+    val animeCurseKing = AppColorScheme(
+        id = AppThemeId.ANIME_CURSE_KING,
+        isDark = true,
+        background = Color(0xFF100507),
+        surface = Color(0xFF1C0A0D),
+        surfaceVariant = Color(0xFF2B0F14),
+        card = Color(0xFF210C10),
+        cardHigh = Color(0xFF37141A),
+        floatingDock = Color(0xEB170709),
+        accent = Color(0xFFE11D48),
+        accentSecondary = Color(0xFFF43F5E),
+        accentLight = Color(0xFFFDA4AF),
+        accentDark = Color(0xFF9F1239),
+        accentGlow = Color(0x4DE11D48),
+        glassFillSubtle = Color(0x0AE11D48),
+        glassFillLight = Color(0x14E11D48),
+        glassFillMedium = Color(0x1FE11D48),
+        glassBorderSubtle = Color(0x26E11D48),
+        glassBorderBright = Color(0x66E11D48),
+        textPrimary = Color(0xFFFFF1F2),
+        textSecondary = Color(0xFFFECDD3),
+        textTertiary = Color(0xFFE11D48),
+        textMuted = Color(0xFF70323B),
+        backgroundImageRes = R.drawable.bg_anime_curse
+    )
+
+    val animeFreedomWings = AppColorScheme(
+        id = AppThemeId.ANIME_FREEDOM_WINGS,
+        isDark = true,
+        background = Color(0xFF0A100C),
+        surface = Color(0xFF121B15),
+        surfaceVariant = Color(0xFF1B2820),
+        card = Color(0xFF152019),
+        cardHigh = Color(0xFF23352A),
+        floatingDock = Color(0xEB0E1612),
+        accent = Color(0xFF10B981),
+        accentSecondary = Color(0xFF38BDF8),
+        accentLight = Color(0xFF6EE7B7),
+        accentDark = Color(0xFF047857),
+        accentGlow = Color(0x4D10B981),
+        glassFillSubtle = Color(0x0A10B981),
+        glassFillLight = Color(0x1410B981),
+        glassFillMedium = Color(0x1F10B981),
+        glassBorderSubtle = Color(0x2610B981),
+        glassBorderBright = Color(0x6610B981),
+        textPrimary = Color(0xFFF0FDF4),
+        textSecondary = Color(0xFFA7F3D0),
+        textTertiary = Color(0xFF10B981),
+        textMuted = Color(0xFF4B6654),
+        backgroundImageRes = R.drawable.bg_anime_titan
+    )
+
+    val animeMoonlessSky = AppColorScheme(
+        id = AppThemeId.ANIME_MOONLESS_SKY,
+        isDark = true,
+        background = Color(0xFF060608),
+        surface = Color(0xFF101015),
+        surfaceVariant = Color(0xFF1B1B22),
+        card = Color(0xFF14141A),
+        cardHigh = Color(0xFF23232C),
+        floatingDock = Color(0xEB0D0D11),
+        accent = Color(0xFFEF4444),
+        accentSecondary = Color(0xFFF97316),
+        accentLight = Color(0xFFFCA5A5),
+        accentDark = Color(0xFFB91C1C),
+        accentGlow = Color(0x4DEF4444),
+        glassFillSubtle = Color(0x0AEF4444),
+        glassFillLight = Color(0x14EF4444),
+        glassFillMedium = Color(0x1FEF4444),
+        glassBorderSubtle = Color(0x26EF4444),
+        glassBorderBright = Color(0x66EF4444),
+        textPrimary = Color(0xFFFEF2F2),
+        textSecondary = Color(0xFFFECACA),
+        textTertiary = Color(0xFFEF4444),
+        textMuted = Color(0xFF5A4848),
+        backgroundImageRes = R.drawable.bg_anime_bankai
+    )
+
+    val animeStarlightSpy = AppColorScheme(
+        id = AppThemeId.ANIME_STARLIGHT_SPY,
+        isDark = true,
+        background = Color(0xFF120A10),
+        surface = Color(0xFF1C111A),
+        surfaceVariant = Color(0xFF2C1B29),
+        card = Color(0xFF221520),
+        cardHigh = Color(0xFF382335),
+        floatingDock = Color(0xEB180E16),
+        accent = Color(0xFFF472B6),
+        accentSecondary = Color(0xFFFBBF24),
+        accentLight = Color(0xFFFBCFE8),
+        accentDark = Color(0xFFDB2777),
+        accentGlow = Color(0x4DF472B6),
+        glassFillSubtle = Color(0x0AF472B6),
+        glassFillLight = Color(0x14F472B6),
+        glassFillMedium = Color(0x1FF472B6),
+        glassBorderSubtle = Color(0x26F472B6),
+        glassBorderBright = Color(0x66F472B6),
+        textPrimary = Color(0xFFFDF2F8),
+        textSecondary = Color(0xFFFBCFE8),
+        textTertiary = Color(0xFFF472B6),
+        textMuted = Color(0xFF6E4D65),
+        backgroundImageRes = R.drawable.bg_anime_starlight
+    )
+
+    val animeSunGod = AppColorScheme(
+        id = AppThemeId.ANIME_SUN_GOD,
+        isDark = true,
+        background = Color(0xFF121008),
+        surface = Color(0xFF1C190F),
+        surfaceVariant = Color(0xFF2A2617),
+        card = Color(0xFF211E13),
+        cardHigh = Color(0xFF36311F),
+        floatingDock = Color(0xEB18150C),
+        accent = Color(0xFFFACC15),
+        accentSecondary = Color(0xFFFB923C),
+        accentLight = Color(0xFFFEF08A),
+        accentDark = Color(0xFFCA8A04),
+        accentGlow = Color(0x4DFACC15),
+        glassFillSubtle = Color(0x0AFACC15),
+        glassFillLight = Color(0x14FACC15),
+        glassFillMedium = Color(0x1FFACC15),
+        glassBorderSubtle = Color(0x26FACC15),
+        glassBorderBright = Color(0x66FACC15),
+        textPrimary = Color(0xFFFEFCE8),
+        textSecondary = Color(0xFFFEF08A),
+        textTertiary = Color(0xFFFACC15),
+        textMuted = Color(0xFF6B6543),
+        backgroundImageRes = R.drawable.bg_anime_nika
+    )
+
+    val animeBloodDevil = AppColorScheme(
+        id = AppThemeId.ANIME_BLOOD_DEVIL,
+        isDark = true,
+        background = Color(0xFF14070A),
+        surface = Color(0xFF1E0E12),
+        surfaceVariant = Color(0xFF2D161C),
+        card = Color(0xFF231116),
+        cardHigh = Color(0xFF381C23),
+        floatingDock = Color(0xEB190B0E),
+        accent = Color(0xFFFF2E63),
+        accentSecondary = Color(0xFFFFA41B),
+        accentLight = Color(0xFFFF7597),
+        accentDark = Color(0xFFCC1444),
+        accentGlow = Color(0x4DFF2E63),
+        glassFillSubtle = Color(0x0AFF2E63),
+        glassFillLight = Color(0x14FF2E63),
+        glassFillMedium = Color(0x1FFF2E63),
+        glassBorderSubtle = Color(0x26FF2E63),
+        glassBorderBright = Color(0x66FF2E63),
+        textPrimary = Color(0xFFFFF0F3),
+        textSecondary = Color(0xFFFFCCD5),
+        textTertiary = Color(0xFFFF2E63),
+        textMuted = Color(0xFF75404B),
+        backgroundImageRes = R.drawable.bg_anime_chainsaw
+    )
+
+    val animeAutoMemory = AppColorScheme(
+        id = AppThemeId.ANIME_AUTO_MEMORY,
+        isDark = true,
+        background = Color(0xFF080D16),
+        surface = Color(0xFF101825),
+        surfaceVariant = Color(0xFF1A263B),
+        card = Color(0xFF131E2E),
+        cardHigh = Color(0xFF21314C),
+        floatingDock = Color(0xEB0D1420),
+        accent = Color(0xFF38BDF8),
+        accentSecondary = Color(0xFF34D399),
+        accentLight = Color(0xFF7DD3FC),
+        accentDark = Color(0xFF0284C7),
+        accentGlow = Color(0x4D38BDF8),
+        glassFillSubtle = Color(0x0A38BDF8),
+        glassFillLight = Color(0x1438BDF8),
+        glassFillMedium = Color(0x1F38BDF8),
+        glassBorderSubtle = Color(0x2638BDF8),
+        glassBorderBright = Color(0x6638BDF8),
+        textPrimary = Color(0xFFF0F9FF),
+        textSecondary = Color(0xFFBAE6FD),
+        textTertiary = Color(0xFF38BDF8),
+        textMuted = Color(0xFF485E7B),
+        backgroundImageRes = R.drawable.bg_anime_violet
+    )
+
+    val animePsyScientist = AppColorScheme(
+        id = AppThemeId.ANIME_PSY_SCIENTIST,
+        isDark = true,
+        background = Color(0xFF0E0A07),
+        surface = Color(0xFF18120E),
+        surfaceVariant = Color(0xFF261C16),
+        card = Color(0xFF1E1611),
+        cardHigh = Color(0xFF31241C),
+        floatingDock = Color(0xEB140E0A),
+        accent = Color(0xFFFB923C),
+        accentSecondary = Color(0xFF22C55E),
+        accentLight = Color(0xFFFDBA74),
+        accentDark = Color(0xFFC2410C),
+        accentGlow = Color(0x4DFB923C),
+        glassFillSubtle = Color(0x0AFB923C),
+        glassFillLight = Color(0x14FB923C),
+        glassFillMedium = Color(0x1FFB923C),
+        glassBorderSubtle = Color(0x26FB923C),
+        glassBorderBright = Color(0x66FB923C),
+        textPrimary = Color(0xFFFFF7ED),
+        textSecondary = Color(0xFFFED7AA),
+        textTertiary = Color(0xFFFB923C),
+        textMuted = Color(0xFF6E5647),
+        backgroundImageRes = R.drawable.bg_anime_steins
+    )
+
     val minimalOled = AppColorScheme(
         id = AppThemeId.MINIMAL_OLED,
         isDark = true,
@@ -665,6 +925,16 @@ object AppThemePalette {
             AppThemeId.ANIME_CRIMSON_FLAME -> animeCrimsonFlame
             AppThemeId.ANIME_SAKURA_TWILIGHT -> animeSakuraTwilight
             AppThemeId.ANIME_EVA_UNIT01 -> animeEvaUnit01
+            AppThemeId.ANIME_SHADOW_MONARCH -> animeShadowMonarch
+            AppThemeId.ANIME_SUN_BREATH -> animeSunBreath
+            AppThemeId.ANIME_CURSE_KING -> animeCurseKing
+            AppThemeId.ANIME_FREEDOM_WINGS -> animeFreedomWings
+            AppThemeId.ANIME_MOONLESS_SKY -> animeMoonlessSky
+            AppThemeId.ANIME_STARLIGHT_SPY -> animeStarlightSpy
+            AppThemeId.ANIME_SUN_GOD -> animeSunGod
+            AppThemeId.ANIME_BLOOD_DEVIL -> animeBloodDevil
+            AppThemeId.ANIME_AUTO_MEMORY -> animeAutoMemory
+            AppThemeId.ANIME_PSY_SCIENTIST -> animePsyScientist
             AppThemeId.MINIMAL_OLED -> minimalOled
             AppThemeId.MINIMAL_NORD -> minimalNord
             AppThemeId.MINIMAL_TOKYO -> minimalTokyo
