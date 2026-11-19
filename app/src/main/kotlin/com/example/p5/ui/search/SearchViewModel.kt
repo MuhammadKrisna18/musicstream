@@ -3,6 +3,7 @@ package com.example.p5.ui.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.Category
+import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Playlist
@@ -78,32 +79,9 @@ class SearchViewModel(
         _artistRecommendationSection,
         _rawHomeSections,
         _selectedGenre,
-        _genreSections
-    ) { topPlayed, artistSec, rawSecs, selectedGenre, genreSecs ->
-        if (selectedGenre != null) {
-            genreSecs
-        } else {
-            val personalized = mutableListOf<HomeSection>()
-
-            if (topPlayed.isNotEmpty()) {
-                personalized.add(
-                    HomeSection(
-                        id = "personalized_on_repeat",
-                        title = "Sering Kamu Putar",
-                        subtitle = "Lagu yang paling sering kamu dengarkan belakangan ini",
-                        query = "",
-                        tracks = topPlayed
-                    )
-                )
-            }
-
-            if (artistSec != null && artistSec.tracks.isNotEmpty()) {
-                personalized.add(artistSec)
-            }
-
-            personalized + rawSecs
-        }
-    }.stateIn(
+        _genreSections,
+        HomeFeedBuilder::combineHomeSections
+    ).stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
@@ -174,14 +152,8 @@ class SearchViewModel(
         artistJob = viewModelScope.launch {
             searchMusicUseCase("$artist official hits")
                 .onSuccess { songs ->
-                    if (songs.isNotEmpty()) {
-                        _artistRecommendationSection.value = HomeSection(
-                            id = "recommended_${artist.hashCode()}",
-                            title = "Spesial Untukmu: $artist",
-                            subtitle = "Koleksi lagu pilihan berdasarkan artis favoritmu",
-                            query = "$artist hits",
-                            tracks = songs.take(12)
-                        )
+                    HomeFeedBuilder.buildArtistRecommendationSection(artist, songs)?.let {
+                        _artistRecommendationSection.value = it
                     }
                 }
         }
@@ -192,12 +164,7 @@ class SearchViewModel(
             _isHomeLoading.value = true
             getHomeFeedUseCase(refresh = false)
                 .onSuccess { feed ->
-                    _rawHomeSections.value = feed.sections
-                    _categories.value = feed.categories
-                    _moodTags.value = feed.moodTags
-                    if (feed.playlists.isNotEmpty()) {
-                        _curatedPlaylists.value = feed.playlists
-                    }
+                    applyHomeFeed(feed)
                     _isHomeLoading.value = false
                 }
                 .onFailure {
@@ -239,12 +206,9 @@ class SearchViewModel(
     fun refreshHomeFeed() {
         viewModelScope.launch {
             _isRefreshing.value = true
-            val currentGenre = _selectedGenre.value
-            if (currentGenre != null) {
+            _selectedGenre.value?.let { currentGenre ->
                 getGenreFeedUseCase(currentGenre)
-                    .onSuccess { sections ->
-                        _genreSections.value = sections
-                    }
+                    .onSuccess { sections -> _genreSections.value = sections }
             }
 
             val topArtist = historyRepository.getTopArtists(1).firstOrNull()?.firstOrNull()
@@ -256,17 +220,21 @@ class SearchViewModel(
 
             getHomeFeedUseCase(refresh = true)
                 .onSuccess { feed ->
-                    _rawHomeSections.value = feed.sections
-                    _categories.value = feed.categories
-                    _moodTags.value = feed.moodTags
-                    if (feed.playlists.isNotEmpty()) {
-                        _curatedPlaylists.value = feed.playlists
-                    }
+                    applyHomeFeed(feed)
                     _isRefreshing.value = false
                 }
                 .onFailure {
                     _isRefreshing.value = false
                 }
+        }
+    }
+
+    private fun applyHomeFeed(feed: HomeFeed) {
+        _rawHomeSections.value = feed.sections
+        _categories.value = feed.categories
+        _moodTags.value = feed.moodTags
+        if (feed.playlists.isNotEmpty()) {
+            _curatedPlaylists.value = feed.playlists
         }
     }
 
@@ -278,16 +246,9 @@ class SearchViewModel(
             }
         getTrendingMusicUseCase(15)
             .onSuccess { songs ->
-                if (songs.isNotEmpty()) {
-                    _rawHomeSections.value = listOf(
-                        HomeSection(
-                            id = "trending",
-                            title = "Trending Now",
-                            subtitle = "Lagu paling populer dan viral saat ini",
-                            query = "trending music hits 2026",
-                            tracks = songs
-                        )
-                    )
+                val sections = HomeFeedBuilder.buildTrendingFallbackSections(songs)
+                if (sections.isNotEmpty()) {
+                    _rawHomeSections.value = sections
                 }
                 _isHomeLoading.value = false
             }
@@ -384,22 +345,21 @@ class SearchViewModel(
     }
 
     fun onSongSelectedFromSearch(song: Song) {
-        val trimmed = _query.value.trim()
-        if (trimmed.length >= 2) {
-            viewModelScope.launch {
-                searchHistoryRepository.addSearchQuery(trimmed)
-            }
-        }
+        recordCurrentQueryToHistory()
     }
 
     fun onPlaylistSelectedFromSearch(playlist: Playlist) {
+        recordCurrentQueryToHistory()
+        openPlaylistDetail(playlist)
+    }
+
+    private fun recordCurrentQueryToHistory() {
         val trimmed = _query.value.trim()
         if (trimmed.length >= 2) {
             viewModelScope.launch {
                 searchHistoryRepository.addSearchQuery(trimmed)
             }
         }
-        openPlaylistDetail(playlist)
     }
 
     fun deleteSearchHistoryItem(query: String) {
