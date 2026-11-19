@@ -43,11 +43,17 @@ class MusicFilterHelperTest {
 
         val compilation3 = createSong("3", "Kompilasi Lagu Pop 1 Jam Nonstop", "Various", 250)
         assertFalse(MusicFilterHelper.isValidMusicTrack(compilation3))
+
+        val compilation4 = createSong("4", "Single Track", "Playlist musik indonesia", 200)
+        assertFalse(MusicFilterHelper.isValidMusicTrack(compilation4))
+
+        val compilation5 = createSong("5", "Lagu Pop", "Artist", 550)
+        assertFalse(MusicFilterHelper.isValidMusicTrack(compilation5))
     }
 
     @Test
     fun isValidMusicTrack_rejectsPodcastsAndTalkshows() {
-        val podcast1 = createSong("1", "Podcast Ngobrol Santai", "Channel Podcast", 600)
+        val podcast1 = createSong("1", "Podcast Ngobrol Santai", "Channel Podcast", 300)
         assertFalse(MusicFilterHelper.isValidMusicTrack(podcast1))
 
         val talkshow = createSong("2", "Eps. 45 - Wawancara Eksklusif", "Talkshow ID", 500)

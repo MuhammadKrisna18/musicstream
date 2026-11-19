@@ -13,7 +13,7 @@ class PlaylistCurator(
 
     suspend fun getCuratedPlaylists(): List<Playlist> {
         val feedPlaylists = youTubeDataSource.getHomeFeed(refresh = false).playlists
-            .filter { !MusicFilterHelper.isExcludedContent(it.title) }
+            .filter { !MusicFilterHelper.isExcludedPlaylist(it.title) }
         if (feedPlaylists.isNotEmpty()) {
             return feedPlaylists
         }
@@ -27,18 +27,17 @@ class PlaylistCurator(
         }
 
         val directTracks = youTubeDataSource.getPlaylistTracks(playlist.id)
-        val validTracks = if (directTracks.isNotEmpty()) {
+        val sourceTracks = if (directTracks.isNotEmpty()) {
             directTracks
         } else {
-            val query = playlist.query.ifBlank { "Lagu ${playlist.title}" }
+            val query = playlist.query.ifBlank { "Lagu ${playlist.title} official audio" }
             youTubeDataSource.search(query, limit = 25)
         }
 
-        val cleanSongs = validTracks.filter { song ->
+        val cleanSongs = sourceTracks.filter { song ->
             MusicFilterHelper.isValidMusicTrack(song)
         }
-        val deduplicated = MusicFilterHelper.deduplicateSongs(if (cleanSongs.isNotEmpty()) cleanSongs else validTracks)
-        val result = deduplicated.ifEmpty { validTracks }
+        val result = MusicFilterHelper.deduplicateSongs(cleanSongs)
         if (result.isNotEmpty()) {
             playlistTrackCache[playlist.id] = result
         }
@@ -49,6 +48,6 @@ class PlaylistCurator(
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return emptyList()
         val results = youTubeDataSource.searchPlaylists(trimmed, limit = 10)
-        return results.filter { !MusicFilterHelper.isExcludedContent(it.title) }.take(limit)
+        return results.filter { !MusicFilterHelper.isExcludedPlaylist(it.title) }.take(limit)
     }
 }

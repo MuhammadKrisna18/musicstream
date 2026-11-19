@@ -164,19 +164,10 @@ class YouTubeNativeDataSource(
     }
 
     private suspend fun fetchNativeMusicFeed(randomize: Boolean = false): HomeFeed = coroutineScope {
-        val selectedChartId = if (randomize) {
-            MusicConfig.chartPlaylistIds.shuffled().first()
-        } else {
-            val hourlyIndex = ((System.currentTimeMillis() / 3_600_000L) % MusicConfig.chartPlaylistIds.size)
-                .toInt()
-                .coerceAtLeast(0)
-            MusicConfig.chartPlaylistIds[hourlyIndex]
-        }
-
         val homeDeferred = async { runCatching { fetchBrowse("FEmusic_home") }.getOrNull() }
         val exploreDeferred = async { runCatching { fetchBrowse("FEmusic_explore") }.getOrNull() }
         val moodsGenresDeferred = async { runCatching { fetchBrowse("FEmusic_moods_and_genres") }.getOrNull() }
-        val chartDeferred = async { runCatching { fetchBrowse(selectedChartId) }.getOrNull() }
+        val chartDeferred = async { runCatching { fetchBrowse("FEmusic_charts") }.getOrNull() }
 
         val homeJson = homeDeferred.await()
         val exploreJson = exploreDeferred.await()
@@ -239,12 +230,11 @@ class YouTubeNativeDataSource(
         }
 
         val pureCategories = dynamicCategories.filter { !InnerTubeFormatter.isExcludedMoodOrActivity(it.title) }
-        val baseCategories = if (pureCategories.isNotEmpty()) pureCategories else MusicConfig.staticCategories
 
         HomeFeed(
             sections = finalSections,
             moodTags = emptyList(),
-            categories = if (randomize) baseCategories.shuffled() else baseCategories,
+            categories = if (randomize) pureCategories.shuffled() else pureCategories,
             playlists = dynamicPlaylists.distinctBy { it.id }.take(10)
         )
     }
@@ -351,7 +341,7 @@ class YouTubeNativeDataSource(
         HomeFeed(
             sections = sections,
             moodTags = emptyList(),
-            categories = if (randomize) MusicConfig.staticCategories.shuffled() else MusicConfig.staticCategories
+            categories = emptyList()
         )
     }
 
@@ -365,7 +355,7 @@ class YouTubeNativeDataSource(
         } else {
             HomeCategories(
                 moodTags = emptyList(),
-                categories = MusicConfig.staticCategories
+                categories = emptyList()
             )
         }
     }

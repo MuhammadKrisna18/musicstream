@@ -114,7 +114,7 @@ class InnerTubeBrowseParser(
 
                     if (InnerTubeJsonHelper.isBrowsePlaylistId(browseId)) {
                         itemParser.parsePlaylistFromTwoRow(twoRow, browseId)?.let {
-                            if (!MusicFilterHelper.isExcludedContent(it.title)) parsedPlaylists.add(it)
+                            if (!MusicFilterHelper.isExcludedPlaylist(it.title)) parsedPlaylists.add(it)
                         }
                     } else {
                         itemParser.parseSongFromTwoRow(twoRow)?.let { tracks.add(it) }
@@ -189,8 +189,7 @@ class InnerTubeBrowseParser(
         val cleanSongs = songs.filter { song ->
             MusicFilterHelper.isValidMusicTrack(song)
         }
-        val deduplicated = MusicFilterHelper.deduplicateSongs(if (cleanSongs.isNotEmpty()) cleanSongs else songs)
-        return deduplicated.ifEmpty { songs }
+        return MusicFilterHelper.deduplicateSongs(cleanSongs)
     }
 
     private fun extractSongsFromPlaylistShelves(shelvesContainer: JSONArray, destination: MutableList<Song>) {

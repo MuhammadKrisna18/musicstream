@@ -95,7 +95,7 @@ class InnerTubeItemParser {
         val thumbnailUrl = InnerTubeJsonHelper.extractMusicThumbnailUrl(responsive, "thumbnail", videoId)
         val durationSec = InnerTubeFormatter.parseDurationToSeconds(durationFormatted)
 
-        return Song(
+        val song = Song(
             id = videoId,
             title = title,
             artist = artist,
@@ -106,6 +106,7 @@ class InnerTubeItemParser {
             viewCount = viewCount,
             channelId = channelId
         )
+        return if (MusicFilterHelper.isValidMusicTrack(song)) song else null
     }
 
     fun parseSongFromTwoRow(twoRow: JSONObject): Song? {
@@ -181,7 +182,7 @@ class InnerTubeItemParser {
         val thumbnailUrl = InnerTubeJsonHelper.extractMusicThumbnailUrl(twoRow, "thumbnailRenderer", videoId)
         val durationSec = InnerTubeFormatter.parseDurationToSeconds(durationFormatted)
 
-        return Song(
+        val song = Song(
             id = videoId,
             title = title,
             artist = artist,
@@ -192,6 +193,7 @@ class InnerTubeItemParser {
             viewCount = viewCount,
             channelId = channelId
         )
+        return if (MusicFilterHelper.isValidMusicTrack(song)) song else null
     }
 
     fun parseSongFromVideoRenderer(vr: JSONObject): Song? {
@@ -229,7 +231,7 @@ class InnerTubeItemParser {
         val channelId = vr.optJSONObject("ownerText")?.optJSONArray("runs")?.optJSONObject(0)?.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
             ?: vr.optJSONObject("longBylineText")?.optJSONArray("runs")?.optJSONObject(0)?.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")?.optString("browseId")
 
-        return Song(
+        val song = Song(
             id = videoId,
             title = title,
             artist = artist,
@@ -240,6 +242,7 @@ class InnerTubeItemParser {
             viewCount = viewCount,
             channelId = channelId
         )
+        return if (MusicFilterHelper.isValidMusicTrack(song)) song else null
     }
 
     fun parsePlaylistFromPlaylistRenderer(pr: JSONObject): Playlist? {

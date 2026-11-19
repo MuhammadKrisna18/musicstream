@@ -97,21 +97,9 @@ class HomeFeedEngine(
 
         val builtSections = sectionTasks.mapNotNull { it.await() }
 
-        val dynamicPlaylists = mutableListOf<Playlist>()
-        if (deezerData != null && deezerData.playlists.isNotEmpty()) {
-            deezerData.playlists.take(8).forEach { dp ->
-                dynamicPlaylists.add(
-                    Playlist(
-                        id = "deezer_pl_${dp.id}",
-                        title = dp.title,
-                        subtitle = "${dp.trackCount} Lagu - Deezer Curated",
-                        thumbnailUrl = dp.pictureUrl,
-                        type = PlaylistType.GENRE,
-                        query = "${dp.title} playlist official"
-                    )
-                )
-            }
-        }
+        val genuinePlaylists = youTubeDataSource.getHomeFeed(refresh = false).playlists
+            .filter { !MusicFilterHelper.isExcludedContent(it.title) }
+            .take(10)
 
         val deezerGenres = deezerGenresDeferred.await()
         val dynamicGenres = mutableListOf<Category>()
@@ -167,17 +155,11 @@ class HomeFeedEngine(
             dynamicGenres
         }
 
-        val finalPlaylists = if (dynamicPlaylists.isNotEmpty()) {
-            dynamicPlaylists
-        } else {
-            youTubeDataSource.getHomeFeed(refresh = false).playlists
-        }
-
         HomeFeed(
             sections = builtSections,
             moodTags = emptyList(),
             categories = finalCategories,
-            playlists = finalPlaylists
+            playlists = genuinePlaylists
         )
     }
 

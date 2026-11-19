@@ -45,7 +45,7 @@ class InnerTubeSearchParser(
                 val pr = item.optJSONObject("playlistRenderer")
                 if (pr != null && playlists.size < 5) {
                     itemParser.parsePlaylistFromPlaylistRenderer(pr)?.let {
-                        if (!MusicFilterHelper.isExcludedContent(it.title)) playlists.add(it)
+                        if (!MusicFilterHelper.isExcludedPlaylist(it.title)) playlists.add(it)
                     }
                 }
 
@@ -88,7 +88,7 @@ class InnerTubeSearchParser(
                         }
                     } else if (playlists.size < 5) {
                         itemParser.parsePlaylistFromResponsive(responsive)?.let { playlist ->
-                            if (!MusicFilterHelper.isExcludedContent(playlist.title) && playlists.none { it.id == playlist.id }) {
+                            if (!MusicFilterHelper.isExcludedPlaylist(playlist.title) && playlists.none { it.id == playlist.id }) {
                                 playlists.add(playlist)
                             }
                         }
@@ -103,7 +103,7 @@ class InnerTubeSearchParser(
                     if (InnerTubeJsonHelper.isSearchPlaylistBrowseId(browseId)) {
                         if (playlists.size < 5) {
                             itemParser.parsePlaylistFromTwoRow(twoRow, browseId)?.let { playlist ->
-                                if (!MusicFilterHelper.isExcludedContent(playlist.title) && playlists.none { it.id == playlist.id }) {
+                                if (!MusicFilterHelper.isExcludedPlaylist(playlist.title) && playlists.none { it.id == playlist.id }) {
                                     playlists.add(playlist)
                                 }
                             }

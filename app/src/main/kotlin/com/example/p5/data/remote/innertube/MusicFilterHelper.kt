@@ -7,14 +7,27 @@ object MusicFilterHelper {
 
     private val podcastKeywords = listOf(
         "podcast", "podkes", "talkshow", "talk show", "interview", "wawancara",
-        "ngobrol", "curhat", "eps.", "episode", "part 1", "part 2", "part 3",
-        "stand up comedy", "cerita misteri", "kajian", "monolog", "bedah buku"
+        "ngobrol", "curhat", "monolog", "stand up comedy", "open mic",
+        "cerita misteri", "misteri", "horor", "kisah misteri",
+        "kajian", "ceramah", "khotbah", "dakwah", "pengajian", "ustadz", "habib",
+        "bedah buku", "tutorial", "unboxing", "reaction", "review", "gameplay",
+        "eps.", "episode", "part 1", "part 2", "part 3", "season 1", "season 2",
+        "audiobook", "audio book", "dongeng", "alur cerita"
     )
 
     private val compilationKeywords = listOf(
-        "full album", "kompilasi", "top 100", "top 50", "kumpulan lagu",
-        "nonstop", "non stop", "1 jam", "1 hour", "2 jam", "2 hours",
-        "billboard hot 100 top music video", "dj remix full", "lagu nonstop"
+        "full album", "fullalbum", "album full", "kumpulan lagu", "daftar lagu",
+        "kompilasi", "compilation", "nonstop", "non stop", "non-stop",
+        "top 100", "top 50", "top 40", "top 30", "top 20", "top 10",
+        "hot 100", "billboard hot", "billboard",
+        "1 jam", "2 jam", "3 jam", "1 hour", "2 hour", "3 hour", "10 hour", "60 menit",
+        "dj remix full", "remix full", "jedag jedug full", "full bass", "megamix", "mixtape",
+        "best songs of", "greatest hits of", "best of ", "all songs",
+        "tracklist", "audio album", "ost full"
+    )
+
+    private val compilationArtistKeywords = listOf(
+        "playlist", "kompilasi", "kumpulan", "full album", "charts", "records compilation"
     )
 
     private val noiseRegex = Regex(
@@ -22,25 +35,56 @@ object MusicFilterHelper {
     )
 
     fun isValidMusicTrack(song: Song): Boolean {
-        if (song.durationSeconds > 720 || (song.durationSeconds in 1..44)) {
+        if (song.durationSeconds > 540 || (song.durationSeconds in 1..44)) {
             return false
         }
+
+        if (song.durationFormatted.isNotBlank()) {
+            val parts = song.durationFormatted.split(":").mapNotNull { it.trim().toIntOrNull() }
+            if (parts.size >= 3) {
+                return false
+            } else if (parts.size == 2) {
+                val totalSec = parts[0] * 60 + parts[1]
+                if (totalSec > 540 || (totalSec in 1..44)) {
+                    return false
+                }
+            }
+        }
+
         val lowerTitle = song.title.lowercase(Locale.ROOT)
         val lowerArtist = song.artist.lowercase(Locale.ROOT)
+
         if (podcastKeywords.any { lowerTitle.contains(it) || lowerArtist.contains(it) }) {
             return false
         }
+
         if (compilationKeywords.any { lowerTitle.contains(it) }) {
             return false
         }
+
+        if (lowerTitle.contains("playlist")) {
+            return false
+        }
+
+        if (compilationArtistKeywords.any { lowerArtist.contains(it) }) {
+            return false
+        }
+
         return true
+    }
+
+    fun isExcludedPlaylist(title: String, author: String = ""): Boolean {
+        val lowerTitle = title.lowercase(Locale.ROOT)
+        val lowerAuthor = author.lowercase(Locale.ROOT)
+        return podcastKeywords.any { lowerTitle.contains(it) || lowerAuthor.contains(it) }
     }
 
     fun isExcludedContent(title: String, artist: String = ""): Boolean {
         val lowerTitle = title.lowercase(Locale.ROOT)
         val lowerArtist = artist.lowercase(Locale.ROOT)
         return podcastKeywords.any { lowerTitle.contains(it) || lowerArtist.contains(it) } ||
-            compilationKeywords.any { lowerTitle.contains(it) }
+            compilationKeywords.any { lowerTitle.contains(it) } ||
+            compilationArtistKeywords.any { lowerArtist.contains(it) }
     }
 
     fun normalizeTitle(title: String, artist: String = ""): String {
