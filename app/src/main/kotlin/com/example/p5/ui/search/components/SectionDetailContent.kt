@@ -40,6 +40,7 @@ import com.example.p5.R
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
+import com.example.p5.ui.common.sharedBoundsIfAvailable
 import com.example.p5.ui.components.SongItem
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
@@ -109,7 +110,8 @@ fun SectionDetailContent(
                     fontWeight = FontWeight.Bold,
                     letterSpacing = (-0.3).sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.sharedBoundsIfAvailable(key = "section_title_${section.id}")
                 )
                 val subtitleText = if (!section.subtitle.isNullOrBlank()) {
                     "${section.tracks.size} lagu • ${section.subtitle}"

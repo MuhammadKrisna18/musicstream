@@ -41,6 +41,8 @@ import coil.compose.AsyncImage
 import com.example.p5.R
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.PlaylistType
+import com.example.p5.ui.common.sharedBoundsIfAvailable
+import com.example.p5.ui.common.sharedElementIfAvailable
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.AppTheme
@@ -162,6 +164,7 @@ fun PlaylistHeroCard(
             Box(
                 modifier = Modifier
                     .size(80.dp)
+                    .sharedElementIfAvailable(key = "playlist_artwork_${playlist.id}")
                     .clip(RoundedCornerShape(14.dp))
                     .background(appColors.background)
                     .glassBorder(
@@ -246,7 +249,8 @@ fun PlaylistHeroCard(
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.sharedBoundsIfAvailable(key = "playlist_title_${playlist.id}")
                 )
 
                 Spacer(modifier = Modifier.height(2.dp))

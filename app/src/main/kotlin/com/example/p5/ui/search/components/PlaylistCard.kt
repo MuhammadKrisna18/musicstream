@@ -40,6 +40,8 @@ import coil.compose.AsyncImage
 import com.example.p5.R
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.PlaylistType
+import com.example.p5.ui.common.sharedBoundsIfAvailable
+import com.example.p5.ui.common.sharedElementIfAvailable
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
 import com.example.p5.ui.theme.AppTheme
@@ -77,6 +79,7 @@ fun PlaylistCard(
         modifier = modifier
             .width(ArtworkCardWidth)
             .height(ArtworkCardHeight)
+            .sharedElementIfAvailable(key = "playlist_artwork_${playlist.id}")
             .pressedScale(targetScale = ScalePressedCard, interactionSource = interactionSource)
             .clip(cardShape)
             .background(appColors.card)
@@ -223,7 +226,8 @@ fun PlaylistCard(
                 lineHeight = 17.sp,
                 maxLines = 2,
                 minLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.sharedBoundsIfAvailable(key = "playlist_title_${playlist.id}")
             )
 
             Spacer(modifier = Modifier.height(4.dp))

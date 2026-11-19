@@ -2,6 +2,9 @@ package com.example.p5.ui.search
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -18,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
+import com.example.p5.ui.common.LocalNavAnimatedVisibilityScope
+import com.example.p5.ui.common.LocalSharedTransitionScope
 import com.example.p5.ui.search.components.CategoryGridSection
 import com.example.p5.ui.search.components.PlaylistDetailContent
 import com.example.p5.ui.search.components.SearchBarField
@@ -37,6 +43,7 @@ import com.example.p5.ui.search.components.SearchResultsContent
 import com.example.p5.ui.theme.AppTheme
 import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel,
@@ -71,13 +78,18 @@ fun SearchScreen(
             .background(Color.Transparent)
             .padding(horizontal = 16.dp)
     ) {
-        AnimatedContent(
-            targetState = selectedPlaylist,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "search_playlist_detail_or_search",
-            modifier = Modifier.fillMaxSize()
-        ) { currentPlaylist ->
-            if (currentPlaylist != null) {
+        SharedTransitionLayout {
+            CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+                AnimatedContent(
+                    targetState = selectedPlaylist,
+                    transitionSpec = {
+                        fadeIn(tween(350)) togetherWith fadeOut(tween(350))
+                    },
+                    label = "search_playlist_detail_or_search",
+                    modifier = Modifier.fillMaxSize()
+                ) { currentPlaylist ->
+                    CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this) {
+                        if (currentPlaylist != null) {
                 PlaylistDetailContent(
                     playlist = currentPlaylist,
                     tracks = selectedPlaylistTracks,
@@ -187,6 +199,9 @@ fun SearchScreen(
                     }
                 }
             }
+        }
+    }
+}
         }
     }
 }

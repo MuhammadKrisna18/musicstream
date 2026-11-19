@@ -2,6 +2,9 @@ package com.example.p5.ui.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
@@ -17,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,6 +31,8 @@ import com.example.p5.R
 import com.example.p5.domain.model.HomeSectionStyle
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
+import com.example.p5.ui.common.LocalNavAnimatedVisibilityScope
+import com.example.p5.ui.common.LocalSharedTransitionScope
 import com.example.p5.ui.search.SearchViewModel
 import com.example.p5.ui.search.components.EditorialHeroCarousel
 import com.example.p5.ui.search.components.GenreFilterRow
@@ -41,7 +47,7 @@ import com.example.p5.ui.search.components.rememberShimmerBrush
 import com.example.p5.ui.search.components.searchShimmerSkeleton
 import com.example.p5.ui.theme.bottomScrollPaddingWithInsets
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun HomeScreen(
     searchViewModel: SearchViewModel,
@@ -78,13 +84,18 @@ fun HomeScreen(
             .fillMaxSize()
             .background(Color.Transparent)
     ) {
-        AnimatedContent(
-            targetState = Pair(selectedSection, selectedPlaylist),
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "home_section_or_playlist_detail",
-            modifier = Modifier.fillMaxSize()
-        ) { (currentSection, currentPlaylist) ->
-            if (currentPlaylist != null) {
+        SharedTransitionLayout {
+            CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+                AnimatedContent(
+                    targetState = Pair(selectedSection, selectedPlaylist),
+                    transitionSpec = {
+                        fadeIn(tween(350)) togetherWith fadeOut(tween(350))
+                    },
+                    label = "home_section_or_playlist_detail",
+                    modifier = Modifier.fillMaxSize()
+                ) { (currentSection, currentPlaylist) ->
+                    CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this) {
+                        if (currentPlaylist != null) {
                 PlaylistDetailContent(
                     playlist = currentPlaylist,
                     tracks = selectedPlaylistTracks,
@@ -206,6 +217,9 @@ fun HomeScreen(
                     }
                 }
             }
+        }
+    }
+}
         }
     }
 }

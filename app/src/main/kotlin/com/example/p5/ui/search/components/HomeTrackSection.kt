@@ -41,6 +41,7 @@ import com.example.p5.R
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.HomeSectionStyle
 import com.example.p5.domain.model.Song
+import com.example.p5.ui.common.sharedBoundsIfAvailable
 import com.example.p5.ui.components.glass.MiniEqualizer
 import com.example.p5.ui.components.glass.glassBorder
 import com.example.p5.ui.components.glass.pressedScale
@@ -86,7 +87,8 @@ fun HomeTrackSection(
                     color = appColors.textPrimary,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.3).sp
+                    letterSpacing = (-0.3).sp,
+                    modifier = Modifier.sharedBoundsIfAvailable(key = "section_title_${section.id}")
                 )
                 if (!section.subtitle.isNullOrBlank()) {
                     Text(
