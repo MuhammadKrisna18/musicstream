@@ -44,17 +44,21 @@ class InnerTubeSearchParser(
 
                 val pr = item.optJSONObject("playlistRenderer")
                 if (pr != null && playlists.size < 5) {
-                    itemParser.parsePlaylistFromPlaylistRenderer(pr)?.let { playlists.add(it) }
+                    itemParser.parsePlaylistFromPlaylistRenderer(pr)?.let {
+                        if (!MusicFilterHelper.isExcludedContent(it.title)) playlists.add(it)
+                    }
                 }
 
                 val vr = item.optJSONObject("videoRenderer") ?: continue
                 if (songs.size >= limit) continue
 
-                itemParser.parseSongFromVideoRenderer(vr)?.let { songs.add(it) }
+                itemParser.parseSongFromVideoRenderer(vr)?.let {
+                    if (MusicFilterHelper.isValidMusicTrack(it)) songs.add(it)
+                }
             }
         }
 
-        return SearchPayload(songs, playlists)
+        return SearchPayload(MusicFilterHelper.deduplicateSongs(songs), playlists)
     }
 
     private fun parseTabbedSearchResults(tabbed: JSONObject, limit: Int): SearchPayload {
@@ -79,12 +83,12 @@ class InnerTubeSearchParser(
                 if (responsive != null) {
                     val parsedSong = itemParser.parseSongFromResponsive(responsive)
                     if (parsedSong != null && songs.size < limit) {
-                        if (songs.none { it.id == parsedSong.id }) {
+                        if (MusicFilterHelper.isValidMusicTrack(parsedSong) && songs.none { it.id == parsedSong.id }) {
                             songs.add(parsedSong)
                         }
                     } else if (playlists.size < 5) {
                         itemParser.parsePlaylistFromResponsive(responsive)?.let { playlist ->
-                            if (playlists.none { it.id == playlist.id }) {
+                            if (!MusicFilterHelper.isExcludedContent(playlist.title) && playlists.none { it.id == playlist.id }) {
                                 playlists.add(playlist)
                             }
                         }
@@ -99,14 +103,14 @@ class InnerTubeSearchParser(
                     if (InnerTubeJsonHelper.isSearchPlaylistBrowseId(browseId)) {
                         if (playlists.size < 5) {
                             itemParser.parsePlaylistFromTwoRow(twoRow, browseId)?.let { playlist ->
-                                if (playlists.none { it.id == playlist.id }) {
+                                if (!MusicFilterHelper.isExcludedContent(playlist.title) && playlists.none { it.id == playlist.id }) {
                                     playlists.add(playlist)
                                 }
                             }
                         }
                     } else if (songs.size < limit) {
                         itemParser.parseSongFromTwoRow(twoRow)?.let { song ->
-                            if (songs.none { it.id == song.id }) {
+                            if (MusicFilterHelper.isValidMusicTrack(song) && songs.none { it.id == song.id }) {
                                 songs.add(song)
                             }
                         }
@@ -115,7 +119,7 @@ class InnerTubeSearchParser(
             }
         }
 
-        return SearchPayload(songs, playlists)
+        return SearchPayload(MusicFilterHelper.deduplicateSongs(songs), playlists)
     }
 
     private fun extractSectionItems(section: JSONObject): List<JSONObject> {

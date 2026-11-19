@@ -2,6 +2,7 @@ package com.example.p5.ui.search.paging
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.p5.data.remote.innertube.MusicFilterHelper
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.usecase.SearchMusicUseCase
 
@@ -44,7 +45,9 @@ class SongSearchPagingSource(
             val result = searchMusicUseCase(searchQuery, limit)
             result.fold(
                 onSuccess = { songs ->
-                    val uniqueSongs = songs.filter { seenSongIds.add(it.id) }
+                    val cleanSongs = songs.filter { MusicFilterHelper.isValidMusicTrack(it) }
+                    val deduplicated = MusicFilterHelper.deduplicateSongs(cleanSongs)
+                    val uniqueSongs = deduplicated.filter { seenSongIds.add(it.id) }
                     LoadResult.Page(
                         data = uniqueSongs,
                         prevKey = if (page == 1) null else page - 1,

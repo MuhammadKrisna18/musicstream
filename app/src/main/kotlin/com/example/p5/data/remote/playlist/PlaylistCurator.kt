@@ -1,7 +1,7 @@
 package com.example.p5.data.remote.playlist
 
 import com.example.p5.data.remote.YouTubeNativeDataSource
-import com.example.p5.data.remote.innertube.InnerTubeFormatter
+import com.example.p5.data.remote.innertube.MusicFilterHelper
 import com.example.p5.domain.model.Playlist
 import com.example.p5.domain.model.Song
 import java.util.concurrent.ConcurrentHashMap
@@ -13,10 +13,11 @@ class PlaylistCurator(
 
     suspend fun getCuratedPlaylists(): List<Playlist> {
         val feedPlaylists = youTubeDataSource.getHomeFeed(refresh = false).playlists
+            .filter { !MusicFilterHelper.isExcludedContent(it.title) }
         if (feedPlaylists.isNotEmpty()) {
             return feedPlaylists
         }
-        return youTubeDataSource.searchPlaylists("Top Hits Indonesia", limit = 6)
+        return searchPlaylists("Top Hits Indonesia", limit = 6)
     }
 
     suspend fun getPlaylistTracks(playlist: Playlist): List<Song> {
@@ -34,19 +35,20 @@ class PlaylistCurator(
         }
 
         val cleanSongs = validTracks.filter { song ->
-            song.durationSeconds in 90..480 && !InnerTubeFormatter.isExcludedCompilation(song.title)
+            MusicFilterHelper.isValidMusicTrack(song)
         }
-
-        val result = if (cleanSongs.isNotEmpty()) cleanSongs else validTracks
+        val deduplicated = MusicFilterHelper.deduplicateSongs(if (cleanSongs.isNotEmpty()) cleanSongs else validTracks)
+        val result = deduplicated.ifEmpty { validTracks }
         if (result.isNotEmpty()) {
             playlistTrackCache[playlist.id] = result
         }
         return result
     }
 
-    suspend fun searchPlaylists(query: String): List<Playlist> {
+    suspend fun searchPlaylists(query: String, limit: Int = 5): List<Playlist> {
         val trimmed = query.trim()
         if (trimmed.isEmpty()) return emptyList()
-        return youTubeDataSource.searchPlaylists(trimmed, limit = 5)
+        val results = youTubeDataSource.searchPlaylists(trimmed, limit = 10)
+        return results.filter { !MusicFilterHelper.isExcludedContent(it.title) }.take(limit)
     }
 }

@@ -2,6 +2,7 @@ package com.example.p5.data.remote.feed
 
 import com.example.p5.data.remote.YouTubeNativeDataSource
 import com.example.p5.data.remote.deezer.DeezerDataSource
+import com.example.p5.data.remote.innertube.MusicFilterHelper
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeFeed
 import com.example.p5.domain.model.HomeSection
@@ -72,7 +73,9 @@ class HomeFeedEngine(
         val sectionTasks = targetSeeds.map { seed ->
             async {
                 val songs = try {
-                    youTubeDataSource.search(seed.query, limit = 12)
+                    val raw = youTubeDataSource.search(seed.query, limit = 16)
+                    val clean = raw.filter { MusicFilterHelper.isValidMusicTrack(it) }
+                    MusicFilterHelper.deduplicateSongs(clean).take(12)
                 } catch (_: Exception) {
                     emptyList()
                 }

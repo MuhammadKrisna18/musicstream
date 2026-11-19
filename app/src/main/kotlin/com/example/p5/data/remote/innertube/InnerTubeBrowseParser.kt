@@ -113,7 +113,9 @@ class InnerTubeBrowseParser(
                         ?.optString("browseId").orEmpty()
 
                     if (InnerTubeJsonHelper.isBrowsePlaylistId(browseId)) {
-                        itemParser.parsePlaylistFromTwoRow(twoRow, browseId)?.let { parsedPlaylists.add(it) }
+                        itemParser.parsePlaylistFromTwoRow(twoRow, browseId)?.let {
+                            if (!MusicFilterHelper.isExcludedContent(it.title)) parsedPlaylists.add(it)
+                        }
                     } else {
                         itemParser.parseSongFromTwoRow(twoRow)?.let { tracks.add(it) }
                     }
@@ -121,14 +123,16 @@ class InnerTubeBrowseParser(
                 }
             }
 
-            if (tracks.isNotEmpty() && title.isNotBlank()) {
+            val validTracks = tracks.filter { MusicFilterHelper.isValidMusicTrack(it) }
+            val cleanTracks = MusicFilterHelper.deduplicateSongs(validTracks)
+            if (cleanTracks.isNotEmpty() && title.isNotBlank() && !MusicFilterHelper.isExcludedContent(title)) {
                 sections.add(
                     HomeSection(
                         id = "${prefixId}_$i",
                         title = title,
                         subtitle = subtitle,
                         query = title,
-                        tracks = tracks,
+                        tracks = cleanTracks,
                         style = inferSectionStyle(title, prefixId)
                     )
                 )
@@ -183,10 +187,10 @@ class InnerTubeBrowseParser(
         }
 
         val cleanSongs = songs.filter { song ->
-            song.durationSeconds in 90..480 && !InnerTubeFormatter.isExcludedCompilation(song.title)
+            MusicFilterHelper.isValidMusicTrack(song)
         }
-
-        return if (cleanSongs.isNotEmpty()) cleanSongs else songs
+        val deduplicated = MusicFilterHelper.deduplicateSongs(if (cleanSongs.isNotEmpty()) cleanSongs else songs)
+        return deduplicated.ifEmpty { songs }
     }
 
     private fun extractSongsFromPlaylistShelves(shelvesContainer: JSONArray, destination: MutableList<Song>) {

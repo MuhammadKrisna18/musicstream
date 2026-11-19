@@ -17,6 +17,7 @@ import com.example.p5.domain.usecase.GetHomeCategoriesUseCase
 import com.example.p5.domain.usecase.GetHomeFeedUseCase
 import com.example.p5.domain.usecase.GetPlaylistTracksUseCase
 import com.example.p5.domain.usecase.GetTrendingMusicUseCase
+import com.example.p5.data.remote.innertube.MusicFilterHelper
 import com.example.p5.domain.usecase.SearchMusicUseCase
 import com.example.p5.domain.usecase.SearchPlaylistsUseCase
 import com.example.p5.domain.usecase.SearchSongsAndPlaylistsUseCase
@@ -216,6 +217,8 @@ class SearchViewModel(
                     async {
                         searchMusicUseCase("$artist official hits")
                             .getOrNull()
+                            ?.filter { MusicFilterHelper.isValidMusicTrack(it) }
+                            ?.let { songs -> MusicFilterHelper.deduplicateSongs(songs) }
                             ?.let { songs -> HomeFeedBuilder.buildArtistRecommendationSection(artist, songs) }
                     }
                 }.awaitAll().filterNotNull()
