@@ -1,8 +1,6 @@
 package com.example.p5.data.repository
 
 import com.example.p5.data.remote.YouTubeNativeDataSource
-import com.example.p5.data.remote.deezer.DeezerDataSource
-import com.example.p5.data.remote.feed.HomeFeedEngine
 import com.example.p5.data.remote.playlist.PlaylistCurator
 import com.example.p5.domain.model.ArtistProfile
 import com.example.p5.domain.model.AudioStream
@@ -21,8 +19,6 @@ import kotlinx.coroutines.withContext
 class MusicRepositoryImpl(
     private val youTubeDataSource: YouTubeNativeDataSource,
     private val playlistCurator: PlaylistCurator = PlaylistCurator(youTubeDataSource),
-    private val deezerDataSource: DeezerDataSource? = null,
-    private val homeFeedEngine: HomeFeedEngine? = null,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : MusicRepository {
 
@@ -59,7 +55,7 @@ class MusicRepositoryImpl(
 
     override suspend fun getHomeFeed(refresh: Boolean): Result<HomeFeed> = withContext(ioDispatcher) {
         runCatching {
-            homeFeedEngine?.generateHomeFeed(refresh) ?: youTubeDataSource.getHomeFeed(refresh)
+            youTubeDataSource.getHomeFeed(refresh)
         }
     }
 

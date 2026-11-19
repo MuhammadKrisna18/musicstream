@@ -176,8 +176,7 @@ class YouTubeNativeDataSource(
 
         val sections = mutableListOf<HomeSection>()
         val dynamicPlaylists = mutableListOf<Playlist>()
-        var dynamicMoodTags: List<MoodTag> = emptyList()
-        var dynamicCategories: List<Category> = emptyList()
+        val dynamicCategories = mutableListOf<Category>()
 
         if (!chartJson.isNullOrEmpty()) {
             val parsedChart = parser.parseBrowseResponse(chartJson, prefixId = "chart")
@@ -195,25 +194,15 @@ class YouTubeNativeDataSource(
             val parsedExplore = parser.parseBrowseResponse(exploreJson, prefixId = "explore")
             sections.addAll(parsedExplore.sections)
             dynamicPlaylists.addAll(parsedExplore.playlists)
-            if (parsedExplore.moodTags.isNotEmpty()) {
-                dynamicMoodTags = parsedExplore.moodTags
-            }
             val cleanCategories = parsedExplore.categories.filter { !InnerTubeFormatter.isExcludedMoodOrActivity(it.title) }
-            if (cleanCategories.isNotEmpty()) {
-                dynamicCategories = cleanCategories
-            }
+            dynamicCategories.addAll(cleanCategories)
         }
 
         if (!moodsGenresJson.isNullOrEmpty()) {
             val parsedMoods = parser.parseBrowseResponse(moodsGenresJson, prefixId = "moods_genres")
             dynamicPlaylists.addAll(parsedMoods.playlists)
-            if (parsedMoods.moodTags.isNotEmpty()) {
-                dynamicMoodTags = parsedMoods.moodTags
-            }
             val cleanCategories = parsedMoods.categories.filter { !InnerTubeFormatter.isExcludedMoodOrActivity(it.title) }
-            if (cleanCategories.isNotEmpty()) {
-                dynamicCategories = cleanCategories
-            }
+            dynamicCategories.addAll(cleanCategories)
         }
 
         val filteredSections = sections.filter { it.tracks.isNotEmpty() }
@@ -229,7 +218,7 @@ class YouTubeNativeDataSource(
             filteredSections
         }
 
-        val pureCategories = dynamicCategories.filter { !InnerTubeFormatter.isExcludedMoodOrActivity(it.title) }
+        val pureCategories = dynamicCategories.distinctBy { it.id }.filter { !InnerTubeFormatter.isExcludedMoodOrActivity(it.title) }
 
         HomeFeed(
             sections = finalSections,

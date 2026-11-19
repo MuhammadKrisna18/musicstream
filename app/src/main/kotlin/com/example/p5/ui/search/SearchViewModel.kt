@@ -300,7 +300,7 @@ class SearchViewModel(
         getHomeCategoriesUseCase()
             .onSuccess { data ->
                 _categories.value = data.categories
-                _moodTags.value = data.moodTags
+                _moodTags.value = emptyList()
             }
         getTrendingMusicUseCase(15)
             .onSuccess { songs ->
