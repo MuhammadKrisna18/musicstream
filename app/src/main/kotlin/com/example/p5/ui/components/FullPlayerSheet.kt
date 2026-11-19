@@ -1,24 +1,18 @@
 package com.example.p5.ui.components
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode as AnimRepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -32,23 +26,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.p5.R
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.ui.components.player.PlayerAlbumView
+import com.example.p5.ui.components.player.PlayerAuroraGlow
 import com.example.p5.ui.components.player.PlayerCenterView
 import com.example.p5.ui.components.player.PlayerControlsView
 import com.example.p5.ui.components.player.PlayerLyricsView
 import com.example.p5.ui.components.player.PlayerQueueView
 import com.example.p5.ui.components.player.PlayerTopBar
 import com.example.p5.ui.theme.AppTheme
-import com.example.p5.ui.theme.AuroraCyan
-import com.example.p5.ui.theme.AuroraDeepIndigo
-import com.example.p5.ui.theme.DurationAuroraFlow
 import com.example.p5.ui.theme.DurationFast
 import com.example.p5.ui.theme.DurationNormal
 import com.example.p5.ui.theme.SpacingLg
@@ -94,17 +84,6 @@ fun FullPlayerSheet(
         )
     }
 
-    val auroraTransition = rememberInfiniteTransition(label = "aurora_flow")
-    val auroraOffset1 by auroraTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 180f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = DurationAuroraFlow, easing = FastOutSlowInEasing),
-            repeatMode = AnimRepeatMode.Reverse
-        ),
-        label = "aurora1"
-    )
-
     val appColors = AppTheme.colors
 
     ModalBottomSheet(
@@ -125,36 +104,10 @@ fun FullPlayerSheet(
                 )
             }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                palette.darkVibrant.copy(alpha = 0.70f),
-                                appColors.background.copy(alpha = 0.88f),
-                                appColors.background
-                            ),
-                            startY = auroraOffset1,
-                            endY = 1600f
-                        )
-                    )
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(380.dp)
-                    .background(
-                        Brush.radialGradient(
-                            colors = listOf(
-                                palette.vibrant.copy(alpha = 0.20f),
-                                palette.lightVibrant.copy(alpha = 0.08f),
-                                Color.Transparent
-                            ),
-                            radius = 650f
-                        )
-                    )
+            PlayerAuroraGlow(
+                palette = palette,
+                backgroundColor = appColors.background,
+                modifier = Modifier.fillMaxSize()
             )
 
             Column(
