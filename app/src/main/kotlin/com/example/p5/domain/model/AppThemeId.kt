@@ -79,5 +79,55 @@ enum class AppThemeId(
         title = "Paper Light",
         category = ThemeCategory.MINIMALIST,
         isDark = false
+    ),
+    MINIMAL_TITANIUM(
+        title = "Titanium Slate",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_MATCHA(
+        title = "Matcha Cream",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_OBSIDIAN(
+        title = "Obsidian Gold",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_GLACIER(
+        title = "Glacier Blue",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_LAVENDER(
+        title = "Muted Lavender",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_CARBON(
+        title = "Carbon Matrix",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_ESPRESSO(
+        title = "Dark Espresso",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_SAGE(
+        title = "Botanical Sage",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_MIDNIGHT_NOIR(
+        title = "Midnight Noir",
+        category = ThemeCategory.MINIMALIST,
+        isDark = true
+    ),
+    MINIMAL_ALABASTER(
+        title = "Alabaster Light",
+        category = ThemeCategory.MINIMALIST,
+        isDark = false
     )
 }

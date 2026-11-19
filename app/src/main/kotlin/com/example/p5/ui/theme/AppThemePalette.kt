@@ -396,6 +396,266 @@ object AppThemePalette {
         backgroundImageRes = null
     )
 
+    val minimalTitanium = AppColorScheme(
+        id = AppThemeId.MINIMAL_TITANIUM,
+        isDark = true,
+        background = Color(0xFF111318),
+        surface = Color(0xFF191C24),
+        surfaceVariant = Color(0xFF232733),
+        card = Color(0xFF1D212B),
+        cardHigh = Color(0xFF2B303E),
+        floatingDock = Color(0xEB161921),
+        accent = Color(0xFF94A3B8),
+        accentSecondary = Color(0xFFCBD5E1),
+        accentLight = Color(0xFFE2E8F0),
+        accentDark = Color(0xFF64748B),
+        accentGlow = Color(0x4D94A3B8),
+        glassFillSubtle = Color(0x0A94A3B8),
+        glassFillLight = Color(0x1494A3B8),
+        glassFillMedium = Color(0x1F94A3B8),
+        glassBorderSubtle = Color(0x2694A3B8),
+        glassBorderBright = Color(0x5994A3B8),
+        textPrimary = Color(0xFFF1F5F9),
+        textSecondary = Color(0xFF94A3B8),
+        textTertiary = Color(0xFF64748B),
+        textMuted = Color(0xFF475569),
+        backgroundImageRes = null
+    )
+
+    val minimalMatcha = AppColorScheme(
+        id = AppThemeId.MINIMAL_MATCHA,
+        isDark = true,
+        background = Color(0xFF121513),
+        surface = Color(0xFF1B211D),
+        surfaceVariant = Color(0xFF262E28),
+        card = Color(0xFF202722),
+        cardHigh = Color(0xFF2F3A32),
+        floatingDock = Color(0xEB181E19),
+        accent = Color(0xFF86EFAC),
+        accentSecondary = Color(0xFFBBF7D0),
+        accentLight = Color(0xFFDCFCE7),
+        accentDark = Color(0xFF4ADE80),
+        accentGlow = Color(0x4D86EFAC),
+        glassFillSubtle = Color(0x0A86EFAC),
+        glassFillLight = Color(0x1486EFAC),
+        glassFillMedium = Color(0x1F86EFAC),
+        glassBorderSubtle = Color(0x2686EFAC),
+        glassBorderBright = Color(0x5986EFAC),
+        textPrimary = Color(0xFFF0FDF4),
+        textSecondary = Color(0xFFBBEFCE),
+        textTertiary = Color(0xFF86EFAC),
+        textMuted = Color(0xFF4B6353),
+        backgroundImageRes = null
+    )
+
+    val minimalObsidian = AppColorScheme(
+        id = AppThemeId.MINIMAL_OBSIDIAN,
+        isDark = true,
+        background = Color(0xFF0C0C0E),
+        surface = Color(0xFF151518),
+        surfaceVariant = Color(0xFF202024),
+        card = Color(0xFF1A1A1E),
+        cardHigh = Color(0xFF28282E),
+        floatingDock = Color(0xEB131316),
+        accent = Color(0xFFE2B755),
+        accentSecondary = Color(0xFFF3D284),
+        accentLight = Color(0xFFFDE68A),
+        accentDark = Color(0xFFC4972E),
+        accentGlow = Color(0x4DE2B755),
+        glassFillSubtle = Color(0x0AE2B755),
+        glassFillLight = Color(0x14E2B755),
+        glassFillMedium = Color(0x1FE2B755),
+        glassBorderSubtle = Color(0x26E2B755),
+        glassBorderBright = Color(0x59E2B755),
+        textPrimary = Color(0xFFFAF7EE),
+        textSecondary = Color(0xFFC7C2B2),
+        textTertiary = Color(0xFFE2B755),
+        textMuted = Color(0xFF6B6758),
+        backgroundImageRes = null
+    )
+
+    val minimalGlacier = AppColorScheme(
+        id = AppThemeId.MINIMAL_GLACIER,
+        isDark = true,
+        background = Color(0xFF0B121A),
+        surface = Color(0xFF121D28),
+        surfaceVariant = Color(0xFF1B2B3C),
+        card = Color(0xFF162331),
+        cardHigh = Color(0xFF22374C),
+        floatingDock = Color(0xEB0F1923),
+        accent = Color(0xFF38BDF8),
+        accentSecondary = Color(0xFF7DD3FC),
+        accentLight = Color(0xFFBAE6FD),
+        accentDark = Color(0xFF0284C7),
+        accentGlow = Color(0x4D38BDF8),
+        glassFillSubtle = Color(0x0A38BDF8),
+        glassFillLight = Color(0x1438BDF8),
+        glassFillMedium = Color(0x1F38BDF8),
+        glassBorderSubtle = Color(0x2638BDF8),
+        glassBorderBright = Color(0x5938BDF8),
+        textPrimary = Color(0xFFF0F9FF),
+        textSecondary = Color(0xFFBAE6FD),
+        textTertiary = Color(0xFF38BDF8),
+        textMuted = Color(0xFF436380),
+        backgroundImageRes = null
+    )
+
+    val minimalLavender = AppColorScheme(
+        id = AppThemeId.MINIMAL_LAVENDER,
+        isDark = true,
+        background = Color(0xFF131118),
+        surface = Color(0xFF1C1924),
+        surfaceVariant = Color(0xFF282333),
+        card = Color(0xFF201D2A),
+        cardHigh = Color(0xFF322C40),
+        floatingDock = Color(0xEB1A1721),
+        accent = Color(0xFFC084FC),
+        accentSecondary = Color(0xFFD8B4FE),
+        accentLight = Color(0xFFE9D5FF),
+        accentDark = Color(0xFFA855F7),
+        accentGlow = Color(0x4DC084FC),
+        glassFillSubtle = Color(0x0AC084FC),
+        glassFillLight = Color(0x14C084FC),
+        glassFillMedium = Color(0x1FC084FC),
+        glassBorderSubtle = Color(0x26C084FC),
+        glassBorderBright = Color(0x59C084FC),
+        textPrimary = Color(0xFFFAF5FF),
+        textSecondary = Color(0xFFD8B4FE),
+        textTertiary = Color(0xFFC084FC),
+        textMuted = Color(0xFF605175),
+        backgroundImageRes = null
+    )
+
+    val minimalCarbon = AppColorScheme(
+        id = AppThemeId.MINIMAL_CARBON,
+        isDark = true,
+        background = Color(0xFF121214),
+        surface = Color(0xFF1A1A1E),
+        surfaceVariant = Color(0xFF26262B),
+        card = Color(0xFF1F1F24),
+        cardHigh = Color(0xFF2E2E35),
+        floatingDock = Color(0xEB17171B),
+        accent = Color(0xFFA3E635),
+        accentSecondary = Color(0xFFBEF264),
+        accentLight = Color(0xFFD9F99D),
+        accentDark = Color(0xFF65A30D),
+        accentGlow = Color(0x4DA3E635),
+        glassFillSubtle = Color(0x0AA3E635),
+        glassFillLight = Color(0x14A3E635),
+        glassFillMedium = Color(0x1FA3E635),
+        glassBorderSubtle = Color(0x26A3E635),
+        glassBorderBright = Color(0x59A3E635),
+        textPrimary = Color(0xFFF7FEE7),
+        textSecondary = Color(0xFFBEF264),
+        textTertiary = Color(0xFFA3E635),
+        textMuted = Color(0xFF536928),
+        backgroundImageRes = null
+    )
+
+    val minimalEspresso = AppColorScheme(
+        id = AppThemeId.MINIMAL_ESPRESSO,
+        isDark = true,
+        background = Color(0xFF100C0A),
+        surface = Color(0xFF1B1512),
+        surfaceVariant = Color(0xFF271F1B),
+        card = Color(0xFF211A16),
+        cardHigh = Color(0xFF332822),
+        floatingDock = Color(0xEB181310),
+        accent = Color(0xFFD97706),
+        accentSecondary = Color(0xFFF59E0B),
+        accentLight = Color(0xFFFCD34D),
+        accentDark = Color(0xFF92400E),
+        accentGlow = Color(0x4DD97706),
+        glassFillSubtle = Color(0x0AD97706),
+        glassFillLight = Color(0x14D97706),
+        glassFillMedium = Color(0x1FD97706),
+        glassBorderSubtle = Color(0x26D97706),
+        glassBorderBright = Color(0x59D97706),
+        textPrimary = Color(0xFFFFFBEB),
+        textSecondary = Color(0xFFFDE68A),
+        textTertiary = Color(0xFFD97706),
+        textMuted = Color(0xFF6E5343),
+        backgroundImageRes = null
+    )
+
+    val minimalSage = AppColorScheme(
+        id = AppThemeId.MINIMAL_SAGE,
+        isDark = true,
+        background = Color(0xFF0F1412),
+        surface = Color(0xFF17201D),
+        surfaceVariant = Color(0xFF22302B),
+        card = Color(0xFF1C2723),
+        cardHigh = Color(0xFF2B3D37),
+        floatingDock = Color(0xEB141C19),
+        accent = Color(0xFF5EEAD4),
+        accentSecondary = Color(0xFF99F6E4),
+        accentLight = Color(0xFFCCFBF1),
+        accentDark = Color(0xFF0D9488),
+        accentGlow = Color(0x4D5EEAD4),
+        glassFillSubtle = Color(0x0A5EEAD4),
+        glassFillLight = Color(0x145EEAD4),
+        glassFillMedium = Color(0x1F5EEAD4),
+        glassBorderSubtle = Color(0x265EEAD4),
+        glassBorderBright = Color(0x595EEAD4),
+        textPrimary = Color(0xFFF0FDFA),
+        textSecondary = Color(0xFF99F6E4),
+        textTertiary = Color(0xFF5EEAD4),
+        textMuted = Color(0xFF40655E),
+        backgroundImageRes = null
+    )
+
+    val minimalMidnightNoir = AppColorScheme(
+        id = AppThemeId.MINIMAL_MIDNIGHT_NOIR,
+        isDark = true,
+        background = Color(0xFF050505),
+        surface = Color(0xFF0E0E0E),
+        surfaceVariant = Color(0xFF191919),
+        card = Color(0xFF131313),
+        cardHigh = Color(0xFF212121),
+        floatingDock = Color(0xEB0A0A0A),
+        accent = Color(0xFFFFFFFF),
+        accentSecondary = Color(0xFFE5E5E5),
+        accentLight = Color(0xFFF5F5F5),
+        accentDark = Color(0xFFA3A3A3),
+        accentGlow = Color(0x4DFFFFFF),
+        glassFillSubtle = Color(0x0AFFFFFF),
+        glassFillLight = Color(0x14FFFFFF),
+        glassFillMedium = Color(0x1FFFFFFF),
+        glassBorderSubtle = Color(0x26FFFFFF),
+        glassBorderBright = Color(0x59FFFFFF),
+        textPrimary = Color(0xFFFFFFFF),
+        textSecondary = Color(0xFFA3A3A3),
+        textTertiary = Color(0xFF737373),
+        textMuted = Color(0xFF525252),
+        backgroundImageRes = null
+    )
+
+    val minimalAlabaster = AppColorScheme(
+        id = AppThemeId.MINIMAL_ALABASTER,
+        isDark = false,
+        background = Color(0xFFF7F5F0),
+        surface = Color(0xFFFFFFFF),
+        surfaceVariant = Color(0xFFEDE8DE),
+        card = Color(0xFFFFFFFF),
+        cardHigh = Color(0xFFF0ECE3),
+        floatingDock = Color(0xF0FFFFFF),
+        accent = Color(0xFFC2410C),
+        accentSecondary = Color(0xFFEA580C),
+        accentLight = Color(0xFFF97316),
+        accentDark = Color(0xFF9A3412),
+        accentGlow = Color(0x33C2410C),
+        glassFillSubtle = Color(0x08C2410C),
+        glassFillLight = Color(0x0FC2410C),
+        glassFillMedium = Color(0x17C2410C),
+        glassBorderSubtle = Color(0x14C2410C),
+        glassBorderBright = Color(0x2EC2410C),
+        textPrimary = Color(0xFF1C1917),
+        textSecondary = Color(0xFF57534E),
+        textTertiary = Color(0xFF78716C),
+        textMuted = Color(0xFFA8A29E),
+        backgroundImageRes = null
+    )
+
     fun getPalette(id: AppThemeId): AppColorScheme {
         return when (id) {
             AppThemeId.DEFAULT_DARK -> defaultDark
@@ -413,6 +673,16 @@ object AppThemePalette {
             AppThemeId.MINIMAL_MOCHA -> minimalMocha
             AppThemeId.MINIMAL_ROSE -> minimalRose
             AppThemeId.MINIMAL_PAPER -> minimalPaper
+            AppThemeId.MINIMAL_TITANIUM -> minimalTitanium
+            AppThemeId.MINIMAL_MATCHA -> minimalMatcha
+            AppThemeId.MINIMAL_OBSIDIAN -> minimalObsidian
+            AppThemeId.MINIMAL_GLACIER -> minimalGlacier
+            AppThemeId.MINIMAL_LAVENDER -> minimalLavender
+            AppThemeId.MINIMAL_CARBON -> minimalCarbon
+            AppThemeId.MINIMAL_ESPRESSO -> minimalEspresso
+            AppThemeId.MINIMAL_SAGE -> minimalSage
+            AppThemeId.MINIMAL_MIDNIGHT_NOIR -> minimalMidnightNoir
+            AppThemeId.MINIMAL_ALABASTER -> minimalAlabaster
         }
     }
 }

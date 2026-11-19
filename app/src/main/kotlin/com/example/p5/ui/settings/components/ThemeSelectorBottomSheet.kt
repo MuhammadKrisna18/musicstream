@@ -72,21 +72,16 @@ fun ThemeSelectorBottomSheet(
 ) {
     val appColors = AppTheme.colors
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    var selectedCategory by remember { mutableStateOf<ThemeCategory?>(null) }
+    var selectedCategory by remember { mutableStateOf(selectedTheme.category) }
 
     val categories = listOf(
-        null to stringResource(R.string.theme_tab_all),
         ThemeCategory.DEFAULT to stringResource(R.string.theme_tab_default),
         ThemeCategory.ANIME to stringResource(R.string.theme_tab_anime),
         ThemeCategory.MINIMALIST to stringResource(R.string.theme_tab_minimalist)
     )
 
     val displayedThemes = remember(selectedCategory) {
-        if (selectedCategory == null) {
-            AppThemeId.entries
-        } else {
-            AppThemeId.entries.filter { it.category == selectedCategory }
-        }
+        AppThemeId.entries.filter { it.category == selectedCategory }
     }
 
     ModalBottomSheet(

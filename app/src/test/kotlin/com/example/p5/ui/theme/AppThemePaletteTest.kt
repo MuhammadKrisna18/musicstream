@@ -14,7 +14,7 @@ class AppThemePaletteTest {
     @Test
     fun allThemeIds_haveValidPalettes() {
         val allThemes = AppThemeId.entries
-        assertEquals(15, allThemes.size)
+        assertEquals(25, allThemes.size)
 
         for (theme in allThemes) {
             val palette = AppThemePalette.getPalette(theme)
@@ -67,7 +67,7 @@ class AppThemePaletteTest {
     @Test
     fun minimalistThemes_countAndCategoryMatch() {
         val minimalThemes = AppThemeId.entries.filter { it.category == ThemeCategory.MINIMALIST }
-        assertEquals(8, minimalThemes.size)
+        assertEquals(18, minimalThemes.size)
 
         val expectedIds = listOf(
             AppThemeId.MINIMAL_OLED,
@@ -77,7 +77,17 @@ class AppThemePaletteTest {
             AppThemeId.MINIMAL_EMERALD,
             AppThemeId.MINIMAL_MOCHA,
             AppThemeId.MINIMAL_ROSE,
-            AppThemeId.MINIMAL_PAPER
+            AppThemeId.MINIMAL_PAPER,
+            AppThemeId.MINIMAL_TITANIUM,
+            AppThemeId.MINIMAL_MATCHA,
+            AppThemeId.MINIMAL_OBSIDIAN,
+            AppThemeId.MINIMAL_GLACIER,
+            AppThemeId.MINIMAL_LAVENDER,
+            AppThemeId.MINIMAL_CARBON,
+            AppThemeId.MINIMAL_ESPRESSO,
+            AppThemeId.MINIMAL_SAGE,
+            AppThemeId.MINIMAL_MIDNIGHT_NOIR,
+            AppThemeId.MINIMAL_ALABASTER
         )
         assertEquals(expectedIds, minimalThemes)
 
