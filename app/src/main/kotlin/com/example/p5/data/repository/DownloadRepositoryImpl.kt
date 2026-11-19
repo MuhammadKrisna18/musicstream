@@ -12,8 +12,10 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.example.p5.data.download.SongDownloadWorker
 import com.example.p5.data.local.MusicDatabaseHelper
+import com.example.p5.domain.model.ActiveDownloadItem
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.DownloadRepository
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -32,6 +34,7 @@ class DownloadRepositoryImpl(
 ) : DownloadRepository {
 
     private val workManager by lazy { WorkManager.getInstance(context) }
+    private val enqueuedSongCache = ConcurrentHashMap<String, Song>()
 
     private val updatesTrigger = MutableSharedFlow<Unit>(
         replay = 1,
@@ -111,6 +114,39 @@ class DownloadRepositoryImpl(
             .distinctUntilChanged()
     }
 
+    override fun getActiveDownloads(): Flow<List<ActiveDownloadItem>> {
+        return workManager.getWorkInfosByTagFlow(SongDownloadWorker.TAG_DOWNLOAD)
+            .map { workInfos ->
+                val list = mutableListOf<ActiveDownloadItem>()
+                workInfos.forEach { workInfo ->
+                    if (workInfo.state == WorkInfo.State.RUNNING || workInfo.state == WorkInfo.State.ENQUEUED) {
+                        val songId = workInfo.tags.firstOrNull { it.startsWith("song_") }?.removePrefix("song_")
+                        if (songId != null) {
+                            val cachedSong = enqueuedSongCache[songId]
+                            val song = cachedSong ?: Song(
+                                id = songId,
+                                title = workInfo.progress.getString(SongDownloadWorker.KEY_TITLE) ?: "Lagu Offline",
+                                artist = workInfo.progress.getString(SongDownloadWorker.KEY_ARTIST) ?: "",
+                                durationSeconds = 0,
+                                durationFormatted = "",
+                                thumbnailUrl = workInfo.progress.getString(SongDownloadWorker.KEY_THUMBNAIL_URL) ?: "",
+                                webUrl = ""
+                            )
+                            val progress = workInfo.progress.getInt(SongDownloadWorker.KEY_PROGRESS, 0)
+                            list.add(ActiveDownloadItem(song = song, progress = progress))
+                        }
+                    } else if (workInfo.state == WorkInfo.State.SUCCEEDED || workInfo.state == WorkInfo.State.FAILED || workInfo.state == WorkInfo.State.CANCELLED) {
+                        val songId = workInfo.tags.firstOrNull { it.startsWith("song_") }?.removePrefix("song_")
+                        if (songId != null) {
+                            enqueuedSongCache.remove(songId)
+                        }
+                    }
+                }
+                list
+            }
+            .distinctUntilChanged()
+    }
+
     override fun getDownloadProgress(): Flow<Map<String, Int>> {
         return workManager.getWorkInfosByTagFlow(SongDownloadWorker.TAG_DOWNLOAD)
             .map { workInfos ->
@@ -130,6 +166,7 @@ class DownloadRepositoryImpl(
     }
 
     override fun enqueueDownload(song: Song) {
+        enqueuedSongCache[song.id] = song
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -160,6 +197,7 @@ class DownloadRepositoryImpl(
 
     override suspend fun deleteDownload(songId: String): Result<Unit> = withContext(ioDispatcher) {
         runCatching {
+            enqueuedSongCache.remove(songId)
             workManager.cancelUniqueWork(SongDownloadWorker.workName(songId))
 
             val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager

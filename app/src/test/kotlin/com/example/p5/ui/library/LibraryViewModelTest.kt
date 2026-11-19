@@ -1,5 +1,6 @@
 package com.example.p5.ui.library
 
+import com.example.p5.domain.model.ActiveDownloadItem
 import com.example.p5.domain.model.LibrarySortOrder
 import com.example.p5.domain.model.Song
 import com.example.p5.domain.repository.DownloadRepository
@@ -92,11 +93,14 @@ class LibraryViewModelTest {
     private class FakeDownloadRepository : DownloadRepository {
         val downloadedFlow = MutableStateFlow<List<Song>>(emptyList())
         val activeDownloadsFlow = MutableStateFlow<Set<String>>(emptySet())
+        val activeItemsFlow = MutableStateFlow<List<ActiveDownloadItem>>(emptyList())
+        val progressFlow = MutableStateFlow<Map<String, Int>>(emptyMap())
 
         override fun getAllDownloadedSongs(): Flow<List<Song>> = downloadedFlow
         override suspend fun isDownloaded(songId: String): Boolean = downloadedFlow.value.any { it.id == songId }
         override fun getActiveDownloadIds(): Flow<Set<String>> = activeDownloadsFlow
-        override fun getDownloadProgress(): Flow<Map<String, Int>> = MutableStateFlow(emptyMap())
+        override fun getActiveDownloads(): Flow<List<ActiveDownloadItem>> = activeItemsFlow
+        override fun getDownloadProgress(): Flow<Map<String, Int>> = progressFlow
         override fun enqueueDownload(song: Song) {
             val current = downloadedFlow.value.toMutableList()
             if (current.none { it.id == song.id }) {
@@ -242,6 +246,38 @@ class LibraryViewModelTest {
         viewModel.clearHistory()
         assertEquals(0, histRepo.historyFlow.value.size)
         assertEquals("Riwayat pemutaran dibersihkan", viewModel.uiState.value.message)
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun activeDownloads_updatesUiStateWithProgress() = runTest {
+        val downloadRepo = FakeDownloadRepository()
+        val viewModel = LibraryViewModel(
+            favoriteRepository = FakeFavoriteRepository(),
+            historyRepository = FakeHistoryRepository(),
+            savedSongRepository = FakeSavedSongRepository(),
+            downloadRepository = downloadRepo
+        )
+
+        val testSong = Song(
+            id = "s_dl_progress",
+            title = "Homura",
+            artist = "LiSA",
+            thumbnailUrl = "",
+            webUrl = "",
+            durationSeconds = 240,
+            durationFormatted = "4:00"
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        downloadRepo.activeItemsFlow.value = listOf(ActiveDownloadItem(testSong, 45))
+        assertEquals(1, viewModel.uiState.value.activeDownloads.size)
+        assertEquals(45, viewModel.uiState.value.downloadProgress["s_dl_progress"])
+        assertTrue(viewModel.uiState.value.activeDownloadIds.contains("s_dl_progress"))
 
         collectJob.cancel()
     }

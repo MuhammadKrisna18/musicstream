@@ -56,15 +56,19 @@ class LibraryViewModel(
             StoredLists(favorites, saved, downloaded)
         },
         historyRepository.getRecentlyPlayed(50),
-        downloadRepository.getActiveDownloadIds(),
+        downloadRepository.getActiveDownloads(),
         messageFlow
     ) { stored, history, activeDownloads, message ->
+        val activeIds = activeDownloads.map { it.song.id }.toSet()
+        val progressMap = activeDownloads.associate { it.song.id to it.progress }
         LibraryUiState(
             favoriteSongs = stored.favorites,
             savedSongs = stored.saved,
             downloadedSongs = stored.downloaded,
             historySongs = history,
-            activeDownloadIds = activeDownloads,
+            activeDownloads = activeDownloads,
+            activeDownloadIds = activeIds,
+            downloadProgress = progressMap,
             message = message
         )
     }.stateIn(

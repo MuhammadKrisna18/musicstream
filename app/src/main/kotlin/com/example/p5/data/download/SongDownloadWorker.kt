@@ -131,7 +131,14 @@ class SongDownloadWorker(
                             val progress = ((downloadedBytes * 100) / totalLength).toInt().coerceIn(0, 100)
                             if (progress != lastReportedProgress) {
                                 lastReportedProgress = progress
-                                setProgress(workDataOf(KEY_PROGRESS to progress))
+                                setProgress(
+                                    workDataOf(
+                                        KEY_PROGRESS to progress,
+                                        KEY_TITLE to title,
+                                        KEY_ARTIST to artist,
+                                        KEY_THUMBNAIL_URL to thumbnailUrl
+                                    )
+                                )
                                 showProgressNotification(title, artist, progress, notificationId)
                             }
                         }

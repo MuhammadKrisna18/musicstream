@@ -262,6 +262,7 @@ fun MainScreen(
                     isFavorite = isSongFavorite,
                     isDownloaded = isSongDownloaded,
                     isDownloading = isSongDownloading,
+                    downloadProgress = libraryUiState.downloadProgress[selectedSongForMenu?.id],
                     onDismiss = { selectedSongForMenu = null },
                     onToggleSave = { song -> libraryViewModel.toggleSaveSong(song) },
                     onToggleFavorite = { song ->

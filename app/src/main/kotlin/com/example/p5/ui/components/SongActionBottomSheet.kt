@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -69,6 +70,7 @@ fun SongActionBottomSheet(
     isFavorite: Boolean,
     isDownloaded: Boolean = false,
     isDownloading: Boolean = false,
+    downloadProgress: Int? = null,
     onDismiss: () -> Unit,
     onToggleSave: (Song) -> Unit,
     onToggleFavorite: (Song) -> Unit,
@@ -200,12 +202,12 @@ fun SongActionBottomSheet(
                     else -> Icons.Rounded.FileDownload
                 }
                 val downloadTitle = when {
-                    isDownloading -> "Sedang Mengunduh..."
+                    isDownloading -> if ((downloadProgress ?: 0) > 0) "Sedang Mengunduh ($downloadProgress%)" else "Sedang Mengunduh..."
                     isDownloaded -> "Hapus dari Unduhan"
                     else -> "Unduh Lagu Offline"
                 }
                 val downloadSubtitle = when {
-                    isDownloading -> "Proses unduhan audio sedang berjalan"
+                    isDownloading -> if ((downloadProgress ?: 0) > 0) "Mengunduh file audio • $downloadProgress%" else "Menyiapkan file audio..."
                     isDownloaded -> "Hapus file musik offline dari perangkat"
                     else -> "Simpan untuk didengarkan tanpa koneksi internet"
                 }
@@ -225,7 +227,21 @@ fun SongActionBottomSheet(
                             onToggleDownload(song)
                             onDismiss()
                         }
-                    }
+                    },
+                    extraContent = if (isDownloading) {
+                        {
+                            val progressFloat = (downloadProgress ?: 0).coerceIn(0, 100) / 100f
+                            LinearProgressIndicator(
+                                progress = { progressFloat },
+                                color = appColors.accent,
+                                trackColor = appColors.glassBorderSubtle,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(3.dp)
+                                    .clip(RoundedCornerShape(2.dp))
+                            )
+                        }
+                    } else null
                 )
             }
 
@@ -265,7 +281,8 @@ private fun ActionSheetRow(
     title: String,
     subtitle: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    extraContent: (@Composable () -> Unit)? = null
 ) {
     val appColors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
@@ -322,6 +339,11 @@ private fun ActionSheetRow(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+
+            if (extraContent != null) {
+                Spacer(modifier = Modifier.height(6.dp))
+                extraContent()
+            }
         }
     }
 }

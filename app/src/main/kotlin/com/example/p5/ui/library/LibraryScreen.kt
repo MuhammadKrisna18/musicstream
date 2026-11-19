@@ -25,6 +25,7 @@ import com.example.p5.R
 import com.example.p5.domain.model.LibrarySortOrder
 import com.example.p5.domain.model.PlayerState
 import com.example.p5.domain.model.Song
+import com.example.p5.ui.library.components.ActiveDownloadsSection
 import com.example.p5.ui.library.components.LibraryEmptyState
 import com.example.p5.ui.library.components.LibraryFilterBar
 import com.example.p5.ui.library.components.LibraryHistoryHeader
@@ -169,7 +170,8 @@ fun LibraryScreen(
             }
 
             1 -> {
-                if (downloadedSongs.isEmpty()) {
+                val activeDownloads = uiState.activeDownloads
+                if (downloadedSongs.isEmpty() && activeDownloads.isEmpty()) {
                     LibraryEmptyState(
                         icon = Icons.Rounded.FileDownload,
                         title = stringResource(R.string.library_empty_downloaded_title),
@@ -183,14 +185,24 @@ fun LibraryScreen(
                         onPlayQueue = onPlayQueue,
                         onMoreOptionsClick = onMoreOptionsClick,
                         headerContent = {
-                            LibraryFilterBar(
-                                sortOrder = sortOrder,
-                                onSortOrderSelected = libraryViewModel::setSortOrder,
-                                artists = downloadedArtists,
-                                selectedArtist = selectedArtist,
-                                onArtistSelected = libraryViewModel::selectArtist,
-                                modifier = Modifier.padding(bottom = 10.dp)
-                            )
+                            Column(modifier = Modifier.padding(bottom = 10.dp)) {
+                                if (activeDownloads.isNotEmpty()) {
+                                    ActiveDownloadsSection(
+                                        downloads = activeDownloads,
+                                        onCancelDownload = libraryViewModel::deleteDownload,
+                                        modifier = Modifier.padding(bottom = 12.dp)
+                                    )
+                                }
+                                if (downloadedSongs.isNotEmpty()) {
+                                    LibraryFilterBar(
+                                        sortOrder = sortOrder,
+                                        onSortOrderSelected = libraryViewModel::setSortOrder,
+                                        artists = downloadedArtists,
+                                        selectedArtist = selectedArtist,
+                                        onArtistSelected = libraryViewModel::selectArtist
+                                    )
+                                }
+                            }
                         }
                     )
                 }
