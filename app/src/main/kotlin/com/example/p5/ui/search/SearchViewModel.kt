@@ -111,24 +111,14 @@ class SearchViewModel(
     private val _isGenreLoading = MutableStateFlow(false)
     val isGenreLoading: StateFlow<Boolean> = _isGenreLoading.asStateFlow()
 
-    private val personalizedInputsFlow = combine(
-        historyRepository.getRecentlyPlayed(12).onStart { emit(emptyList()) },
-        historyRepository.getTopPlayedSongs(10).onStart { emit(emptyList()) },
-        _artistRecommendationSections
-    ) { recent, top, artists ->
-        PersonalizedFeedInput(recent, top, artists)
-    }
-
     val homeSections: StateFlow<List<HomeSection>> = combine(
-        personalizedInputsFlow,
+        _artistRecommendationSections,
         _rawHomeSections,
         _selectedGenre,
         _genreSections
-    ) { personalized, rawSecs, selectedGenre, genreSecs ->
+    ) { artistSecs, rawSecs, selectedGenre, genreSecs ->
         HomeFeedBuilder.combineHomeSections(
-            recentlyPlayed = personalized.recentlyPlayed,
-            topPlayed = personalized.topPlayed,
-            artistSections = personalized.artistSections,
+            artistSections = artistSecs,
             rawSections = rawSecs,
             selectedGenre = selectedGenre,
             genreSections = genreSecs
@@ -299,10 +289,10 @@ class SearchViewModel(
 
     private fun applyHomeFeed(feed: HomeFeed) {
         _rawHomeSections.value = feed.sections
-        _categories.value = feed.categories
-        _moodTags.value = feed.moodTags
+        _categories.value = feed.categories.shuffled()
+        _moodTags.value = emptyList()
         if (feed.playlists.isNotEmpty()) {
-            _curatedPlaylists.value = feed.playlists
+            _curatedPlaylists.value = feed.playlists.shuffled()
         }
     }
 
@@ -462,9 +452,3 @@ class SearchViewModel(
             }
     }
 }
-
-private data class PersonalizedFeedInput(
-    val recentlyPlayed: List<Song>,
-    val topPlayed: List<Song>,
-    val artistSections: List<HomeSection>
-)

@@ -66,10 +66,17 @@ object DynamicMusicCatalog {
             style = HomeSectionStyle.QUICK_PICKS_GRID
         ),
         SeedSection(
-            id = "quick_lofi_vibes",
-            title = "Chill & Santai",
-            subtitle = "Irama santai pengisi jeda dan relaksasi",
-            query = "lofi acoustic chill pop relax",
+            id = "quick_jazz_essentials",
+            title = "Jazz Melodious",
+            subtitle = "Koleksi instrumen dan vokal jazz pilihan",
+            query = "smooth jazz vocal essentials official",
+            style = HomeSectionStyle.QUICK_PICKS_GRID
+        ),
+        SeedSection(
+            id = "quick_dangdut_hits",
+            title = "Dangdut & Koplo Hits",
+            subtitle = "Irama kendang koplo dan tembang populer nusantara",
+            query = "dangdut koplo viral terbaru official",
             style = HomeSectionStyle.QUICK_PICKS_GRID
         )
     )
@@ -134,8 +141,8 @@ object DynamicMusicCatalog {
         SeedSection(
             id = "theme_akustik_tenang",
             title = "Akustik Petikan Gitar",
-            subtitle = "Suasana teduh berteman alunan dawai",
-            query = "lagu gitar akustik santai indonesia",
+            subtitle = "Koleksi lagu akustik dan petikan dawai pilihan",
+            query = "lagu gitar akustik indonesia terbaik official",
             style = HomeSectionStyle.STANDARD_CARDS
         )
     )

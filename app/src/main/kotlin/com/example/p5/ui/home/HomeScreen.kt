@@ -22,6 +22,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -128,6 +129,11 @@ fun HomeScreen(
 
                     Spacer(modifier = Modifier.height(14.dp))
 
+                    val hasPlaylists = selectedGenre == null && curatedPlaylists.isNotEmpty()
+                    val playlistInsertIndex = remember(curatedPlaylists, homeSections) {
+                        if (homeSections.size > 2) (1 until homeSections.size).random() else 0
+                    }
+
                     PullToRefreshBox(
                         isRefreshing = isRefreshing,
                         onRefresh = searchViewModel::refreshHomeFeed,
@@ -162,7 +168,7 @@ fun HomeScreen(
                             if ((isHomeLoading && homeSections.isEmpty()) || isGenreLoading) {
                                 searchShimmerSkeleton(shimmerBrush)
                             } else {
-                                if (selectedGenre == null && curatedPlaylists.isNotEmpty()) {
+                                if (hasPlaylists && homeSections.isEmpty()) {
                                     item(key = "home_curated_playlists") {
                                         PlaylistRowSection(
                                             title = stringResource(R.string.section_playlists_title),
@@ -173,7 +179,18 @@ fun HomeScreen(
                                     }
                                 }
 
-                                homeSections.forEach { section ->
+                                homeSections.forEachIndexed { index, section ->
+                                    if (hasPlaylists && index == playlistInsertIndex) {
+                                        item(key = "home_curated_playlists") {
+                                            PlaylistRowSection(
+                                                title = stringResource(R.string.section_playlists_title),
+                                                subtitle = stringResource(R.string.section_playlists_subtitle),
+                                                playlists = curatedPlaylists,
+                                                onPlaylistClick = searchViewModel::openPlaylistDetail
+                                            )
+                                        }
+                                    }
+
                                     if (section.tracks.isNotEmpty()) {
                                         item(key = section.id) {
                                             when (section.style) {
@@ -201,6 +218,17 @@ fun HomeScreen(
                                                 }
                                             }
                                         }
+                                    }
+                                }
+
+                                if (hasPlaylists && playlistInsertIndex >= homeSections.size) {
+                                    item(key = "home_curated_playlists_end") {
+                                        PlaylistRowSection(
+                                            title = stringResource(R.string.section_playlists_title),
+                                            subtitle = stringResource(R.string.section_playlists_subtitle),
+                                            playlists = curatedPlaylists,
+                                            onPlaylistClick = searchViewModel::openPlaylistDetail
+                                        )
                                     }
                                 }
                             }

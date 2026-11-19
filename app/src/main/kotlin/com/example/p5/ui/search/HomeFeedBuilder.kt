@@ -8,8 +8,6 @@ import com.example.p5.domain.model.Song
 object HomeFeedBuilder {
 
     fun combineHomeSections(
-        recentlyPlayed: List<Song>,
-        topPlayed: List<Song>,
         artistSections: List<HomeSection>,
         rawSections: List<HomeSection>,
         selectedGenre: Category?,
@@ -19,58 +17,9 @@ object HomeFeedBuilder {
             return genreSections
         }
 
-        val result = mutableListOf<HomeSection>()
-
-        if (recentlyPlayed.isNotEmpty()) {
-            result.add(
-                HomeSection(
-                    id = "personalized_quick_picks",
-                    title = "Pilihan Cepat Untukmu",
-                    subtitle = "Lanjutkan mendengarkan lagu yang baru kamu putar",
-                    query = "",
-                    tracks = recentlyPlayed,
-                    style = HomeSectionStyle.QUICK_PICKS_GRID
-                )
-            )
-        }
-
-        val firstChartSection = rawSections.firstOrNull { it.style == HomeSectionStyle.RANKED_CHARTS }
-        if (firstChartSection != null) {
-            result.add(firstChartSection)
-        }
-
-        if (topPlayed.isNotEmpty()) {
-            val topStyle = if (recentlyPlayed.isEmpty()) {
-                HomeSectionStyle.QUICK_PICKS_GRID
-            } else {
-                HomeSectionStyle.STANDARD_CARDS
-            }
-            result.add(
-                HomeSection(
-                    id = "personalized_on_repeat",
-                    title = "Sering Kamu Putar",
-                    subtitle = "Lagu yang paling sering kamu dengarkan belakangan ini",
-                    query = "",
-                    tracks = topPlayed,
-                    style = topStyle
-                )
-            )
-        }
-
-        val remainingRaw = rawSections.filter { it.id != firstChartSection?.id }
-        val validArtistSections = artistSections.filter { it.tracks.isNotEmpty() }
-
-        val maxLoops = maxOf(remainingRaw.size, validArtistSections.size)
-        for (i in 0 until maxLoops) {
-            if (i < validArtistSections.size) {
-                result.add(validArtistSections[i])
-            }
-            if (i < remainingRaw.size) {
-                result.add(remainingRaw[i])
-            }
-        }
-
-        return result
+        val validArtists = artistSections.filter { it.tracks.isNotEmpty() }
+        val validRaw = rawSections.filter { it.tracks.isNotEmpty() }
+        return (validRaw + validArtists).shuffled()
     }
 
     fun curateHeroSpotlightTracks(
@@ -84,9 +33,7 @@ object HomeFeedBuilder {
         val seenArtists = mutableSetOf<String>()
 
         val candidateSections = sections.filter {
-            it.id != "personalized_quick_picks" &&
-                it.id != "personalized_on_repeat" &&
-                it.tracks.isNotEmpty()
+            !it.id.startsWith("personalized_") && it.tracks.isNotEmpty()
         }.ifEmpty { sections.filter { it.tracks.isNotEmpty() } }
 
         for (section in candidateSections) {
