@@ -8,7 +8,8 @@ data class Category(
     val startColor: String = "#00E5BF",
     val endColor: String = "#1A1A1E",
     val browseId: String = "",
-    val params: String = ""
+    val params: String = "",
+    val imageUrl: String? = null
 )
 
 data class MoodTag(
@@ -20,6 +21,6 @@ data class MoodTag(
 )
 
 data class HomeCategories(
-    val moodTags: List<MoodTag>,
-    val categories: List<Category>
+    val moodTags: List<MoodTag> = emptyList(),
+    val categories: List<Category> = emptyList()
 )

@@ -238,13 +238,12 @@ class YouTubeNativeDataSource(
             filteredSections
         }
 
-        val baseMoodTags = if (dynamicMoodTags.isNotEmpty()) dynamicMoodTags else MusicConfig.staticMoodTags
         val pureCategories = dynamicCategories.filter { !InnerTubeFormatter.isExcludedMoodOrActivity(it.title) }
         val baseCategories = if (pureCategories.isNotEmpty()) pureCategories else MusicConfig.staticCategories
 
         HomeFeed(
             sections = finalSections,
-            moodTags = if (randomize) baseMoodTags.shuffled() else baseMoodTags,
+            moodTags = emptyList(),
             categories = if (randomize) baseCategories.shuffled() else baseCategories,
             playlists = dynamicPlaylists.distinctBy { it.id }.take(10)
         )
@@ -351,7 +350,7 @@ class YouTubeNativeDataSource(
 
         HomeFeed(
             sections = sections,
-            moodTags = if (randomize) MusicConfig.staticMoodTags.shuffled() else MusicConfig.staticMoodTags,
+            moodTags = emptyList(),
             categories = if (randomize) MusicConfig.staticCategories.shuffled() else MusicConfig.staticCategories
         )
     }
@@ -360,12 +359,12 @@ class YouTubeNativeDataSource(
         val feed = cachedHomeFeed
         return if (feed != null && feed.categories.isNotEmpty()) {
             HomeCategories(
-                moodTags = feed.moodTags,
+                moodTags = emptyList(),
                 categories = feed.categories
             )
         } else {
             HomeCategories(
-                moodTags = MusicConfig.staticMoodTags,
+                moodTags = emptyList(),
                 categories = MusicConfig.staticCategories
             )
         }

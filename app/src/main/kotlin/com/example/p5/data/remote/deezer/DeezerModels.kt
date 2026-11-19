@@ -21,6 +21,12 @@ data class DeezerPlaylist(
     val trackCount: Int
 )
 
+data class DeezerGenre(
+    val id: Long,
+    val name: String,
+    val pictureUrl: String
+)
+
 data class DeezerChartData(
     val tracks: List<DeezerTrack> = emptyList(),
     val artists: List<DeezerArtist> = emptyList(),

@@ -14,7 +14,59 @@ class DeezerDataSource(
 ) {
     private var cachedChart: DeezerChartData? = null
     private var lastFetchTimeMs: Long = 0L
+    private var cachedGenres: List<DeezerGenre> = emptyList()
+    private var lastGenresFetchTimeMs: Long = 0L
     private val cacheTtlMs: Long = 15 * 60 * 1000L
+
+    suspend fun getGenres(forceRefresh: Boolean = false): List<DeezerGenre> = withContext(ioDispatcher) {
+        val now = System.currentTimeMillis()
+        if (!forceRefresh && cachedGenres.isNotEmpty() && (now - lastGenresFetchTimeMs) < cacheTtlMs) {
+            return@withContext cachedGenres
+        }
+
+        val result = try {
+            fetchGenresData()
+        } catch (_: Exception) {
+            cachedGenres
+        }
+
+        cachedGenres = result
+        lastGenresFetchTimeMs = now
+        result
+    }
+
+    private fun fetchGenresData(): List<DeezerGenre> {
+        val request = Request.Builder()
+            .url(DEEZER_GENRES_URL)
+            .get()
+            .addHeader("User-Agent", "Mozilla/5.0")
+            .build()
+
+        val response = okHttpClient.newCall(request).execute()
+        if (!response.isSuccessful) {
+            throw IOException("Deezer genres request failed: ${response.code}")
+        }
+
+        val jsonString = response.body?.string() ?: throw IOException("Empty response from Deezer")
+        return parseGenresJson(jsonString)
+    }
+
+    private fun parseGenresJson(jsonString: String): List<DeezerGenre> {
+        val root = JSONObject(jsonString)
+        val data = root.optJSONArray("data") ?: return emptyList()
+        val genres = mutableListOf<DeezerGenre>()
+        for (i in 0 until data.length()) {
+            val item = data.optJSONObject(i) ?: continue
+            val id = item.optLong("id")
+            val name = item.optString("name")
+            if (id == 0L || id == 95L || name.isBlank()) continue
+            val picture = item.optString("picture_xl").takeIf { !it.isNullOrBlank() }
+                ?: item.optString("picture_big").takeIf { !it.isNullOrBlank() }
+                ?: item.optString("picture_medium").orEmpty()
+            genres.add(DeezerGenre(id, name, picture))
+        }
+        return genres
+    }
 
     suspend fun getChart(forceRefresh: Boolean = false): DeezerChartData = withContext(ioDispatcher) {
         val now = System.currentTimeMillis()
@@ -116,5 +168,6 @@ class DeezerDataSource(
 
     companion object {
         private const val DEEZER_CHART_URL = "https://api.deezer.com/chart"
+        private const val DEEZER_GENRES_URL = "https://api.deezer.com/genre"
     }
 }
