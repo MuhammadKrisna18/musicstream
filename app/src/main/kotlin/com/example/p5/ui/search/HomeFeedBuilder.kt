@@ -81,31 +81,27 @@ object HomeFeedBuilder {
 
         val spotlight = mutableListOf<Song>()
         val seenIds = mutableSetOf<String>()
+        val seenArtists = mutableSetOf<String>()
 
-        val nonHistorySections = sections.filter {
+        val candidateSections = sections.filter {
             it.id != "personalized_quick_picks" &&
                 it.id != "personalized_on_repeat" &&
                 it.tracks.isNotEmpty()
-        }
-        val sourceSections = if (nonHistorySections.isNotEmpty()) nonHistorySections else sections.filter { it.tracks.isNotEmpty() }
+        }.ifEmpty { sections.filter { it.tracks.isNotEmpty() } }
 
-        var trackDepth = 0
-        while (spotlight.size < maxCount && trackDepth < 5) {
-            var addedInPass = false
-            for (section in sourceSections) {
-                if (spotlight.size >= maxCount) break
-                val candidate = section.tracks.getOrNull(trackDepth) ?: continue
-                if (seenIds.add(candidate.id)) {
-                    spotlight.add(candidate)
-                    addedInPass = true
-                }
+        for (section in candidateSections) {
+            if (spotlight.size >= maxCount) break
+            val topSong = section.tracks.firstOrNull { song ->
+                seenIds.add(song.id) && seenArtists.add(song.artist.lowercase())
+            } ?: section.tracks.firstOrNull { seenIds.add(it.id) }
+
+            if (topSong != null) {
+                spotlight.add(topSong)
             }
-            if (!addedInPass) break
-            trackDepth++
         }
 
         if (spotlight.size < maxCount) {
-            for (section in sections) {
+            for (section in candidateSections) {
                 for (song in section.tracks) {
                     if (spotlight.size >= maxCount) break
                     if (seenIds.add(song.id)) {

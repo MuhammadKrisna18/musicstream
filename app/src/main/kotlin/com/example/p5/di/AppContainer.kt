@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.p5.data.local.MusicDatabaseHelper
 import com.example.p5.data.remote.YouTubeNativeDataSource
 import com.example.p5.data.remote.deezer.DeezerDataSource
+import com.example.p5.data.remote.feed.HomeFeedEngine
 import com.example.p5.data.remote.playlist.PlaylistCurator
 import com.example.p5.data.repository.DownloadRepositoryImpl
 import com.example.p5.data.repository.FavoriteRepositoryImpl
@@ -97,8 +98,12 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
         PlaylistCurator(youTubeDataSource)
     }
 
+    private val homeFeedEngine: HomeFeedEngine by lazy {
+        HomeFeedEngine(youTubeDataSource, deezerDataSource)
+    }
+
     override val musicRepository: MusicRepository by lazy {
-        MusicRepositoryImpl(youTubeDataSource, playlistCurator, deezerDataSource)
+        MusicRepositoryImpl(youTubeDataSource, playlistCurator, deezerDataSource, homeFeedEngine)
     }
 
     override val searchMusicUseCase: SearchMusicUseCase by lazy {
