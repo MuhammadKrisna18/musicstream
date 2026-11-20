@@ -33,12 +33,12 @@ class AppThemePaletteTest {
         val defaultDark = AppThemePalette.getPalette(AppThemeId.DEFAULT_DARK)
         assertEquals(ThemeCategory.DEFAULT, defaultDark.id.category)
         assertTrue(defaultDark.isDark)
-        assertEquals(Color(0xFF1DB954), defaultDark.accent)
+        assertEquals(Color(0xFF8B5CF6), defaultDark.accent)
 
         val defaultLight = AppThemePalette.getPalette(AppThemeId.DEFAULT_LIGHT)
         assertEquals(ThemeCategory.DEFAULT, defaultLight.id.category)
         assertFalse(defaultLight.isDark)
-        assertEquals(Color(0xFF059669), defaultLight.accent)
+        assertEquals(Color(0xFF7C3AED), defaultLight.accent)
     }
 
     @Test
