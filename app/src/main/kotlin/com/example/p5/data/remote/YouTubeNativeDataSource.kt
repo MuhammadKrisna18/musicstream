@@ -9,6 +9,7 @@ import com.example.p5.domain.model.AudioStream
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeCategories
 import com.example.p5.domain.model.HomeFeed
+import com.example.p5.domain.model.HomeGenreConfig
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.HomeSectionStyle
 import com.example.p5.domain.model.MoodTag
@@ -218,12 +219,22 @@ class YouTubeNativeDataSource(
             filteredSections
         }
 
-        val pureCategories = dynamicCategories.distinctBy { it.id }.filter { !InnerTubeFormatter.isExcludedMoodOrActivity(it.title) }
+        val curatedCategories = HomeGenreConfig.ALL.map { genre ->
+            val matched = dynamicCategories.find {
+                it.title.equals(genre.title, ignoreCase = true) ||
+                    it.id.equals(genre.id, ignoreCase = true)
+            }
+            if (matched != null && matched.browseId.isNotBlank()) {
+                genre.toCategory().copy(browseId = matched.browseId, params = matched.params)
+            } else {
+                genre.toCategory()
+            }
+        }
 
         HomeFeed(
             sections = finalSections,
             moodTags = emptyList(),
-            categories = if (randomize) pureCategories.shuffled() else pureCategories,
+            categories = curatedCategories,
             playlists = dynamicPlaylists.distinctBy { it.id }.take(10)
         )
     }
@@ -267,16 +278,19 @@ class YouTubeNativeDataSource(
             }
         }
 
-        val fallbackQuery = category.query.ifBlank { "Lagu ${category.title}" }
+        val homeGenre = HomeGenreConfig.findById(category.id) ?: HomeGenreConfig.findByTitle(category.title)
+        val fallbackQuery = homeGenre?.query ?: category.query.ifBlank { "Lagu ${category.title}" }
         val songs = search(fallbackQuery, limit = 20)
         val fallbackSections = if (songs.isNotEmpty()) {
+            val subtitle = homeGenre?.subtitle ?: "Pilihan lagu ${category.title}"
             listOf(
                 HomeSection(
                     id = "genre_section_${category.id}",
                     title = category.title,
-                    subtitle = "Pilihan lagu ${category.title}",
+                    subtitle = subtitle,
                     query = fallbackQuery,
-                    tracks = songs
+                    tracks = songs,
+                    style = HomeSectionStyle.STANDARD_CARDS
                 )
             )
         } else {
@@ -291,11 +305,11 @@ class YouTubeNativeDataSource(
 
     private suspend fun loadFallbackFeed(randomize: Boolean = false): HomeFeed = coroutineScope {
         val allQueries = listOf(
-            Triple("Trending Now", "Lagu paling populer dan viral saat ini", "top hits indonesia official video singles"),
-            Triple("Rilisan Terbaru", "Karya musik terbaru dari para musisi", "latest official music video singles"),
-            Triple("Chill & Akustik", "Teman santai dan rileks hari ini", "acoustic chill pop singles"),
-            Triple("Top Charts Populer", "Daftar tangga lagu yang sering didengarkan", "indonesia top chart music video"),
-            Triple("Indie Senja", "Alunan melodi indie lokal favorit", "indie pop indonesia music video")
+            Triple("Trending Populer", "Lagu paling populer dan viral saat ini", HomeGenreConfig.POP.query),
+            Triple("Indie Pop & Akustik", "Alunan melodi indie dan petikan akustik syahdu", HomeGenreConfig.INDIE_POP.query),
+            Triple("Dangdut & Koplo Terkini", "Irama kendang koplo dan dangdut pilihan", HomeGenreConfig.KOPLO.query),
+            Triple("R&B & Soul Lounge", "Groove berkelas dan alunan vokal memikat", HomeGenreConfig.RNB.query),
+            Triple("Jazz & Keroncong Syahdu", "Harmoni indah jazz dan langgam keroncong modern", HomeGenreConfig.JAZZ.query)
         )
 
         val selectedQueries = if (randomize) {
@@ -330,23 +344,21 @@ class YouTubeNativeDataSource(
         HomeFeed(
             sections = sections,
             moodTags = emptyList(),
-            categories = emptyList()
+            categories = HomeGenreConfig.CATEGORIES
         )
     }
 
     fun getCategories(): HomeCategories {
         val feed = cachedHomeFeed
-        return if (feed != null && feed.categories.isNotEmpty()) {
-            HomeCategories(
-                moodTags = emptyList(),
-                categories = feed.categories
-            )
+        val categories = if (feed != null && feed.categories.isNotEmpty()) {
+            feed.categories
         } else {
-            HomeCategories(
-                moodTags = emptyList(),
-                categories = emptyList()
-            )
+            HomeGenreConfig.CATEGORIES
         }
+        return HomeCategories(
+            moodTags = emptyList(),
+            categories = categories
+        )
     }
 
     suspend fun getTrending(limit: Int = 15): List<Song> {
