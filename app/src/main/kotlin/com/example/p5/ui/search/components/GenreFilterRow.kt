@@ -52,17 +52,11 @@ fun GenreFilterRow(
                     )
                     .clip(chipShape)
                     .background(if (isAllSelected) appColors.accent else appColors.glassFillLight)
-                    .then(
-                        if (!isAllSelected) {
-                            Modifier.glassBorder(
-                                shape = chipShape,
-                                strokeWidth = 1.dp,
-                                startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
-                                endColor = appColors.glassBorderSubtle
-                            )
-                        } else {
-                            Modifier
-                        }
+                    .glassBorder(
+                        shape = chipShape,
+                        strokeWidth = 1.dp,
+                        startColor = if (isAllSelected) appColors.accentLight.copy(alpha = 0.45f) else appColors.glassBorderBright.copy(alpha = 0.35f),
+                        endColor = if (isAllSelected) appColors.accentDark.copy(alpha = 0.2f) else appColors.glassBorderSubtle
                     )
                     .clickable(
                         interactionSource = interactionSource,
@@ -94,17 +88,11 @@ fun GenreFilterRow(
                     )
                     .clip(chipShape)
                     .background(if (isSelected) appColors.accent else appColors.glassFillLight)
-                    .then(
-                        if (!isSelected) {
-                            Modifier.glassBorder(
-                                shape = chipShape,
-                                strokeWidth = 1.dp,
-                                startColor = appColors.glassBorderBright.copy(alpha = 0.35f),
-                                endColor = appColors.glassBorderSubtle
-                            )
-                        } else {
-                            Modifier
-                        }
+                    .glassBorder(
+                        shape = chipShape,
+                        strokeWidth = 1.dp,
+                        startColor = if (isSelected) appColors.accentLight.copy(alpha = 0.45f) else appColors.glassBorderBright.copy(alpha = 0.35f),
+                        endColor = if (isSelected) appColors.accentDark.copy(alpha = 0.2f) else appColors.glassBorderSubtle
                     )
                     .clickable(
                         interactionSource = interactionSource,

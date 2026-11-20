@@ -130,8 +130,8 @@ fun HomeScreen(
                     Spacer(modifier = Modifier.height(14.dp))
 
                     val hasPlaylists = selectedGenre == null && curatedPlaylists.isNotEmpty()
-                    val playlistInsertIndex = remember(curatedPlaylists, homeSections) {
-                        if (homeSections.size > 2) (1 until homeSections.size).random() else 0
+                    val playlistInsertIndex = remember(curatedPlaylists.size, homeSections.size) {
+                        if (homeSections.size > 2) 2 else 0
                     }
 
                     PullToRefreshBox(
