@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.p5.domain.model.Category
 import com.example.p5.domain.model.HomeFeed
+import com.example.p5.domain.model.HomeGenreConfig
 import com.example.p5.domain.model.HomeSection
 import com.example.p5.domain.model.MoodTag
 import com.example.p5.domain.model.Playlist
@@ -137,7 +138,7 @@ class SearchViewModel(
             initialValue = emptyList()
         )
 
-    private val _categories = MutableStateFlow<List<Category>>(emptyList())
+    private val _categories = MutableStateFlow<List<Category>>(HomeGenreConfig.CATEGORIES)
     val categories: StateFlow<List<Category>> = _categories.asStateFlow()
 
     private val _curatedPlaylists = MutableStateFlow<List<Playlist>>(emptyList())
@@ -253,14 +254,43 @@ class SearchViewModel(
             _isGenreLoading.value = true
             getGenreFeedUseCase(category)
                 .onSuccess { sections ->
-                    _genreSections.value = sections
-                    _isGenreLoading.value = false
+                    if (sections.isNotEmpty()) {
+                        _genreSections.value = sections
+                        _isGenreLoading.value = false
+                    } else {
+                        loadFallbackGenreFeed(category)
+                    }
                 }
                 .onFailure {
-                    _genreSections.value = emptyList()
-                    _isGenreLoading.value = false
+                    loadFallbackGenreFeed(category)
                 }
         }
+    }
+
+    private suspend fun loadFallbackGenreFeed(category: Category) {
+        val homeGenre = HomeGenreConfig.findById(category.id) ?: HomeGenreConfig.findByTitle(category.title)
+        val query = homeGenre?.query ?: category.query.ifBlank { "Lagu ${category.title}" }
+        searchMusicUseCase(query)
+            .onSuccess { songs ->
+                val cleanSongs = songs.filter { MusicFilterHelper.isValidMusicTrack(it) }
+                if (cleanSongs.isNotEmpty()) {
+                    val section = HomeSection(
+                        id = "genre_section_${category.id}",
+                        title = category.title,
+                        subtitle = homeGenre?.subtitle ?: "Pilihan lagu ${category.title}",
+                        query = query,
+                        tracks = cleanSongs
+                    )
+                    _genreSections.value = listOf(section)
+                } else {
+                    _genreSections.value = emptyList()
+                }
+                _isGenreLoading.value = false
+            }
+            .onFailure {
+                _genreSections.value = emptyList()
+                _isGenreLoading.value = false
+            }
     }
 
     fun refreshHomeFeed() {
@@ -289,17 +319,17 @@ class SearchViewModel(
 
     private fun applyHomeFeed(feed: HomeFeed) {
         _rawHomeSections.value = feed.sections
-        _categories.value = feed.categories.shuffled()
+        _categories.value = if (feed.categories.isNotEmpty()) feed.categories else HomeGenreConfig.CATEGORIES
         _moodTags.value = emptyList()
         if (feed.playlists.isNotEmpty()) {
-            _curatedPlaylists.value = feed.playlists.shuffled()
+            _curatedPlaylists.value = feed.playlists
         }
     }
 
     private suspend fun loadFallback() {
         getHomeCategoriesUseCase()
             .onSuccess { data ->
-                _categories.value = data.categories
+                _categories.value = if (data.categories.isNotEmpty()) data.categories else HomeGenreConfig.CATEGORIES
                 _moodTags.value = emptyList()
             }
         getTrendingMusicUseCase(15)

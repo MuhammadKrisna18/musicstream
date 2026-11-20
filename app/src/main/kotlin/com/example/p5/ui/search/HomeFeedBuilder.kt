@@ -19,7 +19,7 @@ object HomeFeedBuilder {
 
         val validArtists = artistSections.filter { it.tracks.isNotEmpty() }
         val validRaw = rawSections.filter { it.tracks.isNotEmpty() }
-        return (validRaw + validArtists).shuffled()
+        return validRaw + validArtists
     }
 
     fun curateHeroSpotlightTracks(

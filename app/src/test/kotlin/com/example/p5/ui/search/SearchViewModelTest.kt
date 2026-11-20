@@ -156,4 +156,31 @@ class SearchViewModelTest {
         assertEquals("c1", spotlight[0].id)
         assertEquals("m1", spotlight[1].id)
     }
+
+    @Test
+    fun categories_initiallyPopulatedWithEightCuratedGenres() {
+        val categories = viewModel.categories.value
+        assertEquals(8, categories.size)
+        val expected = listOf(
+            "Pop",
+            "Indie Pop",
+            "Koplo",
+            "Dangdut",
+            "R&B",
+            "Jazz",
+            "Acoustic",
+            "Keroncong"
+        )
+        assertEquals(expected, categories.map { it.title })
+    }
+
+    @Test
+    fun selectGenre_togglingSameGenre_resetsToNull() {
+        val koplo = Category(id = "koplo", title = "Koplo", query = "koplo")
+        viewModel.selectGenre(koplo)
+        assertEquals("koplo", viewModel.selectedGenre.value?.id)
+
+        viewModel.selectGenre(koplo)
+        org.junit.Assert.assertNull(viewModel.selectedGenre.value)
+    }
 }
